@@ -755,8 +755,8 @@ a little psychology thrown in as well.}
 @node Example C Program
 @chapter An Example C Progrm
 
-To demonstrate the use of @value{TWJR}, here is a my very first
-literate program (from 1998!), reworked to use TWJR.  I am going
+To demonstrate the use of @value{TWJR}, here is my very first
+literate program (from 1998!), reworked to use @value{TWJR}  I am going
 to present the commentary (updated some) and the code, and then
 follow it with the marked-up input.
 
