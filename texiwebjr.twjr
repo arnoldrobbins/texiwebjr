@@ -1,0 +1,1449 @@
+\input mftmac % for Metafont logo
+\input texinfo   @c -*-texinfo-*-
+@c vim: filetype=texinfo tabstop=4
+@c %**start of header (This is for running Texinfo on a region.)
+@setfilename texiwebjr.info
+@settitle TexiWeb Jr.---A Super Simple Literate Programming System
+@c %**end of header (This is for running Texinfo on a region.)
+
+@set xref-automatic-section-title
+
+@c The following information should be updated here only!
+@c This sets the edition of the document.
+
+@c These apply across the board.
+@set UPDATE-MONTH October, 2013
+@set EDITION 0.1
+
+@set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
+
+@iftex
+@set DOCUMENT book
+@set CHAPTER chapter
+@set APPENDIX appendix
+@set SECTION section
+@set SUBSECTION subsection
+@end iftex
+@ifhtml
+@set DOCUMENT Web page
+@set CHAPTER chapter
+@set APPENDIX appendix
+@set SECTION section
+@set SUBSECTION subsection
+@end ifhtml
+@ifinfo
+@set DOCUMENT Info file
+@set CHAPTER major node
+@set APPENDIX major node
+@set SECTION minor node
+@set SUBSECTION node
+@end ifinfo
+@ifdocbook
+@set DOCUMENT book
+@set CHAPTER chapter
+@set APPENDIX appendix
+@set SECTION section
+@set SUBSECTION subsection
+@end ifdocbook
+
+@c some special symbols
+@iftex
+@set PI @math{@pi}
+@end iftex
+@ifnottex
+@set PI @i{pi}
+@end ifnottex
+
+@ifnottex
+@macro ii{text}
+@i{\text\}
+@end macro
+@end ifnottex
+
+@c For HTML, spell out email addresses, to avoid problems with
+@c address harvesters for spammers.
+@ifhtml
+@macro EMAIL{real,spelled}
+``\spelled\''
+@end macro
+@end ifhtml
+@ifnothtml
+@macro EMAIL{real,spelled}
+@email{\real\}
+@end macro
+@end ifnothtml
+
+@ifnottex
+@macro MF{}
+@sc{METAFONT}
+@end macro
+@end ifnottex
+
+@c For printed output put the URLs into footnotes.
+@c Docbook is treated as printed output.
+@ifdocbook
+@set PRINTEDOUTPUT
+@end ifdocbook
+@iftex
+@set PRINTEDOUTPUT
+@end iftex
+
+@c These could become part of the jrweave-generated prologue
+@ifset PRINTEDOUTPUT
+@macro UREF{link, text}
+\text\@footnote{@code{\link\}}
+@end macro
+@end ifset
+
+@ifclear PRINTEDOUTPUT
+@macro UREF{link, text}
+@uref{\link\, \text\}
+@end macro
+@end ifclear
+
+@macro FIXME{text}
+@strong{FIXME}: \text\
+@end macro
+
+@c Letting this into the text makes it come out on the short title page.
+@c @FIXME{This may need more work.}
+
+@c merge the function and variable indexes into the concept index
+@ifnothtml
+@synindex fn cp
+@synindex vr cp
+@end ifnothtml
+
+@c If "finalout" is commented out, the printed output will show
+@c black boxes that mark lines that are too long.  Thus, it is
+@c unwise to comment it out when running a master in case there are
+@c overfulls which are deemed okay.
+
+@iftex
+@c @finalout
+@end iftex
+
+@copying
+Copyright @copyright{} 2013 @*
+Arnold David Robbins @*
+All Rights Reserved.
+@sp
+The @command{jrtangle} and @command{jrweave} programs are copyright
+@copyright{} 2013 by Arnold David Robbins. They are published under
+the conditions of the GNU General Public License, version 3.
+@sp
+The explanatory text provided in this document may be reproduced verbatim
+but may not be otherwise copied or modified.
+@sp 2
+
+This is Edition @value{EDITION} of @cite{@value{TITLE}}.
+@end copying
+
+@c The name of our program. Setting it as a macro makes it
+@c easier to change later.
+@set TWJR @sc{TexiWeb Jr.@:}
+
+@c Uncomment this for the release.  Leaving it off saves paper
+@c during editing and review.
+@c @setchapternewpage odd
+
+@shorttitlepage TexiWeb Jr.
+@titlepage
+@title @value{TITLE}
+@subtitle @value{UPDATE-MONTH}
+@author Arnold D. Robbins
+
+@c Include the Distribution inside the titlepage environment so
+@c that headings are turned off.  Headings on and off do not work.
+
+@page
+@vskip 0pt plus 1filll
+Published by:
+@sp 1
+
+Arnold David Robbins @*
+P.O. Box 354 @*
+Nof Ayalon @*
+D.N. Shimshon 9978500 @*
+ISRAEL @*
+Email: @EMAIL{arnold@@skeeve.com,arnold AT skeeve.com} @*
+URL: @url{http://www.skeeve.com/} @*
+
+@sp 2
+@insertcopying
+@end titlepage
+
+@iftex
+@headings off
+@evenheading @thispage@ @ @ @strong{@value{TITLE}} @| @|
+@oddheading  @| @| @strong{@thischapter}@ @ @ @thispage
+@end iftex
+
+@ifnottex
+@ifnotxml
+@node Top
+@top General Introduction
+@c Preface node should come right after the Top
+@c node, in `unnumbered' sections, then the introductory chapter.
+@c Licensing nodes are appendices, they're not central to TexiWebJr.
+
+This file documents @value{TWJR}, a program suite for Literate Programming
+on top of the Texinfo document formatting markup language.
+
+@insertcopying
+
+@end ifnotxml
+@end ifnottex
+
+@menu
+* Preface::             Preface.
+* Introduction::        Introduction.
+* jrtangle code::       The code for @command{jrtangle}.
+* jrwreave code::       The code for @command{jrwreave}.
+* Code Segment Summaries:: Alpabetic lists of code segments
+                        by defintion and by reference.
+* Use of @command{gawk} features:: Features Specific to @command{gawk}.
+* Bibliography::        Reference material.
+* Concept Index::       The concept index.
+@detailmenu
+@end detailmenu
+@end menu
+
+@summarycontents
+@contents
+
+@c Add these to the menu if they ever get included.
+@c @node Foreword
+@c @unnumbered Foreword
+
+@node Preface
+@unnumbered Preface
+
+Literate programming is a programming style created originally by
+Professor Donald E.@: Knuth, of Stanford University.
+Programming well this way requires the author of a program to
+present not clear explanations of both how his program functions
+and why it is written in the way it is. The discipline involved
+thus leads to better programs.
+
+The Texinfo markup language is the official documentation markup
+language of the GNU Project. It makes writing program documentation
+pleasant. In addition, these documents can be converted to multiple
+formats for end use. The two most important formats (in the author's
+opinion) are HTML for viewing with a Web browser, and @TeX{} for printing.
+
+This @value{DOCUMENT} describes @value{TWJR}, a system that provides
+literate programming on top of the Texinfo markup language.
+
+@menu
+* Audience::            Who should read this @value{DOCUMENT}.
+* Overview::            An overview of the @value{DOCUMENT}.
+* Conventions::         Typographical conventions.
+* Acknowledgements::    Acknowledgements.
+@end menu
+
+@node Audience
+@unnumberedsec Intended Audience
+
+@quotation
+When all you have is a hammer, everything looks like a nail.
+@author{Anonymous}
+@end quotation
+
+You should read this @value{DOCUMENT} if you are interested in
+literate programming, and in seeing how one programmer decided to
+create his own literate programming system for use in writing
+large programs.
+
+You may also find this @value{DOCUMENT} interesting if you
+like programming using scripting languages, as most of the
+code is written in @command{awk}, the author's favorite hammer.
+
+You should be familiar with the Texinfo markup language,
+and also be familiar with the @command{awk} programming language.
+In particular, @value{TWJR} makes use of additional features in
+@command{gawk} (the GNU implementation of Awk).@footnote{This
+in hardly surprising, since I maintain @command{gawk}.}
+
+@node Overview
+@unnumberedsec What Is Covered
+
+@FIXME{Write me.}
+
+This is the list of chapter by chapter summaries, using @samp{@@table @dots @@end table}.
+
+@node Conventions
+@unnumberedsec Typographical Conventions
+
+@c Copied mostly verbatim from the gawk manual.
+
+@cindex Texinfo
+This @value{DOCUMENT} is written in an enhanced version of
+@UREF{http://www.gnu.org/software/texinfo/, Texinfo},
+the GNU documentation formatting language.
+A single Texinfo source file is used to produce both the printed and online
+versions of the documentation.
+@ifnotinfo
+Because of this, the typographical conventions
+are slightly different than in other books you may have read.
+@end ifnotinfo
+
+Examples you would type at the command-line are preceded by the common
+shell primary and secondary prompts, @samp{$} and @samp{>}.  Input that
+you type is shown @kbd{like this}.  Output from the command is preceded
+by the glyph ``@print{}''.  This typically represents the command's
+standard output.  Error messages, and other output on the command's
+standard error, are preceded by the glyph ``@error{}''.  For example:
+
+@example
+$ @kbd{echo hi on stdout}
+@print{} hi on stdout
+$ @kbd{echo hello on stderr 1>&2}
+@error{} hello on stderr
+@end example
+
+@ifnotinfo
+In the text, command names appear in @code{this font}, while code segments
+appear in the same font and quoted, @samp{like this}.
+Options look like this: @option{-f}.
+Some things are
+emphasized @emph{like this}, and if a point needs to be made
+strongly, it is done @strong{like this}.  The first occurrence of
+a new term is usually its @dfn{definition} and appears in the same
+font as the previous occurrence of ``definition'' in this sentence.
+Finally, file names are indicated like this: @file{/path/to/ourfile}.
+@end ifnotinfo
+
+@FIXME{Do we need control characters in this document?}
+
+Characters that you type at the keyboard look @kbd{like this}.  In particular,
+there are special characters called ``control characters.''  These are
+characters that you type by holding down both the @kbd{CONTROL} key and
+another key, at the same time.  For example, a @kbd{Ctrl-d} is typed
+by first pressing and holding the @kbd{CONTROL} key, next
+pressing the @kbd{d} key and finally releasing both keys.
+
+Finally, I will sometimes break with tradition, and write in the first
+person, instead of using ``the royal we.''  However, use of ``we''
+is appropriate during discussional prose; I would like you, the reader,
+to feel as if you're engaging in a conversation with me, the author.
+To that end, ``we'' is entirely correct.
+
+@node Acknowledgements
+@unnumberedsec Acknowledgements
+
+@FIXME{Write me.}
+
+@node Introduction
+@chapter Introduction
+
+This @value{DOCUMENT} documents @value{TWJR}, an intentionally
+simple literate programming system.
+
+This @value{CHAPTER} introduces the basic concepts behind literate
+programming, and describes how to use these tools to create literate
+programs.  It also discusses why @value{TWJR} is built on top Texinfo
+and implemented in @command{awk}.
+
+@menu
+* Litprog intro::               Quick intro to Literate Programming.
+* Processing a document::       Creating code and documentation.
+* Why texinfo::                 Why build on top of Texinfo.
+* Why awk::                     Why implement in @command{awk}.
+@end menu
+
+@node Litprog intro
+@section What Is Literate Programming?
+
+@quotation
+Without wanting to be elitist, the thing that will prevent literate
+programming from becoming a mainstream method is that it requires thought
+and discipline. The mainstream is established by people who want fast
+results while using roughly the same methods that everyone else seems
+to be using, and literate programming is never going to have that kind
+of appeal. This doesn't take away from its usefulness as an approach.
+@author{Patrick TJ McPhee}
+@end quotation
+
+@dfn{Literate programming} is a programming style invented by
+Professor Donald E.@: Knuth of Stanford University for implementing
+the @TeX{} document formatter and @MF{} font-creation programs.
+(@FIXME{Web links for Knuth and for the @TeX{} and @MF{} books}.)
+
+A literate program is a mixture of program fragments that do some
+particular task, and explanatory prose describing what the code is
+doing. Preferably, the prose also describes @emph{why} the code is
+implemented in a particular fashion. More information and pedagogy
+may be found on @UREF{http://www.literateprogramming.com, the literate
+programming website}.
+
+Knuth's original @command{WEB} system was built on top of and for use
+with Pascal.  When this was done in the early 1980s, Pascal was just about
+the only language that was popular, generally portable, and basically
+usable for large programs (despite a number of constraints). @command{WEB}
+provided a number of facilities to make Pascal programming easier, and
+also ``pretty printed'' the code in the finished document.  (Today Knuth
+uses @command{CWEB}, which is similar to the original @command{WEB}
+but is intended for use with C.)
+
+Many literate programming tools have been developed since then.
+@value{TWJR} is inspired by two in particular: Norman Ramsey's
+@command{noweb}, and Ben Pfaff's TexiWeb.
+(@FIXME{web links needed})
+
+@command{noweb} makes a conscious attempt to provide a minimal additional
+markup over and above the documment formatting language. It also attempts
+to be portable to any markup language, not just @TeX{} or @LaTeX{},
+and to any programming language.
+Finally, it is programmable, with several stages in a pipeline and
+a documented intermediate format, making it easily extensible.
+It is the ``minimal additional markup'' aspect of @command{noweb}
+that I find particular appealing.
+
+TexiWeb was created by Ben Pfaff for writing his AVL library.
+(@FIXME{Link for the AVL library.})
+It builds on the Texinfo markup language, which at first glance is
+exactly what I was looking for: Texinfo + Literate Programming.
+However, TexiWeb has two drawbacks: it is poorly documented,
+and it assumes that the code is written in C, and thus does
+pretty-printing.
+
+I wanted to be able to use Texinfo, and to write code in any language.
+Thus, @value{TWJR}, which acknowledges TexiWeb as its inspiration,
+and the Texinfo bias, but which is built from scratch.
+
+@node Processing a document
+@section Processing A Document
+
+Traditionally, a web document is processed in two different ways,
+towards two different ends.
+
+@table @dfn
+@item Weaving
+This process turns a literate program into a
+form that can be processed for printing.  Knuth's @command{WEB}
+provided @command{WEAVE}, which created a straight @TeX{} document.
+The @command{noweb} suite has @command{noweave}.
+
+In @value{TWJR}, the weaving program is called @command{jrweave}.
+It reads a @value{TWJR} document and produces a Texinfo document
+which can then be processed by @command{texi2dvi} or @command{texi2pdf}
+to produce a printable file. (It can also be processed with @command{makeinfo}
+to produce Info, HTML, DocBook, or Texinfo XML.)
+
+@item Tangling
+This process turns a literate program into straight code
+that can be either run directly (scripting languages), or compiled
+(C, C++, etc.).  Knuth's @command{WEB}
+provided @command{TANGLE}, which created a straight Pascal program.
+The @command{noweb} suite has @command{notangle}.
+
+In @value{TWJR}, the tangling program is called @command{jrtangle}.
+It reads a @value{TWJR} document and produces the source files
+for running or compiling.
+@end table
+
+By convention, @value{TWJR} files have a @samp{.twjr} extension.
+This is valuable, since the @TeX{} by-product files generally have
+two- or three-character extensions. Thus, for a document @file{foo.twjr},
+you can safely say @samp{rm foo.?? foo.???} (in a Bourne-compatible
+shell) to remove the by-product files without accidentally nuking
+your primary document.
+
+As part of writing a @value{TWJR} program, you should also include
+a @file{Makefile} in your document.  If you're wondering about
+bootstrapping, then you're thinking ahead. We will get to that.
+
+@node Why texinfo
+@section Why Build On Top of Texinfo
+
+Why Texinfo?  Good question, I'm glad you asked.
+
+I have written books in @command{troff}, Texinfo, and DocBook (both SGML
+and XML).  I have also written a little bit in straight HTML. Of all
+of these, I find that Texinfo is the easiest to use.  It is expressive
+enough for designating the different kinds of things that need special
+designation in a printed document, and for structuring a document in
+the traditional way, without being so verbose that my fingers end up
+hurting when I'm done working on a document after a few hours.
+
+While my first preference might have been to use @command{noweb}, since I
+familiar with it, it does not support Texinfo. Even though @LaTeX{} is
+a more powerful markup language, I didn't want to climb that learning curve
+just to use @command{noweb}.  Also, I felt that it might be
+easier---and certainly more @emph{fun}---to write my own small literate
+programming system than to add a Texinfo backend to @command{noweb}.
+
+Similarly, TexiWeb already does what I would seem to need, but its lack of
+documentation makes it harder to use, and its enforced pretty-printing is
+definitely undesirable for code not written in C. I prefer
+code to look like code (constant-width font, no pretty-printing) and I
+want to be able to use any kind of code in my code chunks, including @command{awk},
+Makefiles, shell scripts, whatever.
+
+Additionally, TexiWeb seems focused primarily on @TeX{}.  The advantage
+of Texinfo is that it can be translated into HTML and also DocBook XML,
+and I would like to preserve those advantages.
+
+Finally, I think it's better for the author to do the indexing manually
+than to rely on the literate programming tool, although that opinion may
+change as this evolves.
+
+@node Why awk
+@section Why Implement In @command{awk}
+
+Why write in @command{awk}? Good question. I glad you asked this one too.
+
+I got involved with the GNU Awk project (@FIXME{link here}) late in
+1987.  I have been the sole maintainer and the primary author of its
+documentation since 1994.  The language is small, elegant, and generally
+quite powerful.  @command{gawk}, in particular, adds many useful features
+over the original Unix (and POSIX standard) @command{awk}.
+
+Part of what makes maintaining @command{gawk} enjoyable is that I like
+using the language itself, on a daily basis.
+
+Weaving and tangling primarily involve a lot of text manipulation, and
+this is an area where @command{awk} shines. In particular, there's no
+need to worry about low-level details like I/O and memory management;
+the expression of what needs to be done has an almost one-to-one
+correspondence to the code that does it!
+
+@value{TWJR} gives me the opportunity to enjoy three of my favorite
+activities all at the same time: writing with Texinfo, programming
+in @command{gawk}, and doing that programming in the literate
+style.@footnote{This may explain why so many literate programmers have
+chosen to create their own literate programming systems.  So we now get
+a little psychology thrown in as well.}
+
+@node jrtangle code
+@chapter Tangling: The @command{jrtangle} Program
+
+Let's get started.  Here is the code for @command{jrtangle}.
+
+The file starts with the obligatory @samp{#!} header and copyright
+statements, followed by functions common to both @command{jrtangle}
+and @command{jrweave}.
+
+@(jrtangle@) =
+@<Shebang header@>
+@<GPL 3 Copyright statement@>
+
+@<Common Functions@>
+@
+
+On my system, the latest version of @command{gawk} lives
+in @file{/usr/local/bin2}. This should be changed on
+some other system.
+
+@<Shebang header@>=
+#! /usr/local/bin2/gawk -f
+@
+
+The common functions are described later in this @value{CHAPTER}.
+
+@ignore
+
+# FIXME:
+#	3. Set up a command to do noweb cpif functionality.
+#	4. Move different flags into an array, a la line numbers.
+@end ignore
+
+@menu
+* jrtangle ifweave iftangle::      Text inclusion/exclusion for @command{jrtangle}.
+* jrtangle file chunks::           Processing file chunks for @command{jrtangle}.
+* jrtangle code chunks::           Processing code chunks for @command{jrtangle}.
+* jrtangle error checking::        Checking for errors in @command{jrtangle}.
+* Expanding code chunks::          Expanding code chunks into straight code.
+* jrtangle after creation::        Doing something after creating a file.
+* Common Chunks::                  Common code chunks and functions.
+@end menu
+
+@node jrtangle ifweave iftangle
+@section Document Sections Exclusive to Tangling and Weaving
+
+One nice thing in TexiWeb are @samp{@@iftangle @dots{} @@end iftangle} and
+@samp{@@ifweave @dots{} @@end ifweave} bracketing commands.  Those should
+be dealt with early on.  They do the obvious thing: include lines that
+should be used only for one operation or the other.  Note that these
+have to be done differently for @command{jrtangle} and @command{jrweave};
+each one ignores what the other one passes through.
+
+@(jrtangle@) =
+@<Handle @code{ifweave} and @code{iftangle} for @code{jrtangle}@>
+@
+
+The following code is straightforward. We see here the first instance
+of any global variables: @code{Line_numbers}. Instead of having lots
+of different global variables, they are grouped by function into
+associative arrays.  Here we see @code{Line_numbers["@@ifweave"]}
+and @code{Line_numbers["@@iftangle"]} to help in error checking. If an
+@code{@@ifweave} block is encountered while @command{jrtangle} thinks
+it's processing an @code{@@iftangle} block, then something got messed
+up somewhere.  Note also the convention that global variables start with
+a capital letter.
+
+@vindex Line_numbers
+@cindex @code{@@ifweave} command, @command{jrtangle}
+@cindex @code{@@iftangle} command, @command{jrtangle}
+
+@<Handle @code{ifweave} and @code{iftangle} for @code{jrtangle}@>=
+# ifweave lines should be removed
+
+/^@ifweave[[:space:]]*$/, /^@end ifweave[[:space:]]*$/ {
+	if ("iftangle" in Line_numbers)
+		fatal(_"cannot nest @iftangle inside @ifweave\n");
+
+	# start of ifweave, save line number
+	if (/^@ifweave[[:space:]]*$/)
+		Line_numbers["ifweave"] = (FILENAME ":" FNR)
+
+	# end of ifweave, delete line number
+	if (/^@end ifweave[[:space:]]*$/)
+		delete Line_numbers["ifweave"]
+	
+	# simply skip these lines, this is tangling
+	next
+}
+
+# For tangling we remove the bracketing control lines and let anything
+# in between fall through.
+
+/^@iftangle[[:space:]]*$/, /^@end iftangle[[:space:]]*$/ {
+	if ("ifweave" in Line_numbers)
+		fatal(_"cannot nest @ifweave inside @iftangle\n");
+
+	# start of iftangle, save line number, skip this line
+	if (/^@iftangle[[:space:]]*$/) {
+		Line_numbers["iftangle"] = (FILENAME ":" FNR)
+		next
+	}
+
+	# end of iftangle, delete line number, skip this line
+	if (/^@end iftangle[[:space:]]*$/) {
+		delete Line_numbers["iftangle"]
+		next
+	}
+
+	# otherwise fall through into the rest of the code
+}
+@
+
+@node jrtangle file chunks
+@section Processing File Chunks for @command{jrtangle}
+
+The next part of interest is to handle file chunks. File chunks
+specify the name of a file and include straight code intermixed with
+references to code chunks.
+
+@(jrtangle@) =
+@<Process file chunks for @code{jrtangle}@>
+@
+
+File chunks start with @samp{@@(filename.c) =} in column 1. Unlike TexiWeb
+and like @command{noweb}, we don't require @samp{+=} to add more stuff to
+a definition. We just use @samp{=} and figure it out. File chunks end with
+a single @samp{@@} on a line by itself, with the @samp{@@} in column 1.
+
+Instead of using a range pattern, we use a boolean flag; this lets us
+avoid special-casing the first and last lines.  The code checks that
+we're not already gathering a file; if we are someone left off a trailing
+@samp{@@} somewhere. The @code{check_unfinished()} function checks other
+possible things that may have gone wrong.
+
+The check against @code{Debug} uses a nice trick. By using
+@command{gawk}'s @option{-v} option, we can set @code{Debug} to any
+value, such as @samp{filename code} and debug as many different aspects
+of the program simultaneously as we might want.  Use of the @command{gawk}
+built-in debugger can also help.
+
+@<Process file chunks for @code{jrtangle}@>=
+$0 ~ File_chunk_pattern {
+	new_file = gensub(File_chunk_pattern, "\\1", 1)
+	if (Gathering_file) {
+		fatal(_"file start of %s found while still collecting %s\n",
+			Source_file, new_file)
+	}
+	check_unfinished()
+
+	Gathering_file = TRUE
+	Line_numbers["File_chunk"] = (FILENAME ":" FNR)
+	Source_file = new_file
+
+	if (Debug ~ /filename/)
+		printf("saw new filename %s\n", Source_file) > "/dev/stderr"
+
+	next
+}
+@
+
+The @code{BEGIN} rule sets up some constants. @code{File_chunk_pattern}
+is a variable since it needs to be used for matching and with
+@code{gensub()}. This is better than repeating the regexp in the code.
+
+@FIXME{Move this chunk into the common code.}
+
+@<Process file chunks for @code{jrtangle}@>=
+BEGIN {
+	TRUE = 1
+	FALSE = 0
+	File_chunk_pattern = "^@\\(([^)]+)@\\)[[:space:]]*=[[:space:]]*$"
+}
+@
+
+Here is the @samp{@@} sign that ends the input file.
+It also ends code segments.
+
+@<Process file chunks for @code{jrtangle}@>=
+/^@[[:space:]]*$/ {
+	if (Gathering_file)
+		end_file_gathering()
+	else if (Gathering_code)
+		end_code_gathering()
+	else
+		warning(_"unmatched terminating @-sign: ignored\n")
+	
+	next
+}
+@
+
+After some experimentation, things are simplest if file contents and
+code chunks do @emph{not} have the final terminating newline. Code that outputs
+file contents must remember to add the final newline.
+
+@<Process file chunks for @code{jrtangle}@>=
+# end_file_gathering ---finish up collecting a file
+
+function end_file_gathering()
+{
+	Gathering_file = FALSE
+
+	if (Source_file in File_contents)
+		File_contents[Source_file] = File_contents[Source_file] "\n" File_lines
+	else
+		File_contents[Source_file] = File_lines
+
+	File_lines = ""
+	Line_numbers["File_chunk"] = ""
+
+	if (Debug ~ /filename/)
+		printf("finished collecting file %s\n", Source_file) > "/dev/stderr"
+}
+@
+
+And finally, we have to collect the lines themselves.
+Doing so is simple. Collect each line and append it.
+Any embedded code chunks are expanded at the end.
+
+@<Process file chunks for @code{jrtangle}@>=
+Gathering_file {
+	if (File_lines == "")
+		File_lines = $0
+	else
+		File_lines = File_lines "\n" $0
+}
+@
+
+@node jrtangle code chunks
+@section Processing Code Chunks for @command{jrtangle}
+
+The next major piece of logic is the collection of code chunks.
+
+@(jrtangle@) =
+@<Process code chunks for @code{jrtangle}@>
+@
+
+Code chunks are like file chunks. They start with @samp{@@<chunk-name@@> =}
+and end with a standalone @samp{@@} sign. The logic and handling are similar
+to what we just did for files.
+First the pattern to match.
+Our first cut at a pattern was @samp{^@@<([^@@]+)@@>[[:space:]]*=[[:space:]]*$}
+but this didn't work as soon as we used a chunk name that included Texinfo
+commands.  Duh.  So now the pattern is more general.
+
+Since we have to bootstrap from this file, and @samp{@@<(.+)@@>}
+looks like a code chunk name, we create it using string concatenation:
+
+@FIXME{Move this chunk into the common code.}
+
+@<Process code chunks for @code{jrtangle}@>=
+BEGIN {
+	Code_chunk_pattern = "^@" "<(.+)" "@>[[:space:]]*=[[:space:]]*$"
+}
+@
+
+As a side note, the fact that @command{awk} lets you put
+functions anywhere in the file, along with allowing multiple @code{BEGIN}
+and @code{END} rules anywhere in the file, mitigates some of the need
+for building up chunks in the way normally done with @command{WEB}-like
+tools.
+
+Next the logic:
+
+@<Process code chunks for @code{jrtangle}@>=
+$0 ~ Code_chunk_pattern {
+	new_code = gensub(Code_chunk_pattern, "\\1", 1)
+	if (Gathering_code) {
+		fatal(_"code start of %s found while still collecting %s\n",
+			Code_chunk, new_code)
+	}
+	check_unfinished()
+
+	Gathering_code = TRUE
+	Code_chunk = new_code
+	Line_numbers["Code_chunk"] = (FILENAME ":" FNR)
+
+	if (Debug ~ /code/)
+		printf("saw new code chunk %s\n", Code_chunk) > "/dev/stderr"
+
+	next
+}
+
+# Gather up the code segment.
+# Any embedded code segments are expanded at the end.
+
+Gathering_code {
+	if (Code_lines == "")
+		Code_lines = $0
+	else
+		Code_lines = Code_lines "\n" $0
+}
+
+# end_code_gathering --- complete process of collecting lines of code chunk
+
+function end_code_gathering()
+{
+	Gathering_code = FALSE
+
+	if (Code_chunk in Code_contents)
+		Code_contents[Code_chunk] = Code_contents[Code_chunk] "\n" Code_lines
+	else
+		Code_contents[Code_chunk] = Code_lines
+
+	Code_lines = ""
+	Code_chunk_start = ""
+
+	if (Debug ~ /code/)
+		printf("finished collecting code %s\n", Code_chunk) > "/dev/stderr"
+}
+@
+
+@node jrtangle error checking
+@section Checking for Errors
+
+Here is the error checking code. First add it to the file:
+
+@(jrtangle@) =
+@<Error checking for @code{jrtangle}@>
+@
+
+And now the code:
+
+@<Error checking for @code{jrtangle}@>=
+# Error checking:
+
+END {
+	check_unfinished()
+}
+
+# check_unfinished --- print a fatal error when an unfinished code or
+#			file section is detected. Also ifweave / iftangle.
+
+function check_unfinished()
+{
+	if (Gathering_code)
+		fatal(_"unfinished code section (started at %s)\n",
+			Line_numbers["Code_chunk"])
+	else if (Gathering_file)
+		fatal(_"unfinished file section (started at %s)\n",
+			Line_numbers["File_chunk"])
+
+	if ("ifweave" in Line_numbers)
+		fatal(_"unfinished @ifweave section (started at %s)\n",
+			Line_numbers["ifweave"])
+	if ("iftangle" in Line_numbers)
+		fatal(_"unfinished @iftangle section (started at %s)\n",
+			Line_numbers["iftangle"])
+}
+@
+
+@node Expanding code chunks
+@section Expanding Code Chunks
+
+Expanding code chunks is the hardest part of @command{jrtangle}.
+In particular, any expanded chunks may contain other chunks that
+need expanding. This naturally leads to a recursive implementation,
+which in turn will require checking that a code chunk's expansion
+does not include itself, either directly or indirectly.
+
+@(jrtangle@) =
+@<Expand code chunks@>
+@
+
+We will work through the code top down:
+
+@<Expand code chunks@>=
+# Finishing off code is easy, at least from 10,000 feet.
+
+END {
+	dump_filenames()
+
+	if (Debug ~ /code/)
+		dump_chunks()
+}
+@
+
+Of course, we have just pushed off the inevitable only a little bit.
+At the outermost level, the code loops through all the files and writes
+them out, letting @code{expand_code_chunks()} do the real work.
+
+In practice, if a source file's contents haven't changed we don't
+want to write them out again, since this could easily cause @command{make}
+to recompile a file that doesn't need recompiling. In large programs
+this is a Bad Thing.  We will deal later with this issue.
+
+@FIXME{Commented out code is for work in progress.}
+
+@<Expand code chunks@>=
+# dump_filenames --- create files and update them as needed
+
+function dump_filenames(	i, s, update_values)
+{
+	for (i in File_contents) {
+		s = expand_code_chunks(File_contents[i])
+
+#		create_file_update_values(i, update_values)
+#		printf("%s\n", s) > update_values["destination"]
+#		close(update_values["destination"])
+
+		printf("%s\n", s) > i
+		close(i)
+
+		# cpif the file
+#		system(update_values["command"])
+
+		# run any "post create" command (such as changing mode)
+		if (i in Post_create_commands)
+			system(Post_create_commands[i])
+	}
+}
+@
+
+In turn, @code{expand_code_chunks()} initializes for recursion checking
+and then passes the buck to @code{do_expand_code_chunks()}.
+
+@<Expand code chunks@>=
+# expand_code_chunks --- expand embedded code chunks. this is the hard part
+
+function expand_code_chunks(contents)
+{
+	@<Reset for recursion@>
+
+	return do_expand_code_chunks(contents)
+}
+@
+
+By the time we get here, it isn't actually so hard.
+@code{do_expand_code_chunks()} splits the file contents into
+individual lines. It then loops over the results.
+If a line does not contain any chunk names, then the result
+can be kept verbatim, and it is copied into the @code{results}
+array.
+
+On the other hand, if it does, it has to be expanded, and that is
+done down in @code{expand_one_line()}.
+
+@<Expand code chunks@>=
+# do_expand_code_chunks --- do the actual work to expand code chunks
+
+function do_expand_code_chunks(contents,	nlines, lines, results, i, j)
+{
+	nlines = split(contents, lines, "\n")
+
+	for (i = 1; i <= nlines; i++) {
+		if (lines[i] !~ Chunk_name_pattern) {
+			results[i] = lines[i]
+		} else
+			results[i] = expand_one_line(lines[i])
+	}
+
+	return join(results, 1, nlines, "\n")
+}
+@
+
+@<Expand code chunks@>=
+@<Function to expand one line@>
+@
+
+@code{expand_one_line()} does all the work to isolate chunk
+names, expand them, and put everything back together with reasonable
+indentation.  At the end, if the expanded line contains further code
+chunks, it recursively calls @code{do_expand_code_chunks()} to process
+them as well.
+
+@<Function to expand one line@> =
+# expand_one_line --- expand a line with code chunk references
+
+function expand_one_line(input_line,	parts, chunk_names, nparts, num_names, code_lines, i, j)
+{
+	@<Split the input line into text parts and chunk names@>
+	@<Check for recursive expansion@>
+    @<Get the code lines, insert white space if needed@>
+	@<Put the line back together, expanding code chunks along the way@>
+
+	if (code_lines ~ Chunk_name_pattern)
+		return do_expand_code_chunks(code_lines)	# get any further code chunks, recursively
+	else
+		return code_lines
+}
+@
+
+This uses the four-argument version of @code{split()}; the fourth argument
+is an array of strings where each element is what matched the separating
+regexp.
+
+@<Split the input line into text parts and chunk names@> =
+nparts = split(input_line, parts, Chunk_name_pattern, chunk_names)
+num_names = length(chunk_names)
+@
+
+In our case, the split is made using @code{Chunk_name_pattern}, causing @code{parts}
+to contain the parts of the line before and after each chunk name. The fourth argument,
+@code{chunk_names}, will contain the names of the code chunks and there will
+be more than one element if there were several chunks referenced on the line.
+@code{num_names} tells us how many chunk names there are.
+
+First, error checking looks to see if the chunk name is @emph{not} in
+@code{Code_contents}, then it was never defined. (That is also an error.)
+Next, it checks to see if any of the found chunk names are already in
+the process of being expanded. This is done using a global array name
+@code{Currently_expanding}.  If present, it's an error; otherwise the
+name is entered into the array.
+
+@<Check for recursive expansion@> =
+# check for recursive expansion
+for (i = 1; i <= num_names; i++) {
+	j = strip_out_name(chunk_names[i])
+	if (! (j in Code_contents))
+		fatal(_"expand_one_line: code chunk `%s' used but not defined\n",
+			chunk_names[i]);
+	if (j in Currently_expanding)
+		fatal(_"expand_one_line: code chunk `%s' expands itself recursively\n",
+			chunk_names[i])
+	else
+		Currently_expanding[j]++
+}
+@
+
+And way back up in @code{expand_code_chunks()}, we have to empty out the
+@code{Currently_expanding} array:
+
+@<Reset for recursion@> =
+delete Currently_expanding
+@
+
+There are several helper functions used in expanding code chunks:
+
+@<Expand code chunks@>=
+@<Expansion helper functions@>
+@
+
+The first one is @code{strip_out_name()}, which pulls out the name
+of the chunk from in between the @samp{@@<} and the @samp{@@>}:
+
+@<Expansion helper functions@>=
+# strip_out_name --- get the name from name
+
+function strip_out_name(name, l)
+{
+	l = length(name)
+	name = substr(name, 3, l - 4)
+
+	return name
+}
+@
+
+Returning to processing code lines, we first get the code
+associated with the first chunk.  If the part of the line
+preceding the first chunk reference is all white space,
+we insert that part in front of the text of each retrieved
+line. The result is that indentation in the finished, generated
+code, looks reasonable.
+
+@<Get the code lines, insert white space if needed@> =
+code_lines = code_body(chunk_names[1])
+
+if (input_line !~ ("^" Chunk_name_pattern)) {
+	if (parts[1] ~ /^[[:space:]]+$/) {
+		# insert leading white space on all lines to get indentation
+		gsub(/^|\n/, ("&" parts[1]), code_lines)
+	} else {
+		code_lines = parts[1] code_lines
+	}
+}
+@
+
+Reassembling the lines is straightforward, the parts are concatenated
+with the expansion of the chunks.
+
+@<Put the line back together, expanding code chunks along the way@> =
+for (i = 2; i <= nparts; i++) {
+	code_lines = code_lines parts[i]
+	if (i in chunk_names)
+		code_lines = code_lines Code_contents[code_body(chunk_names[i])]
+}
+@
+
+The @code{code_body()} function retrieves the code associated
+with a chunk name. Since @code{Code_contents} is indexed by chunk names
+without the leading brackets, this just strips them off using
+@code{strip_out_name()}.
+
+@<Expansion helper functions@> =
+# code_body --- get the code body associated with name
+
+function code_body(name,	l)
+{
+	return Code_contents[strip_out_name(name)]
+}
+@
+
+Let's not forget to define @code{Chunk_name_pattern}, which is
+used throughout the expansion process.
+
+@FIXME{This may need to move to the common code}.
+
+@<Expansion helper functions@> =
+BEGIN {
+	Chunk_name_pattern = "@<[^>]+@>"
+}
+@
+
+
+@node jrtangle after creation
+@section Doing Something After Creating A File
+
+A useful feature is to have the ability to do something to a file after it's
+been created.  For example to make a script file executable.
+
+@(jrtangle@) =
+@<Post Creation Tasks@>
+@
+
+The way to do this is to specify a line that looks like this
+
+@example
+@@post_create @var{filename} @var{command to run}
+@end example
+
+The @var{command to run} is associated with @var{filename} and run after
+the file is created.
+
+@<Post Creation Tasks@>=
+/^@post_create[[:space:]]+/ {
+	if (NF < 3)
+		fatal(_"usage: @post_create filename command\n")
+	check_unfinished()
+
+	name = $2
+	$1 = $2 = ""
+	Post_create_commands[name] = $0
+}
+@
+
+@node Common Chunks
+@section Common Code Chunks and Functions
+
+This section contains code chunks and @command{awk}
+functions that will be useful in both @command{jrtangle}
+and @command{jrweave}.
+
+@<GPL 3 Copyright statement@>=
+#
+# Copyright (C) 2013 Arnold David Robbins
+# 
+# This file is part of TexiWeb Jr., a literate programming system.
+# 
+# TexiWeb Jr. is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# TexiWeb Jr. is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+@
+
+We need the following functions in both programs:
+
+@table @code
+@item message()
+Print a message to standard error.
+This function automatically adds @code{FILENAME} and @code{FNR} to the
+message so that the user can tell where the problem is.
+The first argument, @code{msg}, indicates what kind of message
+is being printed (warning or fatal).
+
+@item fatal()
+Print an error message using @code{message()} and then exit.
+
+@item warning()
+Print a warning message using @code{message()} but don't exit.
+
+@item join()
+Join an array into a single string. This function is copied
+from @cite{Effective Awk Programming} (the @command{gawk}
+documentation).
+
+@end table
+
+Since @command{gawk} does not have a ``varargs'' facility,
+we simply supply 10 arguments; the extras will be ignored if the
+format string does not reference them.
+
+@<Common Functions@>=
+@<Helper Functions@>
+@
+
+@<Helper Functions@>=
+# Helper functions
+
+# message --- write a particular kind of message out to stderr
+
+function message(msg, format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+{
+	printf("%s:%d: %s: " format, FILENAME, FNR, msg,
+		a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) > "/dev/stderr"
+	exit 1
+}
+
+# fatal --- print a fatal error message and exit.
+#	 No varargs, so fake it with lots of parameters.
+
+function fatal(format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+{
+	message(_"fatal", format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+	exit 1
+}
+
+# warning --- print a warning message to stderr
+#	 No varargs, so fake it with lots of parameters.
+
+function warning(format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+{
+	message(_"warning", format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+}
+
+# join.awk --- join an array into a string
+#
+# Arnold Robbins, arnold@skeeve.com, Public Domain
+# May 1993
+
+function join(array, start, end, sep,    result, i)
+{
+	if (sep == "")
+		sep = " "
+	else if (sep == SUBSEP) # magic value
+		sep = ""
+	result = array[start]
+	for (i = start + 1; i <= end; i++)
+		result = result sep array[i]
+	return result
+}
+@
+
+The @code{dump_chunks()} function may be called if debugging.
+
+@<Helper Functions@>=
+# dump_chunks --- print out all the chunks
+
+function dump_chunks(	i, format)
+{
+	format = "@<%s"
+	format = format "@>=\n%s@\n\n"
+	for (i in Code_contents)
+		printf(format, i, Code_contents[i]) > "/dev/stderr"
+}
+@
+
+
+@ignore
+
+# Along the same lines, we want to be able to update files
+# only if they have changed.  This is done in noweb by the "cpif"
+# program which means "copy if changed".  We will call it
+# update_file and allow the user to replace it.
+#
+# Usage is
+# 	@update_file [PATH] FILE [SUFFIX]
+# Default path is "."
+# Default suffix is ".tmp"
+#
+# This supplies a template that is then used for creating
+# each file.  Tangle substitutes the parameters in the
+# recipe and executes the result, supplying the current
+# filename for FILE.  PATH and SUFFIX are fixed.
+
+/^@update_file/, /^@end update_file/ {
+	if (/^@update_file/) {
+		delete Update_file	# starting over
+
+		if (NF == 1) {
+			fatal(_"@update_file: missing parameters")
+		} else if (NF == 2) {
+			Update_file["path"] = "."
+			Udpate_file["filename"] = $2
+			Update_file["suffix"] = ".tmp"
+		} else if (NF == 3) {
+			Update_file["path"] = "."
+			Udpate_file["filename"] = $2
+			Update_file["suffix"] = ".tmp"
+		} else {
+			# NF >= 4
+			Update_file["path"] = $2
+			Udpate_file["filename"] = $3
+			Update_file["suffix"] = $4
+			if (NF > 4)
+				warning(_"@update_file: ignoring extra argurments")
+		}
+
+		next
+	}
+
+	if (/^@end update_file/) {
+		next
+	}
+
+	if ("text" in Update_file)
+		Update_file["text"] = Update_file["text"] "\n" $0
+	else
+		Update_file["text"] = $0
+}
+
+# Here are the defaults for Update_file
+
+BEGIN {
+	Update_file["path"] = "FULLPATH"
+	Update_file["filename"] = "FILENAME"
+	Update_file["suffix"] = ".tmp"
+	Update_file["text"] = \
+		"if [ -f FULLPATH/FILENAME ]\n" \
+		"then\n" \
+		"\tif cmp FULLPATH/FILENAME.tmp FULLPATH/FILENAME > /dev/null\n" \
+		"\tthen\n" \
+		"\t\trm FULLPATH/FILENAME.tmp\n" \
+		"\telse\n" \
+		"\t\tmv FULLPATH/FILENAME.tmp FULLPATH/FILENAME\n" \
+		"\tfi\n" \
+		"else\n" \
+		"\tmv FULLPATH/FILENAME.tmp FULLPATH/FILENAME\n" \
+		"fi\n"
+
+	if (Debug ~ /shell/)
+		Update_file["text"] = "set -x; " Update_file["text"]
+}
+
+# create_file_update_values --- take a filename and return strings
+
+function create_file_update_values(filename, results,	dir, command)
+{
+	delete results
+
+	# determine directory
+	# dir = ...
+	results["destination"] = dir "/" filename Update_file["suffix"]
+	command = Update_file["text"]
+	gsub(Update_file["filename"], filename, command)
+#	gsub(Update_file["suffix"], filename, command)
+	gsub(Update_file["path"], dir, command)
+	results["command"] = command
+}
+
+@end ignore
+
+
+@node jrweave code
+@chapter Weaving: The @command{jrweave} Program
+
+Weaving a @value{TWJR} document is in fact the more challenging task. @dots{}
+
+@node Code Segment Summaries
+@appendix Code Segment Summaries
+
+Blah blah
+
+@menu
+* Code Segment Definitions::	Code segments by definition.
+* Code Segment References::	Code segments by reference.
+@end menu
+
+@node Code Segment Definitions
+@appendixsec Code Segment Definitions
+
+@code{@@print_code_defs}
+
+@node Code Segment References
+@appendixsec Code Segment References
+
+@code{@@print_code_refs}
+
+@node Use of @command{gawk} features
+@appendix Features Specific to @command{gawk}
+
+The code for @command{jrtangle} and @command{jrweave} makes free use of
+features that are only in @command{gawk}. This section notes them, with
+some discussion of what would have to be done to use a POSIX standard
+version of @command{awk}.
+
+In practice, @command{gawk} is quite portable, and it's likely that if
+you're reading this and are interested in using @value{TWJR} yourself,
+then you won't mind building @command{gawk} and having it available.
+
+@table @asis
+@item The @code{gensub()} function
+The @value{TWJR} code takes advantage of @code{gensub()}'s ability to
+pull out the pieces that much subparentheses. This would have to be
+done more manually in a standard @command{awk}, using @code{match()}
+and @code{split()}.
+
+@item The four-argument version of @code{split()}
+The fourth argument to @code{split()} is an array that holds the text
+in between the pieces that matched the pattern.  This too would have
+to be manually using @code{match()} and @code{split()}.
+
+@item Bitwise functions
+The @code{and()} function is used in the calculation for expanding
+tabs. This would have to be done differently in a standard @command{awk}.
+
+@item Translatable strings
+This one is easy. A translatable string looks like the concatenation of
+a variable named @samp{_} with a string constant. Such constructs should
+work as-is in other @command{awk} versions.
+@end table
+
+@node Bibliography
+@unnumbered Bibliography
+
+@enumerate
+
+@item
+@uref{http://www.amazon.com/Literate-Programming-Center-Language-Information/dp/0937073806/ref=sr_1_1?s=books&ie=UTF8&qid=1383293813&sr=1-1&keywords=Literate+Programming,
+@cite{Literate Programming}},
+Donald E.@: Knuth,
+Center for the Study of Language and Information, 1992.
+ISBN-10: 0937073806,
+ISBN-13: 978-0937073803.
+
+@end enumerate
+
+@node Concept Index
+@unnumbered Index
+
+@printindex cp
+
+@bye

@@ -1,0 +1,6 @@
+2013-11-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Initial git checkin. Bootstrap of jrtangle
+	was accomplished on 2013-11-04.
+	* texinfo.tex: Initial checkin.
+	* COPYING: Initial checkin.

@@ -1,0 +1,5 @@
+for oldstlye
+
+@tex
+\gdef\oldnum#1{\begingroup\oldstyle #1\endgroup}%
+@end tex

@@ -1,0 +1,43 @@
+From karl@freefriends.org  Tue Nov  5 19:16:28 2013
+Return-Path: <karl@freefriends.org>
+Received: from skeeve.com (skeeve.com [127.0.0.1])
+	by skeeve.com (8.14.4/8.14.4/Debian-2ubuntu2) with ESMTP id rA5HGOZT004839
+	for <arnold@localhost>; Tue, 5 Nov 2013 19:16:28 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	frenzy.freefriends.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00
+	autolearn=ham version=3.3.1
+X-Envelope-From: karl@freefriends.org
+X-Envelope-To: <arnold@skeeve.com>
+Received: from frenzy.freefriends.org [66.54.153.139]
+	by skeeve.com with IMAP (fetchmail-6.3.21)
+	for <arnold@localhost> (single-drop); Tue, 05 Nov 2013 19:16:28 +0200 (IST)
+Received: from freefriends.org (localhost [127.0.0.1])
+	by freefriends.org (8.14.6/8.14.6) with ESMTP id rA4NTmBL010765
+	for <arnold@skeeve.com>; Mon, 4 Nov 2013 16:29:49 -0700
+Received: (from nobody@localhost)
+	by freefriends.org (8.14.6/8.14.6/submit) id rA4NTm4G010764;
+	Mon, 4 Nov 2013 23:29:48 GMT
+Date: Mon, 4 Nov 2013 23:29:48 GMT
+Message-Id: <201311042329.rA4NTm4G010764@freefriends.org>
+X-Authentication-Warning: frenzy.freefriends.org: nobody set sender to karl@freefriends.org using -f
+From: karl@freefriends.org (Karl Berry)
+To: arnold@skeeve.com
+Subject: Re: question about ownership
+In-Reply-To: <201311041514.rA4FEjJP015964@freefriends.org>
+Status: R
+
+    doc to the FSF, I can also make use of code / doc for my own things, right?
+
+Yes.
+
+There is a "grant back" in the standard assignment text which allows you
+to use your own work under any terms, without limitation.
+    
+    Do I need to notify the FSF?  
+
+Nope.
+
+k
+
