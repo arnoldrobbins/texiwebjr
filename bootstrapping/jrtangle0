@@ -1,0 +1,559 @@
+#! /usr/local/bin/gawk -f
+
+# This file is part of TexiWeb Jr., a literate programming system.
+# 
+# TexiWeb Jr. is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# TexiWeb Jr. is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+
+# This file implements a simplified version of Ben Pfaff's TexiWeb language
+# which reads texiweb source and produces Texinfo for printing and C
+# output for code.
+# 
+# TexiWeb is desirable for the following reasons:
+# 
+# 1. It is based on Texinfo, which is the markup language I most prefer
+#    after having used several such languages over the years.
+# 
+# 2. It is for literate programming, which I think is the best way to
+#    write large programs.
+# 
+# I have chosen to reimplement his processor after being inspired by noweb
+# to be very minimalist. In particular, TexiWeb expects C code for the code
+# chunks and also does things like pretty printing and indexing. I prefer
+# code to look like code (constant-width font, no pretty printing) and I
+# want to be able to use any kind of code in my code chunks, including awk,
+# Makefiles, shell scripts, whatever.
+#
+# In addition, I think it's better for the author to do the indexing manually
+# than to rely on the literate programming tool, although that opinion may
+# change as this evolves.
+#
+# So, this is really just "inspired by" TexiWeb and not a reimplementation.
+#
+# This is the bootstrap version that just does the "tangle" function, which
+# is to extract source code chunks. See the TEXIWEB file for some minimal
+# documentation. I will write more once I have a working set of scripts.
+
+# FIXME:
+# DONE	1. Set up an array of line numbers to track open things like file
+# 	   chunks, code chunks, ifweave, iftangle so that we can report that
+# 	   they aren't closed.
+# DONE	2. Set up checks that ifweave/iftangle are not nested in each other.
+#	3. Set up a command to do noweb cpif functionality.
+#	4. Move different flags into an array, a la line numbers.
+
+# One nice thing in TexiWeb are @iftangle ... @end iftangle and
+# @ifweave ... @end ifweave bracketing commands.  Those should be dealt
+# with early on.
+
+/^@ifweave[[:space:]]*$/, /^@end ifweave[[:space:]]*$/ {
+	if ("iftangle" in Line_numbers)
+		fatal(_"cannot nest @iftangle inside @ifweave\n");
+
+	# start of ifweave, save line number
+	if (/^@ifweave[[:space:]]*$/)
+		Line_numbers["ifweave"] = (FILENAME ":" FNR)
+
+	# end of ifweave, delete line number
+	if (/^@end ifweave[[:space:]]*$/)
+		delete Line_numbers["ifweave"]
+	
+	# simply skip these lines, this is tangling
+	next
+}
+
+# For tangling we remove the bracketing control lines and let anything
+# in between fall through.
+
+/^@iftangle[[:space:]]*$/, /^@end iftangle[[:space:]]*$/ {
+	if ("ifweave" in Line_numbers)
+		fatal(_"cannot nest @ifweave inside @iftangle\n");
+
+	# start of iftangle, save line number, skip this line
+	if (/^@iftangle[[:space:]]*$/) {
+		Line_numbers["iftangle"] = (FILENAME ":" FNR)
+		next
+	}
+
+	# end of iftangle, delete line number, skip this line
+	if (/^@end iftangle[[:space:]]*$/) {
+		delete Line_numbers["iftangle"]
+		next
+	}
+
+	# otherwise fall through into the rest of the code
+}
+
+# File chunks start with `@(filename.c) =' in column 1. Unlike TexiWeb and
+# like noweb, we don't require += to add more stuff to a definition. We
+# just use = and figure it out. File chunks end with a single @ on a line
+# by itself, with the @ in column 1.
+#
+# Instead of using a range pattern, we use a boolean flag; this lets us
+# avoid special-casing the first and last lines.
+
+$0 ~ File_chunk_pattern {
+	new_file = gensub(File_chunk_pattern, "\\1", 1)
+	if (Gathering_file) {
+		fatal(_"file start of %s found while still collecting %s\n",
+			Source_file, new_file)
+	}
+	check_unfinished()
+
+	Gathering_file = TRUE
+	Line_numbers["File_chunk"] = (FILENAME ":" FNR)
+	Source_file = new_file
+
+	if (Debug ~ /filename/)
+		printf("saw new filename %s\n", Source_file) > "/dev/stderr"
+
+	next
+}
+
+# The BEGIN rule sets up some constants. File_chunk_pattern is a variable since
+# it needs to be used for matching and with gensub(). This is better than repeating
+# it in the code.
+
+BEGIN {
+	TRUE = 1
+	FALSE = 0
+	File_chunk_pattern = "^@\\(([^)]+)@\\)[[:space:]]*=[[:space:]]*$"
+}
+
+# Here is the @ sign that ends the input file.
+# It also ends code segments.
+
+/^@[[:space:]]*$/ {
+	if (Gathering_file)
+		end_file_gathering()
+	else if (Gathering_code)
+		end_code_gathering()
+	else
+		warning(_"unmatched terminating @-sign: ignored\n")
+	
+	next
+}
+
+# After some experimentation, things are simplest if file contents and
+# code chunks do NOT have the final terminating newline. Code that outputs
+# file contents must remember to add the final newline.
+
+# end_file_gathering ---finish up collecting a file
+
+function end_file_gathering()
+{
+	Gathering_file = FALSE
+
+	if (Source_file in File_contents)
+		File_contents[Source_file] = File_contents[Source_file] "\n" File_lines
+	else
+		File_contents[Source_file] = File_lines
+
+	File_lines = ""
+	Line_numbers["File_chunk"] = ""
+
+	if (Debug ~ /filename/)
+		printf("finished collecting file %s\n", Source_file) > "/dev/stderr"
+}
+
+# Error checking:
+
+END {
+	check_unfinished()
+}
+
+# check_unfinished --- print a fatal error when an unfinished code or
+#			file section is detected. Also ifweave / iftangle.
+
+function check_unfinished()
+{
+	if (Gathering_code)
+		fatal(_"unfinished code section (started at %s)\n",
+			Line_numbers["Code_chunk"])
+	else if (Gathering_file)
+		fatal(_"unfinished file section (started at %s)\n",
+			Line_numbers["File_chunk"])
+
+	if ("ifweave" in Line_numbers)
+		fatal(_"unfinished @ifweave section (started at %s)\n",
+			Line_numbers["ifweave"])
+	if ("iftangle" in Line_numbers)
+		fatal(_"unfinished @iftangle section (started at %s)\n",
+			Line_numbers["iftangle"])
+}
+
+# And gathering up the file is simple. Collect each line and append it.
+# Any embedded code segments are expanded at the end.
+
+Gathering_file {
+	if (File_lines == "")
+		File_lines = $0
+	else
+		File_lines = File_lines "\n" $0
+}
+
+# A useful feature is to have the ability to do something to a file after it's
+# been created.  For example to make a script file executable.
+
+/^@post_create[[:space:]]+/ {
+	if (NF < 3)
+		fatal(_"usage: @post_create filename command\n")
+	check_unfinished()
+
+	name = $2
+	$1 = $2 = ""
+	Post_create_commands[name] = $0
+}
+
+#--- # Along the same lines, we want to be able to update files
+#--- # only if they have changed.  This is done in noweb by the "cpif"
+#--- # program which means "copy if changed".  We will call it
+#--- # update_file and allow the user to replace it.
+#--- #
+#--- # Usage is
+#--- # 	@update_file [PATH] FILE [SUFFIX]
+#--- # Default path is "."
+#--- # Default suffix is ".tmp"
+#--- #
+#--- # This supplies a template that is then used for creating
+#--- # each file.  Tangle substitutes the parameters in the
+#--- # recipe and executes the result, supplying the current
+#--- # filename for FILE.  PATH and SUFFIX are fixed.
+#--- 
+#--- /^@update_file/, /^@end update_file/ {
+#--- 	if (/^@update_file/) {
+#--- 		delete Update_file	# starting over
+#--- 
+#--- 		if (NF == 1) {
+#--- 			fatal(_"@update_file: missing parameters")
+#--- 		} else if (NF == 2) {
+#--- 			Update_file["path"] = "."
+#--- 			Udpate_file["filename"] = $2
+#--- 			Update_file["suffix"] = ".tmp"
+#--- 		} else if (NF == 3) {
+#--- 			Update_file["path"] = "."
+#--- 			Udpate_file["filename"] = $2
+#--- 			Update_file["suffix"] = ".tmp"
+#--- 		} else {
+#--- 			# NF >= 4
+#--- 			Update_file["path"] = $2
+#--- 			Udpate_file["filename"] = $3
+#--- 			Update_file["suffix"] = $4
+#--- 			if (NF > 4)
+#--- 				warning(_"@update_file: ignoring extra argurments")
+#--- 		}
+#--- 
+#--- 		next
+#--- 	}
+#--- 
+#--- 	if (/^@end update_file/) {
+#--- 		next
+#--- 	}
+#--- 
+#--- 	if ("text" in Update_file)
+#--- 		Update_file["text"] = Update_file["text"] "\n" $0
+#--- 	else
+#--- 		Update_file["text"] = $0
+#--- }
+#--- 
+#--- # Here are the defaults for Update_file
+#--- 
+#--- BEGIN {
+#--- 	Update_file["path"] = "FULLPATH"
+#--- 	Update_file["filename"] = "FILENAME"
+#--- 	Update_file["suffix"] = ".tmp"
+#--- 	Update_file["text"] = \
+#--- 		"if [ -f FULLPATH/FILENAME ]\n" \
+#--- 		"then\n" \
+#--- 		"\tif cmp FULLPATH/FILENAME.tmp FULLPATH/FILENAME > /dev/null\n" \
+#--- 		"\tthen\n" \
+#--- 		"\t\trm FULLPATH/FILENAME.tmp\n" \
+#--- 		"\telse\n" \
+#--- 		"\t\tmv FULLPATH/FILENAME.tmp FULLPATH/FILENAME\n" \
+#--- 		"\tfi\n" \
+#--- 		"else\n" \
+#--- 		"\tmv FULLPATH/FILENAME.tmp FULLPATH/FILENAME\n" \
+#--- 		"fi\n"
+#--- 
+#--- 	if (Debug ~ /shell/)
+#--- 		Update_file["text"] = "set -x; " Update_file["text"]
+#--- }
+#--- 
+# create_file_update_values --- take a filename and return strings
+
+function create_file_update_values(filename, results,	dir, command)
+{
+	delete results
+
+	# determine directory
+	# dir = ...
+	results["destination"] = dir "/" filename Update_file["suffix"]
+	command = Update_file["text"]
+	gsub(Update_file["filename"], filename, command)
+#	gsub(Update_file["suffix"], filename, command)
+	gsub(Update_file["path"], dir, command)
+	results["command"] = command
+}
+
+# Code chunks are like file chunks. They start with @<chunk-name@> =
+# and end with a standalone @ sign. The logic and handling are similar
+# to what we just did for files.
+
+BEGIN {
+	Code_chunk_pattern = "^@" "<(.+)" "@>[[:space:]]*=[[:space:]]*$"
+}
+
+$0 ~ Code_chunk_pattern {
+	new_code = gensub(Code_chunk_pattern, "\\1", 1)
+	if (Gathering_code) {
+		fatal(_"code start of %s found while still collecting %s\n",
+			Code_chunk, new_code)
+	}
+	check_unfinished()
+
+	Gathering_code = TRUE
+	Code_chunk = new_code
+	Line_numbers["Code_chunk"] = (FILENAME ":" FNR)
+
+	if (Debug ~ /code/)
+		printf("saw new code chunk %s\n", Code_chunk) > "/dev/stderr"
+
+	next
+}
+
+# Gather up the code segment.
+# Any embedded code segments are expanded at the end.
+
+Gathering_code {
+	if (Code_lines == "")
+		Code_lines = $0
+	else
+		Code_lines = Code_lines "\n" $0
+}
+
+function end_code_gathering()
+{
+	Gathering_code = FALSE
+
+	if (Code_chunk in Code_contents)
+		Code_contents[Code_chunk] = Code_contents[Code_chunk] "\n" Code_lines
+	else
+		Code_contents[Code_chunk] = Code_lines
+
+	Code_lines = ""
+	Code_chunk_start = ""
+
+	if (Debug ~ /code/)
+		printf("finished collecting code %s\n", Code_chunk) > "/dev/stderr"
+}
+
+# Finishing off code is similarly easy.
+
+END {
+	dump_filenames()
+
+	if (Debug ~ /code/)
+		dump_chunks()
+}
+
+# dump_filenames --- create files and update them as needed
+
+function dump_filenames(	i, s, update_values)
+{
+	for (i in File_contents) {
+		s = expand_code_chunks(File_contents[i])
+		create_file_update_values(i, update_values)
+
+#		printf("%s\n", s) > update_values["destination"]
+#		close(update_values["destination"])
+
+		printf("%s\n", s) > i
+		close(i)
+
+		# cpif the file
+#		system(update_values["command"])
+
+		if (i in Post_create_commands)
+			system(Post_create_commands[i])
+	}
+}
+
+function dump_chunks(	i)
+{
+	for (i in Code_contents)
+		printf("@<%s@>=\n%s@\n\n", i, Code_contents[i]) > "/dev/stderr"
+}
+
+# strip_out_name --- get the name from @<name@>
+
+function strip_out_name(name, l)
+{
+	l = length(name)
+	name = substr(name, 3, l - 4)
+
+	return name
+}
+
+# code_body --- get the code body associated with @<name@>
+
+function code_body(name,	l)
+{
+	return Code_contents[strip_out_name(name)]
+}
+
+# expand_code_chunks --- expand embedded code chunks. this is the hard part
+
+function expand_code_chunks(contents)
+{
+	delete Currently_expanding
+
+	return do_expand_code_chunks(contents)
+}
+
+function do_expand_code_chunks(contents,	nlines, lines, results, i, j)
+{
+	nlines = split(contents, lines, "\n")
+
+	for (i = 1; i <= nlines; i++) {
+		if (lines[i] !~ /@<.*@>/) {
+			results[i] = lines[i]
+		} else
+			results[i] = expand_one_line(lines[i])
+	}
+
+	return join(results, 1, nlines, "\n")
+}
+
+# expand_one_line --- expand a line with code chunk references
+
+function expand_one_line(input_line,	parts, chunk_names, nparts, num_names, code_lines, i, j)
+{
+	nparts = split(input_line, parts, Chunk_name_pattern, chunk_names)
+	num_names = length(chunk_names)
+
+	# error checking
+	for (i = 1; i <= num_names; i++) {
+		j = strip_out_name(chunk_names[i])
+		if (! (j in Code_contents))
+			fatal(_"expand_one_line: code chunk `%s' used but not defined\n",
+				chunk_names[i]);
+		if (j in Currently_expanding)
+			fatal(_"expand_one_line: code chunk `%s' expands itself recursively\n",
+				chunk_names[i])
+		else
+			Currently_expanding[j]++
+	}
+
+	code_lines = code_body(chunk_names[1])
+
+	if (input_line !~ ("^" Chunk_name_pattern)) {
+		if (parts[1] ~ /^[[:space:]]+$/) {
+			# insert leading white space on all lines to get indentation
+			gsub(/^|\n/, ("&" parts[1]), code_lines)
+		} else {
+			code_lines = parts[1] code_lines
+		}
+	}
+	
+	for (i = 2; i <= nparts; i++) {
+		code_lines = code_lines parts[i]
+		if (i in chunk_names)
+			code_lines = code_lines Code_contents[code_body(chunk_names[i])]
+	}
+
+	if (code_lines ~ Chunk_name_pattern)
+		return do_expand_code_chunks(code_lines)	# get any further code chunks, recursively
+	else
+		return code_lines
+}
+
+BEGIN {
+	Chunk_name_pattern = "@<[^>]+@>"
+}
+
+# Helper functions
+
+# message --- write a particular kind of message out to stderr
+#
+function message(msg, format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+{
+	printf("%s:%d: %s: " format, FILENAME, FNR, msg,
+		a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) > "/dev/stderr"
+	exit 1
+}
+
+# fatal --- print a fatal error message and exit.
+#	 No varargs, so fake it with lots of parameters.
+
+function fatal(format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+{
+	message(_"fatal", format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+	exit 1
+}
+
+# warning --- print a warning message to stderr
+#	 No varargs, so fake it with lots of parameters.
+
+function warning(format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+{
+	message("_warning", format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+}
+
+# expand_tabs --- expand tabs in the string
+
+function expand_tabs(string, tabstop,	chars, out, i, j, n)
+{
+	if (tabstop < 2)
+		fatal(_"expand_tabs: tabstop %d < 2\n", tabstop)
+
+	n = split(string, chars, "")
+	j = 0
+	for (i = 1; i <= n;) {
+		if (chars[i] != "\t") {
+			out[j++] = chars[i++]
+			continue
+		}
+		i++	# skip the tab
+
+		do {
+			out[j++] = " "
+		} while (and(j, tabstop-1) != 0)
+	}
+
+	return join(out, 0, j, SUBSEP)
+}
+
+# join.awk --- join an array into a string
+#
+# Arnold Robbins, arnold@skeeve.com, Public Domain
+# May 1993
+
+function join(array, start, end, sep,    result, i)
+{
+	if (sep == "")
+		sep = " "
+	else if (sep == SUBSEP) # magic value
+		sep = ""
+	result = array[start]
+	for (i = start + 1; i <= end; i++)
+		result = result sep array[i]
+	return result
+}
+
+# NOTES:
+# 1. Several gawkisms:
+# 	A. gensub
+#	B. four argument split
+#	C. Bitwise and() function
+#	D. Translatable strings

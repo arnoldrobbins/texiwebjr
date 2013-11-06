@@ -1,3 +1,10 @@
+2013-11-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: More improvements in jrtangle, especially
+	towards post-processing. Preprocessing step added.
+	* bootstrapping: New directory with simple bootstrapping scripts.
+	This may go away eventually.
+
 2013-11-05         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Initial git checkin. Bootstrap of jrtangle

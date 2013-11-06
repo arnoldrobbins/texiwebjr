@@ -12,10 +12,11 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH October, 2013
+@set UPDATE-MONTH November, 2013
 @set EDITION 0.1
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
+@set SHORTTITLE TexiWeb Jr.
 
 @iftex
 @set DOCUMENT book
@@ -80,10 +81,6 @@
 @end ifnottex
 
 @c For printed output put the URLs into footnotes.
-@c Docbook is treated as printed output.
-@ifdocbook
-@set PRINTEDOUTPUT
-@end ifdocbook
 @iftex
 @set PRINTEDOUTPUT
 @end iftex
@@ -104,6 +101,16 @@
 @macro FIXME{text}
 @strong{FIXME}: \text\
 @end macro
+
+@tex
+\gdef\oldnum#1{\begingroup\oldstyle #1\endgroup}%
+@end tex
+
+@ifnottex
+@macro oldnum{value}
+\value\
+@end macro
+@end ifnottex
 
 @c Letting this into the text makes it come out on the short title page.
 @c @FIXME{This may need more work.}
@@ -147,7 +154,7 @@ This is Edition @value{EDITION} of @cite{@value{TITLE}}.
 @c during editing and review.
 @c @setchapternewpage odd
 
-@shorttitlepage TexiWeb Jr.
+@shorttitlepage @value{SHORTTITLE}
 @titlepage
 @title @value{TITLE}
 @subtitle @value{UPDATE-MONTH}
@@ -175,7 +182,7 @@ URL: @url{http://www.skeeve.com/} @*
 
 @iftex
 @headings off
-@evenheading @thispage@ @ @ @strong{@value{TITLE}} @| @|
+@evenheading @thispage@ @ @ @strong{@value{SHORTTITLE}} @| @|
 @oddheading  @| @| @strong{@thischapter}@ @ @ @thispage
 @end iftex
 
@@ -200,6 +207,7 @@ on top of the Texinfo document formatting markup language.
 * Introduction::        Introduction.
 * jrtangle code::       The code for @command{jrtangle}.
 * jrwreave code::       The code for @command{jrwreave}.
+* Evaluation::          Evaluation.
 * Code Segment Summaries:: Alpabetic lists of code segments
                         by defintion and by reference.
 * Use of @command{gawk} features:: Features Specific to @command{gawk}.
@@ -425,7 +433,7 @@ form that can be processed for printing.  Knuth's @command{WEB}
 provided @command{WEAVE}, which created a straight @TeX{} document.
 The @command{noweb} suite has @command{noweave}.
 
-In @value{TWJR}, the weaving program is called @command{jrweave}.
+The @value{TWJR} weaving program is called @command{jrweave}.
 It reads a @value{TWJR} document and produces a Texinfo document
 which can then be processed by @command{texi2dvi} or @command{texi2pdf}
 to produce a printable file. (It can also be processed with @command{makeinfo}
@@ -438,7 +446,7 @@ that can be either run directly (scripting languages), or compiled
 provided @command{TANGLE}, which created a straight Pascal program.
 The @command{noweb} suite has @command{notangle}.
 
-In @value{TWJR}, the tangling program is called @command{jrtangle}.
+The @value{TWJR} tangling program is called @command{jrtangle}.
 It reads a @value{TWJR} document and produces the source files
 for running or compiling.
 @end table
@@ -468,11 +476,13 @@ the traditional way, without being so verbose that my fingers end up
 hurting when I'm done working on a document after a few hours.
 
 While my first preference might have been to use @command{noweb}, since I
-familiar with it, it does not support Texinfo. Even though @LaTeX{} is
-a more powerful markup language, I didn't want to climb that learning curve
-just to use @command{noweb}.  Also, I felt that it might be
-easier---and certainly more @emph{fun}---to write my own small literate
-programming system than to add a Texinfo backend to @command{noweb}.
+familiar with it, it does not support Texinfo. Even though @LaTeX{} is a
+more powerful markup language, I didn't want to climb that learning curve
+just to use @command{noweb}.  Also, I felt that it might be easier---and
+certainly more @emph{fun}---to write my own small literate programming
+system than to add a Texinfo backend to @command{noweb}.@footnote{The
+truth is that doing something like this has been in the back of my mind
+for close to 20 years; I finally decided to ``just do it.''}
 
 Similarly, TexiWeb already does what I would seem to need, but its lack of
 documentation makes it harder to use, and its enforced pretty-printing is
@@ -527,7 +537,7 @@ and @command{jrweave}.
 
 @(jrtangle@) =
 @<Shebang header@>
-@<GPL 3 Copyright statement@>
+@<Common Chunks@>
 
 @<Common Functions@>
 @
@@ -540,7 +550,13 @@ some other system.
 #! /usr/local/bin2/gawk -f
 @
 
-The common functions are described later in this @value{CHAPTER}.
+The common chunks functions are described later in this @value{CHAPTER}.
+However, we define one of them now, so that the license will come
+out at the top of the file. The actual license text is provided later.
+
+@<Common Chunks@>=
+@<GPL 3 Copyright statement@>
+@
 
 @ignore
 
@@ -555,6 +571,8 @@ The common functions are described later in this @value{CHAPTER}.
 * jrtangle code chunks::           Processing code chunks for @command{jrtangle}.
 * jrtangle error checking::        Checking for errors in @command{jrtangle}.
 * Expanding code chunks::          Expanding code chunks into straight code.
+* jrtangle before everything::     Doing something before extracting any files.
+* jrtangle avoiding update::       Avoiding update of unchanged files.
 * jrtangle after creation::        Doing something after creating a file.
 * Common Chunks::                  Common code chunks and functions.
 @end menu
@@ -677,13 +695,11 @@ $0 ~ File_chunk_pattern {
 }
 @
 
-The @code{BEGIN} rule sets up some constants. @code{File_chunk_pattern}
+The @code{BEGIN} block sets up some constants. @code{File_chunk_pattern}
 is a variable since it needs to be used for matching and with
 @code{gensub()}. This is better than repeating the regexp in the code.
 
-@FIXME{Move this chunk into the common code.}
-
-@<Process file chunks for @code{jrtangle}@>=
+@<Common Chunks@>=
 BEGIN {
 	TRUE = 1
 	FALSE = 0
@@ -764,9 +780,7 @@ commands.  Duh.  So now the pattern is more general.
 Since we have to bootstrap from this file, and @samp{@@<(.+)@@>}
 looks like a code chunk name, we create it using string concatenation:
 
-@FIXME{Move this chunk into the common code.}
-
-@<Process code chunks for @code{jrtangle}@>=
+@<Common Chunks@>=
 BEGIN {
 	Code_chunk_pattern = "^@" "<(.+)" "@>[[:space:]]*=[[:space:]]*$"
 }
@@ -774,9 +788,11 @@ BEGIN {
 
 As a side note, the fact that @command{awk} lets you put
 functions anywhere in the file, along with allowing multiple @code{BEGIN}
-and @code{END} rules anywhere in the file, mitigates some of the need
+and @code{END} blocks anywhere in the file, mitigates some of the need
 for building up chunks in the way normally done with @command{WEB}-like
-tools.
+tools.  When writing the bootstrap version of @command{jrtangle}, it was
+straightforward to write in a linear fashion and just drop in yet
+another @code{BEGIN} block.
 
 Next the logic:
 
@@ -886,6 +902,8 @@ We will work through the code top down:
 # Finishing off code is easy, at least from 10,000 feet.
 
 END {
+	@<Do any initial setup@>
+
 	dump_filenames()
 
 	if (Debug ~ /code/)
@@ -893,7 +911,7 @@ END {
 }
 @
 
-Of course, we have just pushed off the inevitable only a little bit.
+Of course, we have pushed off the inevitable only a little bit.
 At the outermost level, the code loops through all the files and writes
 them out, letting @code{expand_code_chunks()} do the real work.
 
@@ -901,6 +919,11 @@ In practice, if a source file's contents haven't changed we don't
 want to write them out again, since this could easily cause @command{make}
 to recompile a file that doesn't need recompiling. In large programs
 this is a Bad Thing.  We will deal later with this issue.
+
+As a side note, it may be that dumping all the files every time
+is a bad idea. If experience shows us that this is so, this is
+where to make the change, along with new code to take a command-line option
+indicating which file(s) to extract.
 
 @FIXME{Commented out code is for work in progress.}
 
@@ -922,9 +945,7 @@ function dump_filenames(	i, s, update_values)
 		# cpif the file
 #		system(update_values["command"])
 
-		# run any "post create" command (such as changing mode)
-		if (i in Post_create_commands)
-			system(Post_create_commands[i])
+		@<Run ``post create'' commands@>
 	}
 }
 @
@@ -971,6 +992,15 @@ function do_expand_code_chunks(contents,	nlines, lines, results, i, j)
 }
 @
 
+Let's go ahead and define @code{Chunk_name_pattern}, which is
+used throughout the expansion process.
+
+@<Common Chunks@>=
+BEGIN {
+	Chunk_name_pattern = "@<[^>]+@>"
+}
+@
+
 @<Expand code chunks@>=
 @<Function to expand one line@>
 @
@@ -1000,7 +1030,8 @@ function expand_one_line(input_line,	parts, chunk_names, nparts, num_names, code
 
 This uses the four-argument version of @code{split()}; the fourth argument
 is an array of strings where each element is what matched the separating
-regexp.
+regexp.  Element @var{i} in the @code{chunk_names} array is what came after element
+@var{i} in the @code{parts} array.
 
 @<Split the input line into text parts and chunk names@> =
 nparts = split(input_line, parts, Chunk_name_pattern, chunk_names)
@@ -1013,10 +1044,10 @@ to contain the parts of the line before and after each chunk name. The fourth ar
 be more than one element if there were several chunks referenced on the line.
 @code{num_names} tells us how many chunk names there are.
 
-First, error checking looks to see if the chunk name is @emph{not} in
-@code{Code_contents}, then it was never defined. (That is also an error.)
+After splitting, error checking looks to see if the chunk name is @emph{not} in
+@code{Code_contents}; if so, then it was never defined. (That is also an error.)
 Next, it checks to see if any of the found chunk names are already in
-the process of being expanded. This is done using a global array name
+the process of being expanded. This is done using a global array named
 @code{Currently_expanding}.  If present, it's an error; otherwise the
 name is entered into the array.
 
@@ -1024,9 +1055,11 @@ name is entered into the array.
 # check for recursive expansion
 for (i = 1; i <= num_names; i++) {
 	j = strip_out_name(chunk_names[i])
+
 	if (! (j in Code_contents))
 		fatal(_"expand_one_line: code chunk `%s' used but not defined\n",
 			chunk_names[i]);
+
 	if (j in Currently_expanding)
 		fatal(_"expand_one_line: code chunk `%s' expands itself recursively\n",
 			chunk_names[i])
@@ -1051,6 +1084,8 @@ There are several helper functions used in expanding code chunks:
 The first one is @code{strip_out_name()}, which pulls out the name
 of the chunk from in between the @samp{@@<} and the @samp{@@>}:
 
+@FIXME{This may need to move to the common code section.}
+
 @<Expansion helper functions@>=
 # strip_out_name --- get the name from name
 
@@ -1069,6 +1104,11 @@ preceding the first chunk reference is all white space,
 we insert that part in front of the text of each retrieved
 line. The result is that indentation in the finished, generated
 code, looks reasonable.
+
+This too is an explicit design decision. Knuth's original
+@command{TANGLE} made the generated code as ugly as possible
+so that there would be no temptation to work with it directly.
+I don't want to be so draconian.
 
 @<Get the code lines, insert white space if needed@> =
 code_lines = code_body(chunk_names[1])
@@ -1094,9 +1134,13 @@ for (i = 2; i <= nparts; i++) {
 }
 @
 
+@FIXME{Bug here!!! The code contents is used to index itself.
+This needs retesting on a line with multiple chunk names on
+the same line.}
+
 The @code{code_body()} function retrieves the code associated
 with a chunk name. Since @code{Code_contents} is indexed by chunk names
-without the leading brackets, this just strips them off using
+without the enclosing brackets, this just strips them off using
 @code{strip_out_name()}.
 
 @<Expansion helper functions@> =
@@ -1108,17 +1152,118 @@ function code_body(name,	l)
 }
 @
 
-Let's not forget to define @code{Chunk_name_pattern}, which is
-used throughout the expansion process.
+@node jrtangle before everything
+@section Doing Something Before Extracting Any Files
 
-@FIXME{This may need to move to the common code}.
+If a @value{TWJR} document describes many source files, it is
+logical to want to have subdirectories of different kinds for
+different files, and perhaps to run some kind of configuration
+or other initialization programs.  To that end, the author of
+the document can provide a script (or command invoking a script)
+bracketed @samp{@@initial_setup @dots{} @end initial_setup} lines.
 
-@<Expansion helper functions@> =
-BEGIN {
-	Chunk_name_pattern = "@<[^>]+@>"
+Such lines must first be gathered, using the now familiar collection
+pattern:
+
+@(jrtangle@) =
+@<Collect initial setup lines@>
+@
+
+@<Collect initial setup lines@>=
+/^@initial_setup$/, /^@end initial_setup$/ {
+	if ("initial_setup" in Line_numbers)
+		fatal(_"cannot nest @initial_setup inside another @initial_setup\n");
+
+	# start of iftangle, save line number, skip this line
+	if (/^@initial_setup$/) {
+		Line_numbers["initial_setup"] = (FILENAME ":" FNR)
+		Initial_setup = ""
+		next
+	}
+
+	# end of iftangle, delete line number, skip this line
+	if (/^@end initiali_setup$/) {
+		delete Line_numbers["initiali_setup"]
+		next
+	}
+
+	# otherwise fall through into the rest of the code
+	Initial_setup = Initial_setup "\n" $0
 }
 @
 
+As a result of the @samp{Initial_setup = ""} statement, the last such section
+``wins.''  I don't see a reason to make this something that accumulates.
+
+Besides giving the user control over the initial setup, this scheme has the
+advantage of being OS-independent; a Windows user can write batch commands
+in such a section, whereas a user on a POSIX system can write a shell script,
+and @command{gawk} doesn't have to care.
+
+In the @code{END} block that dumps the file, we run the command collected
+in @code{Initial_setup}.  Note that it is up to the author of the program
+to make sure that the commands are safe to run multiple times in a row.
+For example, when creating directories, it is better to write something like
+this:
+
+@example
+for i in src doc support @dots{}
+if [ ! -d $i ]
+then
+    mkdir $i
+fi
+@end example
+
+@noindent
+The above loop checks that each directory does not exist before
+creating it.  Running the @code{Initial_setup} is easy:
+
+@<Do any initial setup@>=
+if (length(Initial_setup) > 0)
+	system(Initial_setup)
+@
+
+@node jrtangle avoiding update
+@section Avoiding Update of Unchanged Files
+
+@ignore
+define a template, specifying directory, filename and "tmp" extension.
+
+@@file_update_recipe path filename tmpsuffix
+returned output name for gawk is path/(filename tmpsuffix)
+
+if [ ! -f path/filename ]
+then
+	mv $outname path/filename
+elif cmp -s $outname path/file > /dev/null
+then
+	:
+else
+	mv $outname path/filename
+fi
+
+@@end file_update_recipe
+
+@@update_file foo.c src .mytmp$$
+@@update_file foo.1 man .mtmp$$
+
+defaults are path -> @path@. , filename -> @file@ , tmpsuffix -> @suffix@
+fix this up...
+default recipe =
+if [ ! -f "path/filename" ]
+then
+	mv "$outname" "path/filename"
+elif cmp -s "$outname" "path/file" > /dev/null
+then
+	:
+else
+	mv "$outname" "path/filename"
+fi
+
+Code should go through each one and escape . * ? \  $
+
+
+@end ignore
 
 @node jrtangle after creation
 @section Doing Something After Creating A File
@@ -1130,7 +1275,7 @@ been created.  For example to make a script file executable.
 @<Post Creation Tasks@>
 @
 
-The way to do this is to specify a line that looks like this
+The way to do this is to specify a line like the following:
 
 @example
 @@post_create @var{filename} @var{command to run}
@@ -1151,12 +1296,21 @@ the file is created.
 }
 @
 
+And when dumping files, we run the associated command:
+
+@<Run ``post create'' commands@> =
+# run any "post create" command (such as changing mode)
+if (i in Post_create_commands)
+	system(Post_create_commands[i])
+@
+
 @node Common Chunks
 @section Common Code Chunks and Functions
 
 This section contains code chunks and @command{awk}
 functions that will be useful in both @command{jrtangle}
 and @command{jrweave}.
+
 
 @<GPL 3 Copyright statement@>=
 #
@@ -1371,6 +1525,13 @@ function create_file_update_values(filename, results,	dir, command)
 @chapter Weaving: The @command{jrweave} Program
 
 Weaving a @value{TWJR} document is in fact the more challenging task. @dots{}
+
+@node Evaluation
+@chapter Evaluation
+
+Design decision to produce every file and let user code check if duplicated.
+
+May need to provide @samp{@@include} in order to scale to bigger programs.
 
 @node Code Segment Summaries
 @appendix Code Segment Summaries

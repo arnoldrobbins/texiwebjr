@@ -1,0 +1,312 @@
+#! /usr/local/bin/gawk -f
+
+# Copyright (C) 2013 Arnold David Robbins
+# 
+# This file is part of TexiWeb Jr., a literate programming system.
+# 
+# TexiWeb Jr. is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# TexiWeb Jr. is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+# For tangling we skip everything
+
+/^@iftangle[[:space:]]*$/, /^@end iftangle[[:space:]]*$/ {
+	if ("ifweave" in Line_numbers)
+		fatal(_"cannot nest @ifweave inside @iftangle\n");
+
+	# start of ifweave, save line number
+	if (/^@ifweave[[:space:]]*$/)
+		Line_numbers["iftangle"] = (FILENAME ":" FNR)
+
+	# end of ifweave, delete line number
+	if (/^@end ifweave[[:space:]]*$/)
+		delete Line_numbers["iftangle"]
+	
+	# simply skip these lines, this is tangling
+	next
+}
+
+# For weaving we remove the bracketing control lines and let anything
+# in between fall through.
+
+/^@ifweave[[:space:]]*$/, /^@end ifweave[[:space:]]*$/ {
+	if ("iftangle" in Line_numbers)
+		fatal(_"cannot nest @iftangle inside @ifweave\n");
+
+	# start of iftangle, save line number, skip this line
+	if (/^@iftangle[[:space:]]*$/) {
+		Line_numbers["ifweave"] = (FILENAME ":" FNR)
+		next
+	}
+
+	# end of iftangle, delete line number, skip this line
+	if (/^@end iftangle[[:space:]]*$/) {
+		delete Line_numbers["ifweave"]
+		next
+	}
+
+	# otherwise fall through into the rest of the code
+}
+
+# File chunks start with "@(filename.c) =" in column 1. Unlike TexiWeb and
+# like noweb, we dont require += to add more stuff to a definition. We
+# just use = and figure it out. File chunks end with a single @ on a line
+# by itself, with the @ in column 1.
+#
+# Instead of using a range pattern, we use a boolean flag; this lets us
+# avoid special-casing the first and last lines.
+
+$0 ~ File_chunk_pattern {
+	print "@example"
+	x = gensub(/[@{}]/, "@&", "g")
+	print x
+
+	new_file = gensub(File_chunk_pattern, "\\1", 1)
+	if (Gathering_file) {
+		fatal(_"file start of %s found while still collecting %s\n",
+			Source_file, new_file)
+	}
+	check_unfinished()
+
+	Gathering_file = TRUE
+	Line_numbers["File_chunk"] = (FILENAME ":" FNR)
+	Source_file = new_file
+
+	if (Debug ~ /filename/)
+		printf("saw new filename %s\n", Source_file) > "/dev/stderr"
+
+	next
+}
+
+# The BEGIN rule sets up some constants. File_chunk_pattern is a variable since
+# it needs to be used for matching and with gensub(). This is better than repeating
+# it in the code.
+
+BEGIN {
+	TRUE = 1
+	FALSE = 0
+	File_chunk_pattern = "^@\\(([^)]+)@\\)[[:space:]]*=[[:space:]]*$"
+}
+
+# Here is the @ sign that ends the input file.
+# It also ends code segments.
+
+/^@[[:space:]]*$/ {
+	if (Gathering_file)
+		end_file_gathering()
+	else if (Gathering_code)
+		end_code_gathering()
+	else
+		warning(_"unmatched terminating @-sign: ignored\n")
+	
+	next
+}
+
+# After some experimentation, things are simplest if file contents and
+# code chunks do NOT have the final terminating newline. Code that outputs
+# file contents must remember to add the final newline.
+
+# end_file_gathering ---finish up collecting a file
+
+function end_file_gathering()
+{
+	Gathering_file = FALSE
+
+	# print the file
+	x = expand_tabs(File_lines, 4)
+	print gensub(/[@{}]/, "@&", "g", x)
+	print "@@"
+	print "@end example"
+
+	File_lines = ""
+	Line_numbers["File_chunk"] = ""
+
+	if (Debug ~ /filename/)
+		printf("finished collecting file %s\n", Source_file) > "/dev/stderr"
+}
+
+# Error checking:
+
+END {
+	check_unfinished()
+}
+
+# check_unfinished --- print a fatal error when an unfinished code or
+#			file section is detected. Also ifweave / iftangle.
+
+function check_unfinished()
+{
+	if (Gathering_code)
+		fatal(_"unfinished code section (started at %s)\n",
+			Line_numbers["Code_chunk"])
+	else if (Gathering_file)
+		fatal(_"unfinished file section (started at %s)\n",
+			Line_numbers["File_chunk"])
+
+	if ("ifweave" in Line_numbers)
+		fatal(_"unfinished @ifweave section (started at %s)\n",
+			Line_numbers["ifweave"])
+	if ("iftangle" in Line_numbers)
+		fatal(_"unfinished @iftangle section (started at %s)\n",
+			Line_numbers["iftangle"])
+}
+
+# And gathering up the file is simple. Collect each line and append it.
+# Any embedded code segments are expanded at the end.
+
+Gathering_file {
+	if (File_lines == "")
+		File_lines = $0
+	else
+		File_lines = File_lines "\n" $0
+	
+	next
+}
+
+
+BEGIN {
+	Code_chunk_pattern = "^@" "<(.+)" "@>[[:space:]]*=[[:space:]]*$"
+}
+
+$0 ~ Code_chunk_pattern {
+	print "@example"
+	x = gensub(/[@{}]/, "@&", "g")
+	print x
+
+	new_code = gensub(Code_chunk_pattern, "\\1", 1)
+	if (Gathering_code) {
+		fatal(_"code start of %s found while still collecting %s\n",
+			Code_chunk, new_code)
+	}
+	check_unfinished()
+
+	Gathering_code = TRUE
+	Code_chunk = new_code
+	Line_numbers["Code_chunk"] = (FILENAME ":" FNR)
+
+	if (Debug ~ /code/)
+		printf("saw new code chunk %s\n", Code_chunk) > "/dev/stderr"
+
+	next
+}
+
+# Gather up the code segment.
+# Any embedded code segments are expanded at the end.
+
+Gathering_code {
+	if (Code_lines == "")
+		Code_lines = $0
+	else
+		Code_lines = Code_lines "\n" $0
+	next
+}
+
+function end_code_gathering()
+{
+	Gathering_code = FALSE
+
+	# print the code
+	x = expand_tabs(Code_lines, 4)
+	print gensub(/[@{}]/, "@&", "g", x)
+
+	print "@@"
+	print "@end example"
+
+	Code_lines = ""
+	Code_chunk_start = ""
+
+	if (Debug ~ /code/)
+		printf("finished collecting code %s\n", Code_chunk) > "/dev/stderr"
+}
+
+BEGIN {
+	Chunk_name_pattern = "@<[^>]+@>"
+}
+
+{ print }
+
+# Helper functions
+
+# message --- write a particular kind of message out to stderr
+#
+function message(msg, format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+{
+	printf("%s:%d: %s: " format, FILENAME, FNR, msg,
+		a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) > "/dev/stderr"
+	exit 1
+}
+
+# fatal --- print a fatal error message and exit.
+#	 No varargs, so fake it with lots of parameters.
+
+function fatal(format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+{
+	message(_"fatal", format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+	exit 1
+}
+
+# warning --- print a warning message to stderr
+#	 No varargs, so fake it with lots of parameters.
+
+function warning(format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+{
+	message(_"warning", format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+}
+
+# expand_tabs --- expand tabs in the string
+
+function expand_tabs(string, tabstop,	chars, out, i, j, k, n)
+{
+	if (tabstop < 2)
+		fatal(_"expand_tabs: tabstop %d < 2\n", tabstop)
+
+	n = split(string, chars, "")
+	j = k = 0
+	for (i = 1; i <= n;) {
+		if (chars[i] == "\n") {
+			out[j++] = chars[i++]
+			k = 0
+			continue
+		}
+
+		if (chars[i] != "\t") {
+			out[j++] = chars[i++]
+			k++
+			continue
+		}
+		i++	# skip the tab
+
+		do {
+			out[j++] = " "
+			k++
+		} while (and(k, tabstop-1) != 0)
+	}
+
+	return join(out, 0, j, SUBSEP)
+}
+
+# join.awk --- join an array into a string
+#
+# Arnold Robbins, arnold@skeeve.com, Public Domain
+# May 1993
+
+function join(array, start, end, sep,    result, i)
+{
+	if (sep == "")
+		sep = " "
+	else if (sep == SUBSEP) # magic value
+		sep = ""
+	result = array[start]
+	for (i = start + 1; i <= end; i++)
+		result = result sep array[i]
+	return result
+}
