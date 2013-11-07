@@ -1,3 +1,7 @@
+2013-11-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* jrweave0: Allow for @post_create.
+
 2013-11-06         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* jrtangle0, jrweave0, makepdf0: Bootstrapping scripts.

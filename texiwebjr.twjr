@@ -535,6 +535,7 @@ The file starts with the obligatory @samp{#!} header and copyright
 statements, followed by functions common to both @command{jrtangle}
 and @command{jrweave}.
 
+@post_create jrtangle chmod +x jrtangle
 @(jrtangle@) =
 @<Shebang header@>
 @<Common Chunks@>
@@ -561,8 +562,11 @@ out at the top of the file. The actual license text is provided later.
 @ignore
 
 # FIXME:
-#	3. Set up a command to do noweb cpif functionality.
+#	3. Set up a structure to do noweb cpif functionality.
 #	4. Move different flags into an array, a la line numbers.
+#	5. Add a command to chunks in smallexample.
+#	6. Add a way to specify leading comment delimiter or to use what was
+#	   on invocation line.
 @end ignore
 
 @menu
@@ -1160,7 +1164,7 @@ logical to want to have subdirectories of different kinds for
 different files, and perhaps to run some kind of configuration
 or other initialization programs.  To that end, the author of
 the document can provide a script (or command invoking a script)
-bracketed @samp{@@initial_setup @dots{} @end initial_setup} lines.
+bracketed @samp{@@initial_setup @dots{} @@end initial_setup} lines.
 
 Such lines must first be gathered, using the now familiar collection
 pattern:
@@ -1526,6 +1530,8 @@ function create_file_update_values(filename, results,	dir, command)
 
 Weaving a @value{TWJR} document is in fact the more challenging task. @dots{}
 
+@post_create jrweave chmod +x jrweave
+
 @node Evaluation
 @chapter Evaluation
 
@@ -1608,3 +1614,5 @@ ISBN-13: 978-0937073803.
 @printindex cp
 
 @bye
+
+bootstrapping chapter

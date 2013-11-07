@@ -1,3 +1,8 @@
+2013-11-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Misc minor changes. Some serious ones blown
+	away by accidentally doing them in the .texi file. Duh.
+
 2013-11-06         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: More improvements in jrtangle, especially

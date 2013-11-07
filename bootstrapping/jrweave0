@@ -57,6 +57,8 @@
 	# otherwise fall through into the rest of the code
 }
 
+/^@post_create/	{ next }
+
 # File chunks start with "@(filename.c) =" in column 1. Unlike TexiWeb and
 # like noweb, we dont require += to add more stuff to a definition. We
 # just use = and figure it out. File chunks end with a single @ on a line
