@@ -6,7 +6,7 @@
 @settitle TexiWeb Jr.---A Super Simple Literate Programming System
 @c %**end of header (This is for running Texinfo on a region.)
 
-@set xref-automatic-section-title
+@xrefautomaticsectiontitle on
 
 @c The following information should be updated here only!
 @c This sets the edition of the document.
@@ -176,7 +176,6 @@ ISRAEL @*
 Email: @EMAIL{arnold@@skeeve.com,arnold AT skeeve.com} @*
 URL: @url{http://www.skeeve.com/} @*
 
-@sp 2
 @insertcopying
 @end titlepage
 
@@ -203,16 +202,18 @@ on top of the Texinfo document formatting markup language.
 @end ifnottex
 
 @menu
-* Preface::             Preface.
-* Introduction::        Introduction.
-* jrtangle code::       The code for @command{jrtangle}.
-* jrwreave code::       The code for @command{jrwreave}.
-* Evaluation::          Evaluation.
-* Code Segment Summaries:: Alpabetic lists of code segments
-                        by defintion and by reference.
+* Preface::                 Preface.
+* Introduction::            Introduction.
+* jrtangle code::           The code for @command{jrtangle}.
+* jrwreave code::           The code for @command{jrwreave}.
+* Bootstrapping::           Chicken and egg issues.
+* Evaluation and Futures::  Evaluation and future work.
+* Command summary::         Alphabetic list of @value{TWJR} commands.
+* Code Segment Summaries::  Alpabetic lists of code segments
+                            by defintion and by reference.
 * Use of @command{gawk} features:: Features Specific to @command{gawk}.
-* Bibliography::        Reference material.
-* Concept Index::       The concept index.
+* Bibliography::            Reference material.
+* Concept Index::           The concept index.
 @detailmenu
 @end detailmenu
 @end menu
@@ -272,6 +273,11 @@ and also be familiar with the @command{awk} programming language.
 In particular, @value{TWJR} makes use of additional features in
 @command{gawk} (the GNU implementation of Awk).@footnote{This
 in hardly surprising, since I maintain @command{gawk}.}
+
+You should also understand at least the basics of @command{make}
+and @file{Makefile} construction, since it is important that
+@value{TWJR} work in a Unix-style command-line environment
+with @command{make}.
 
 @node Overview
 @unnumberedsec What Is Covered
@@ -544,8 +550,12 @@ and @command{jrweave}.
 @
 
 On my system, the latest version of @command{gawk} lives
-in @file{/usr/local/bin2}. This should be changed on
-some other system.
+in @file{/usr/local/bin}. This should be changed on
+your system if it's not correct.
+
+As a general note, @command{jrtangle} (@FIXME{and @command{jrweave}?})
+need features introduced in @command{gawk} 4.0; previous versions will
+not work.
 
 @<Shebang header@>=
 #! /usr/local/bin2/gawk -f
@@ -562,9 +572,7 @@ out at the top of the file. The actual license text is provided later.
 @ignore
 
 # FIXME:
-#	3. Set up a structure to do noweb cpif functionality.
-#	4. Move different flags into an array, a la line numbers.
-#	5. Add a command to chunks in smallexample.
+#	5. Add a command to do chunks in smallexample.
 #	6. Add a way to specify leading comment delimiter or to use what was
 #	   on invocation line.
 @end ignore
@@ -616,11 +624,11 @@ a capital letter.
 	if ("iftangle" in Line_numbers)
 		fatal(_"cannot nest @iftangle inside @ifweave\n");
 
-	# start of ifweave, save line number
+	# start of construct, save line number
 	if (/^@ifweave[[:space:]]*$/)
 		Line_numbers["ifweave"] = (FILENAME ":" FNR)
 
-	# end of ifweave, delete line number
+	# end of construct, delete line number
 	if (/^@end ifweave[[:space:]]*$/)
 		delete Line_numbers["ifweave"]
 	
@@ -635,13 +643,13 @@ a capital letter.
 	if ("ifweave" in Line_numbers)
 		fatal(_"cannot nest @ifweave inside @iftangle\n");
 
-	# start of iftangle, save line number, skip this line
+	# start of construct, save line number, skip this line
 	if (/^@iftangle[[:space:]]*$/) {
 		Line_numbers["iftangle"] = (FILENAME ":" FNR)
 		next
 	}
 
-	# end of iftangle, delete line number, skip this line
+	# end of construct, delete line number, skip this line
 	if (/^@end iftangle[[:space:]]*$/) {
 		delete Line_numbers["iftangle"]
 		next
@@ -679,16 +687,19 @@ value, such as @samp{filename code} and debug as many different aspects
 of the program simultaneously as we might want.  Use of the @command{gawk}
 built-in debugger can also help.
 
+Similar to @code{Line_numbers}, @code{Flags} is a global array of
+flags indexed by strings indicating what we're doing.
+
 @<Process file chunks for @code{jrtangle}@>=
 $0 ~ File_chunk_pattern {
 	new_file = gensub(File_chunk_pattern, "\\1", 1)
-	if (Gathering_file) {
+	if (Flags["File_chunk"]) {
 		fatal(_"file start of %s found while still collecting %s\n",
 			Source_file, new_file)
 	}
 	check_unfinished()
 
-	Gathering_file = TRUE
+	Flags["File_chunk"] = TRUE
 	Line_numbers["File_chunk"] = (FILENAME ":" FNR)
 	Source_file = new_file
 
@@ -716,9 +727,9 @@ It also ends code segments.
 
 @<Process file chunks for @code{jrtangle}@>=
 /^@[[:space:]]*$/ {
-	if (Gathering_file)
+	if (Flags["File_chunk"])
 		end_file_gathering()
-	else if (Gathering_code)
+	else if (Flags["Code_chunk"])
 		end_code_gathering()
 	else
 		warning(_"unmatched terminating @-sign: ignored\n")
@@ -736,7 +747,7 @@ file contents must remember to add the final newline.
 
 function end_file_gathering()
 {
-	Gathering_file = FALSE
+	Flags["File_chunk"] = FALSE
 
 	if (Source_file in File_contents)
 		File_contents[Source_file] = File_contents[Source_file] "\n" File_lines
@@ -756,11 +767,13 @@ Doing so is simple. Collect each line and append it.
 Any embedded code chunks are expanded at the end.
 
 @<Process file chunks for @code{jrtangle}@>=
-Gathering_file {
+Flags["File_chunk"] {
 	if (File_lines == "")
 		File_lines = $0
 	else
 		File_lines = File_lines "\n" $0
+
+	next
 }
 @
 
@@ -803,13 +816,13 @@ Next the logic:
 @<Process code chunks for @code{jrtangle}@>=
 $0 ~ Code_chunk_pattern {
 	new_code = gensub(Code_chunk_pattern, "\\1", 1)
-	if (Gathering_code) {
+	if (Flags["Code_chunk"]) {
 		fatal(_"code start of %s found while still collecting %s\n",
 			Code_chunk, new_code)
 	}
 	check_unfinished()
 
-	Gathering_code = TRUE
+	Flags["Code_chunk"] = TRUE
 	Code_chunk = new_code
 	Line_numbers["Code_chunk"] = (FILENAME ":" FNR)
 
@@ -822,18 +835,20 @@ $0 ~ Code_chunk_pattern {
 # Gather up the code segment.
 # Any embedded code segments are expanded at the end.
 
-Gathering_code {
+Flags["Code_chunk"] {
 	if (Code_lines == "")
 		Code_lines = $0
 	else
 		Code_lines = Code_lines "\n" $0
+
+	next
 }
 
 # end_code_gathering --- complete process of collecting lines of code chunk
 
 function end_code_gathering()
 {
-	Gathering_code = FALSE
+	Flags["Code_chunk"] = FALSE
 
 	if (Code_chunk in Code_contents)
 		Code_contents[Code_chunk] = Code_contents[Code_chunk] "\n" Code_lines
@@ -871,12 +886,12 @@ END {
 
 function check_unfinished()
 {
-	if (Gathering_code)
-		fatal(_"unfinished code section (started at %s)\n",
-			Line_numbers["Code_chunk"])
-	else if (Gathering_file)
+	if (Flags["File_chunk"])
 		fatal(_"unfinished file section (started at %s)\n",
 			Line_numbers["File_chunk"])
+	else if (Flags["Code_chunk"])
+		fatal(_"unfinished code section (started at %s)\n",
+			Line_numbers["Code_chunk"])
 
 	if ("ifweave" in Line_numbers)
 		fatal(_"unfinished @ifweave section (started at %s)\n",
@@ -934,20 +949,20 @@ indicating which file(s) to extract.
 @<Expand code chunks@>=
 # dump_filenames --- create files and update them as needed
 
-function dump_filenames(	i, s, update_values)
+function dump_filenames(	i, s, update_recipe)
 {
 	for (i in File_contents) {
 		s = expand_code_chunks(File_contents[i])
 
-#		create_file_update_values(i, update_values)
-#		printf("%s\n", s) > update_values["destination"]
-#		close(update_values["destination"])
+		create_update_recipe(i, update_recipe)
+		printf("%s\n", s) > update_recipe["output"]
+		close(update_recipe["output"])
 
-		printf("%s\n", s) > i
-		close(i)
+##		printf("%s\n", s) > i
+##		close(i)
 
-		# cpif the file
-#		system(update_values["command"])
+		# update the file if necessary
+		system(update_recipe["recipe"])
 
 		@<Run ``post create'' commands@>
 	}
@@ -1134,13 +1149,9 @@ with the expansion of the chunks.
 for (i = 2; i <= nparts; i++) {
 	code_lines = code_lines parts[i]
 	if (i in chunk_names)
-		code_lines = code_lines Code_contents[code_body(chunk_names[i])]
+		code_lines = code_lines code_body(chunk_names[i])
 }
 @
-
-@FIXME{Bug here!!! The code contents is used to index itself.
-This needs retesting on a line with multiple chunk names on
-the same line.}
 
 The @code{code_body()} function retrieves the code associated
 with a chunk name. Since @code{Code_contents} is indexed by chunk names
@@ -1178,21 +1189,21 @@ pattern:
 	if ("initial_setup" in Line_numbers)
 		fatal(_"cannot nest @initial_setup inside another @initial_setup\n");
 
-	# start of iftangle, save line number, skip this line
+	# start of construct, save line number, skip this line
 	if (/^@initial_setup$/) {
 		Line_numbers["initial_setup"] = (FILENAME ":" FNR)
 		Initial_setup = ""
 		next
 	}
 
-	# end of iftangle, delete line number, skip this line
-	if (/^@end initiali_setup$/) {
-		delete Line_numbers["initiali_setup"]
+	# end of construct, delete line number, skip this line
+	if (/^@end initial_setup$/) {
+		delete Line_numbers["initial_setup"]
 		next
 	}
 
-	# otherwise fall through into the rest of the code
 	Initial_setup = Initial_setup "\n" $0
+	next
 }
 @
 
@@ -1220,54 +1231,165 @@ fi
 
 @noindent
 The above loop checks that each directory does not exist before
-creating it.  Running the @code{Initial_setup} is easy:
+creating it.
+
+Just in case, we append a final newline to the text of
+@code{Initial_setup}.  Running the @code{Initial_setup} is easy:
 
 @<Do any initial setup@>=
-if (length(Initial_setup) > 0)
+if (length(Initial_setup) > 0) {
+	Initial_setup = Initial_setup "\n"
 	system(Initial_setup)
+}
 @
 
 @node jrtangle avoiding update
 @section Avoiding Update of Unchanged Files
 
-@ignore
-define a template, specifying directory, filename and "tmp" extension.
+This should get interesting.  First, let's talk about 
+what @command{noweb} does.  To extract a file, you
+tell @command{notangle} which file you are interested in,
+and it prints the file contents to standard output. Said
+contents may be redirected straight into the destination file.
+Or they may be passed to a special program named @command{cpif}
+(``copy if'') that compares the new contents to those of the
+existing file on disk.  It goes something like this:
 
-@@file_update_recipe path filename tmpsuffix
-returned output name for gawk is path/(filename tmpsuffix)
+@example
+notangle -Rfoo.c foo.nw | cpif foo.c
+@end example
 
-if [ ! -f path/filename ]
-then
-	mv $outname path/filename
-elif cmp -s $outname path/file > /dev/null
-then
-	:
-else
-	mv $outname path/filename
-fi
+Then, if @file{foo.c} has not changed, it will not be updated.
+This is most useful in @file{Makefile} rules, since it prevents
+@command{make} from recompiling @file{foo.c} unnecessarily.
 
-@@end file_update_recipe
+I would prefer a mechanism that doesn't require the user to
+install (or me to write) a separate program such as @command{cpif}.
+In addition, I would like it to be possible to take directory structure
+into account, since modern large programs generally group different
+components into different subdirectories.
 
-@@update_file foo.c src .mytmp$$
-@@update_file foo.1 man .mtmp$$
+To that end, I think it makes sense to define a @dfn{template}
+that describes how to update a file using system-level (shell)
+commands.  Then for each file, the author can specify how to
+make the substitutions in the template in order to do the update.
 
-defaults are path -> @path@. , filename -> @file@ , tmpsuffix -> @suffix@
-fix this up...
-default recipe =
-if [ ! -f "path/filename" ]
-then
-	mv "$outname" "path/filename"
-elif cmp -s "$outname" "path/file" > /dev/null
-then
-	:
-else
-	mv "$outname" "path/filename"
-fi
+We will define a default template, with the option for the user
+to override it.
 
-Code should go through each one and escape . * ? \  $
+The template is defined with @samp{@@file_update_recipe @dots{}
+@@end file_update_recipe}, and each file supplies values to the
+template with @samp{@@file_update @var{file} @var{directory} @var{suffix}}.
 
+@(jrtangle@) =
+@<File update recipe handling@>
+@
 
-@end ignore
+Let's start with the default template. Taking a page from
+Autoconf's book, we will use @samp{@@@var{param}@@} to
+specify the parameters. The possible parameters have hard-coded
+names: @code{DIR}, @code{FILE}, @code{SUFFIX}.
+
+@<File update recipe handling@>=
+BEGIN {
+	Update_recipe = \
+		"PATH=/bin:/usr/bin\n" \
+		"export PATH\n" \
+		"destname=\"@DIR@/@FILE@\"\n" \
+		"outname=\"${destname}@SUFFIX@\"\n" \
+		"if [ ! -f \"$destname\" ]\n" \
+		"then\n" \
+		"\tmv \"$outname\" \"$destname\"\n" \
+		"elif cmp -s \"$outname\" \"$destname\" > /dev/null\n" \
+		"then\n" \
+		"\t:\n" \
+		"else\n" \
+		"\tmv \"$outname\" \"$destname\"\n" \
+		"fi\n"
+}
+@
+
+The user can override this template. The collection code will look
+familiar by now:
+
+@<File update recipe handling@>=
+/^@file_update_recipe$/, /^@file_update_recipe$/ {
+	if ("file_update_recipe" in Line_numbers)
+		fatal(_"cannot nest @file_update_recipe inside another @file_update_recipe\n");
+
+	# start of construct, save line number, skip this line
+	if (/^@file_update_recipe$/) {
+		Line_numbers["file_update_recipe"] = (FILENAME ":" FNR)
+		Update_recipe = ""
+		next
+	}
+
+	# end of construct, delete line number, skip this line
+	if (/^@end file_update_recipe$/) {
+		delete Line_numbers["file_update_recipe"]
+		next
+	}
+
+	Update_recipe = Update_recipe "\n" $0
+
+	next
+}
+@
+
+Next we have to handle the definitions provide by the user. Well, actually,
+this brings up the fact that we need defaults in case the user doesn't
+provide values.  At this point, @command{gawk}'s true multidimensional arrays
+add some nice clarity to what's going on:
+
+@<File update recipe handling@>=
+BEGIN {
+	# @default is an unlikely name for a real file
+	Update_value["@default"]["DIR"] = "."	# current directory
+	Update_value["@default"]["SUFFIX"] = ".twjr_tmp"	# an unlikely suffix
+	# No default for filename, jrtangle knows it!
+}
+@
+
+And @emph{now} we can deal with the user's values:
+
+@<File update recipe handling@>=
+/^@file_update / {
+	if (NF != 4)
+		fatal(_"usage: @file_update name dir suffix\n")
+
+	Update_value[$2]["DIR"] = $3
+	Update_value[$2]["SUFFIX"] = $4
+
+	next
+}
+@
+
+Finally, we have to deal with creating the per-file template
+string and the name of the destination file (a temporary one)
+in which to place the output.
+
+@<File update recipe handling@>=
+# create_update_recipe --- create update recipe per file, return dest filename
+
+function create_update_recipe(file, results,		source_file, dir, suffix, recipe)
+{
+	if (file in Update_value)
+		source_file = file
+	else
+		source_file = "@default"
+	
+	dir = Update_value[source_file]["DIR"]
+	suffix = Update_value[source_file]["SUFFIX"]
+
+	delete results
+	recipe = gensub(/@DIR@/, dir, "g", Update_recipe)
+	recipe = gensub(/@FILE@/, file, "g", recipe)
+	recipe = gensub(/@SUFFIX@/, suffix, "g", recipe)
+	results["recipe"] = recipe
+
+	results["output"] = (dir "/" file suffix)
+}
+@
 
 @node jrtangle after creation
 @section Doing Something After Creating A File
@@ -1314,7 +1436,6 @@ if (i in Post_create_commands)
 This section contains code chunks and @command{awk}
 functions that will be useful in both @command{jrtangle}
 and @command{jrweave}.
-
 
 @<GPL 3 Copyright statement@>=
 #
@@ -1429,102 +1550,6 @@ function dump_chunks(	i, format)
 }
 @
 
-
-@ignore
-
-# Along the same lines, we want to be able to update files
-# only if they have changed.  This is done in noweb by the "cpif"
-# program which means "copy if changed".  We will call it
-# update_file and allow the user to replace it.
-#
-# Usage is
-# 	@update_file [PATH] FILE [SUFFIX]
-# Default path is "."
-# Default suffix is ".tmp"
-#
-# This supplies a template that is then used for creating
-# each file.  Tangle substitutes the parameters in the
-# recipe and executes the result, supplying the current
-# filename for FILE.  PATH and SUFFIX are fixed.
-
-/^@update_file/, /^@end update_file/ {
-	if (/^@update_file/) {
-		delete Update_file	# starting over
-
-		if (NF == 1) {
-			fatal(_"@update_file: missing parameters")
-		} else if (NF == 2) {
-			Update_file["path"] = "."
-			Udpate_file["filename"] = $2
-			Update_file["suffix"] = ".tmp"
-		} else if (NF == 3) {
-			Update_file["path"] = "."
-			Udpate_file["filename"] = $2
-			Update_file["suffix"] = ".tmp"
-		} else {
-			# NF >= 4
-			Update_file["path"] = $2
-			Udpate_file["filename"] = $3
-			Update_file["suffix"] = $4
-			if (NF > 4)
-				warning(_"@update_file: ignoring extra argurments")
-		}
-
-		next
-	}
-
-	if (/^@end update_file/) {
-		next
-	}
-
-	if ("text" in Update_file)
-		Update_file["text"] = Update_file["text"] "\n" $0
-	else
-		Update_file["text"] = $0
-}
-
-# Here are the defaults for Update_file
-
-BEGIN {
-	Update_file["path"] = "FULLPATH"
-	Update_file["filename"] = "FILENAME"
-	Update_file["suffix"] = ".tmp"
-	Update_file["text"] = \
-		"if [ -f FULLPATH/FILENAME ]\n" \
-		"then\n" \
-		"\tif cmp FULLPATH/FILENAME.tmp FULLPATH/FILENAME > /dev/null\n" \
-		"\tthen\n" \
-		"\t\trm FULLPATH/FILENAME.tmp\n" \
-		"\telse\n" \
-		"\t\tmv FULLPATH/FILENAME.tmp FULLPATH/FILENAME\n" \
-		"\tfi\n" \
-		"else\n" \
-		"\tmv FULLPATH/FILENAME.tmp FULLPATH/FILENAME\n" \
-		"fi\n"
-
-	if (Debug ~ /shell/)
-		Update_file["text"] = "set -x; " Update_file["text"]
-}
-
-# create_file_update_values --- take a filename and return strings
-
-function create_file_update_values(filename, results,	dir, command)
-{
-	delete results
-
-	# determine directory
-	# dir = ...
-	results["destination"] = dir "/" filename Update_file["suffix"]
-	command = Update_file["text"]
-	gsub(Update_file["filename"], filename, command)
-#	gsub(Update_file["suffix"], filename, command)
-	gsub(Update_file["path"], dir, command)
-	results["command"] = command
-}
-
-@end ignore
-
-
 @node jrweave code
 @chapter Weaving: The @command{jrweave} Program
 
@@ -1532,12 +1557,26 @@ Weaving a @value{TWJR} document is in fact the more challenging task. @dots{}
 
 @post_create jrweave chmod +x jrweave
 
-@node Evaluation
-@chapter Evaluation
+@node Bootstrapping
+@chapter Bootstrapping The System
+
+@quotation
+Which came first, the chicken or the egg?@footnote{http://www.gagcartoons.com/cartoons/171/}
+@end quotation
+
+@node Evaluation and Futures
+@chapter Evaluation and Future Work
 
 Design decision to produce every file and let user code check if duplicated.
 
 May need to provide @samp{@@include} in order to scale to bigger programs.
+
+Tangle enhancements, in particular putting in @samp{#line} lines for C and C++.
+
+@node Command summary
+@appendix Alphabetic List of @value{TWJR} Commands
+
+@FIXME{Write me.}
 
 @node Code Segment Summaries
 @appendix Code Segment Summaries
@@ -1591,6 +1630,10 @@ tabs. This would have to be done differently in a standard @command{awk}.
 This one is easy. A translatable string looks like the concatenation of
 a variable named @samp{_} with a string constant. Such constructs should
 work as-is in other @command{awk} versions.
+
+@item Multidimensional Arrays
+Here too, the standard syntax could be made to work, by contorting
+the code slightly. However, the multidimensional arrays are cleaner.
 @end table
 
 @node Bibliography
@@ -1615,4 +1658,6 @@ ISBN-13: 978-0937073803.
 
 @bye
 
-bootstrapping chapter
+TODO:
+- Full indexing of variables and functions
+- Adding URLs where needed.

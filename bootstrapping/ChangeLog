@@ -1,3 +1,8 @@
+2013-11-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* jrtangle0: Bug fix for lines with multiple chunks.
+	* jrweave0: Print out a "do not edit" warning to avoid confusion.
+
 2013-11-07         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* jrweave0: Allow for @post_create.

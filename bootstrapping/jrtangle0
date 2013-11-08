@@ -469,7 +469,7 @@ function expand_one_line(input_line,	parts, chunk_names, nparts, num_names, code
 	for (i = 2; i <= nparts; i++) {
 		code_lines = code_lines parts[i]
 		if (i in chunk_names)
-			code_lines = code_lines Code_contents[code_body(chunk_names[i])]
+			code_lines = code_lines code_body(chunk_names[i])
 	}
 
 	if (code_lines ~ Chunk_name_pattern)
