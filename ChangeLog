@@ -1,3 +1,8 @@
+2013-11-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: jrweave done enough that what it produces
+	can be formatted with TeX.  Still lots to go.
+
 2013-11-08         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Pretty much finished the full jrtangle,
