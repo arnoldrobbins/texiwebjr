@@ -575,6 +575,7 @@ out at the top of the file. The actual license text is provided later.
 #	5. Add a command to do chunks in smallexample.
 #	6. Add a way to specify leading comment delimiter or to use what was
 #	   on invocation line.
+#	7. Add a way to turn on debugging of shell commands with set -x
 @end ignore
 
 @menu
@@ -622,7 +623,7 @@ a capital letter.
 
 /^@ifweave[[:space:]]*$/, /^@end ifweave[[:space:]]*$/ {
 	if ("iftangle" in Line_numbers)
-		fatal(_"cannot nest @iftangle inside @ifweave\n");
+		fatal(_"cannot nest @iftangle inside @ifweave\n")
 
 	# start of construct, save line number
 	if (/^@ifweave[[:space:]]*$/)
@@ -641,7 +642,7 @@ a capital letter.
 
 /^@iftangle[[:space:]]*$/, /^@end iftangle[[:space:]]*$/ {
 	if ("ifweave" in Line_numbers)
-		fatal(_"cannot nest @ifweave inside @iftangle\n");
+		fatal(_"cannot nest @ifweave inside @iftangle\n")
 
 	# start of construct, save line number, skip this line
 	if (/^@iftangle[[:space:]]*$/) {
@@ -944,8 +945,6 @@ is a bad idea. If experience shows us that this is so, this is
 where to make the change, along with new code to take a command-line option
 indicating which file(s) to extract.
 
-@FIXME{Commented out code is for work in progress.}
-
 @<Expand code chunks@>=
 # dump_filenames --- create files and update them as needed
 
@@ -957,9 +956,6 @@ function dump_filenames(	i, s, update_recipe)
 		create_update_recipe(i, update_recipe)
 		printf("%s\n", s) > update_recipe["output"]
 		close(update_recipe["output"])
-
-##		printf("%s\n", s) > i
-##		close(i)
 
 		# update the file if necessary
 		system(update_recipe["recipe"])
@@ -1016,7 +1012,7 @@ used throughout the expansion process.
 
 @<Common Chunks@>=
 BEGIN {
-	Chunk_name_pattern = "@<[^>]+@>"
+	Chunk_name_pattern = "@<[^>\n]+@>"
 }
 @
 
@@ -1077,7 +1073,7 @@ for (i = 1; i <= num_names; i++) {
 
 	if (! (j in Code_contents))
 		fatal(_"expand_one_line: code chunk `%s' used but not defined\n",
-			chunk_names[i]);
+			chunk_names[i])
 
 	if (j in Currently_expanding)
 		fatal(_"expand_one_line: code chunk `%s' expands itself recursively\n",
@@ -1105,7 +1101,7 @@ of the chunk from in between the @samp{@@<} and the @samp{@@>}:
 
 @FIXME{This may need to move to the common code section.}
 
-@<Expansion helper functions@>=
+@<Helper Functions@> =
 # strip_out_name --- get the name from name
 
 function strip_out_name(name, l)
@@ -1187,7 +1183,7 @@ pattern:
 @<Collect initial setup lines@>=
 /^@initial_setup$/, /^@end initial_setup$/ {
 	if ("initial_setup" in Line_numbers)
-		fatal(_"cannot nest @initial_setup inside another @initial_setup\n");
+		fatal(_"cannot nest @initial_setup inside another @initial_setup\n")
 
 	# start of construct, save line number, skip this line
 	if (/^@initial_setup$/) {
@@ -1302,7 +1298,7 @@ BEGIN {
 		"\tmv \"$outname\" \"$destname\"\n" \
 		"elif cmp -s \"$outname\" \"$destname\" > /dev/null\n" \
 		"then\n" \
-		"\t:\n" \
+		"\trm \"$outname\"\n" \
 		"else\n" \
 		"\tmv \"$outname\" \"$destname\"\n" \
 		"fi\n"
@@ -1315,7 +1311,7 @@ familiar by now:
 @<File update recipe handling@>=
 /^@file_update_recipe$/, /^@file_update_recipe$/ {
 	if ("file_update_recipe" in Line_numbers)
-		fatal(_"cannot nest @file_update_recipe inside another @file_update_recipe\n");
+		fatal(_"cannot nest @file_update_recipe inside another @file_update_recipe\n")
 
 	# start of construct, save line number, skip this line
 	if (/^@file_update_recipe$/) {
@@ -1345,7 +1341,7 @@ add some nice clarity to what's going on:
 BEGIN {
 	# @default is an unlikely name for a real file
 	Update_value["@default"]["DIR"] = "."	# current directory
-	Update_value["@default"]["SUFFIX"] = ".twjr_tmp"	# an unlikely suffix
+	Update_value["@default"]["SUFFIX"] = ".tangle_tmp"	# an unlikely suffix
 	# No default for filename, jrtangle knows it!
 }
 @
@@ -1560,6 +1556,7 @@ have to remove any lines that are just for @command{jrtangle},
 since Texinfo won't know what to do with them.
 
 @menu
+* jrweave two passes::            Two pass design.
 * jrweave initial code::          Initial Stuff and Printing A Warning.
 * jrweave ifweave iftangle::      Text inclusion/exclusion for @command{jrwaeave}.
 * jrweave language additions::    Extra stuff for authors.
@@ -1568,17 +1565,61 @@ since Texinfo won't know what to do with them.
 * jrweave delete jrtangle code::  Removing stuff for @command{jrtangle}.
 @end menu
 
-@node jrweave initial code
-@section Initial Stuff and Printing A Warning
+@node jrweave two passes
+@section Processing In Two Passes
+
+The general tradition in literate programming documentation is that each
+unique chunk is numbered sequentially from 1, in the order that they are
+defined.  Even as chunks are added on to, they are referred to by the
+same number.  The numbering is managed by the weaving process; the author
+of a literate program does not have to manage this.
+
+An important part of the literate style is that a code chunk may be
+refereced before it is defined; in fact this is usually the case.
+This raises a difficulty; @command{jrweave} cannot print a chunk
+with its associated number if it hasn't yet seen its definition.
+
+The solution to this problem is to use a two-pass design. In the
+first pass @command{jrweave} collects information about each
+unique file and each unique code chunk, assigning numbers as it
+goes.  In the second pass it prints the file, formatting file
+and code chunk names appropriately.
 
 We start with the @samp{#!} header and the copyright statement,
-and proceed to print an initial header to remind the user @emph{not}
-to edit the generated Texinfo file.
+and then proceed to arrange to perform two passes over the input.
 
 @post_create jrweave chmod +x jrweave
 @(jrweave@) =
 @<Shebang header@>
 @<Common Chunks@>
+@<Set up two passes@>
+
+# debugging
+Pass == 2 && FNR == 1 {
+	junk++
+}
+@
+
+@<Set up two passes@> =
+BEGIN {
+	if (ARGC != 2)
+		fatal(_"usage: jrweave file.twjr\n")
+
+	Pass = 1
+	ARGV[2] = "Pass=2"
+	ARGV[3] = ARGV[1]
+	ARGC = 4
+}
+@
+
+@node jrweave initial code
+@section Initial Stuff and Printing A Warning
+
+We continue with the common code chunks, and then print an initial header
+to remind the user @emph{not} to edit the generated Texinfo file.
+Printing the header is independent of the two-pass nature of the program.
+
+@(jrweave@) =
 @<Create ``do not edit'' warning@>
 @<Helper Functions@>
 @
@@ -1639,6 +1680,8 @@ for (i = 1; i <= l + 4; i++)
 printf "\n"
 @
 
+@FIXME{Should not need to do this in a separate chunk.}
+
 @<Print another line of percent signs@> =
 for (i = 1; i <= l + 4; i++)
 	printf("%%")
@@ -1663,8 +1706,11 @@ And without a lot of fanfare, here is the code:
 # iftangle lines should be removed
 
 /^@iftangle[[:space:]]*$/, /^@end iftangle[[:space:]]*$/ {
+	if (Pass == 1)
+		next
+
 	if ("ifweave" in Line_numbers)
-		fatal(_"cannot nest @iftangle inside @ifweave\n");
+		fatal(_"cannot nest @iftangle inside @ifweave\n")
 
 	# start of construct, save line number
 	if (/^@iftangle[[:space:]]*$/)
@@ -1682,8 +1728,11 @@ And without a lot of fanfare, here is the code:
 # in between fall through.
 
 /^@ifweave[[:space:]]*$/, /^@end ifweave[[:space:]]*$/ {
+	if (Pass == 1)
+		next
+
 	if ("iftangle" in Line_numbers)
-		fatal(_"cannot nest @ifweave inside @iftangle\n");
+		fatal(_"cannot nest @ifweave inside @iftangle\n")
 
 	# start of construct, save line number, skip this line
 	if (/^@ifweave[[:space:]]*$/) {
@@ -1713,15 +1762,17 @@ work. We add them to the output right after the title page.
 @
 
 @<Texinfo authoring additions@>=
-/^@end titlepage/ {
+/^@end titlepage/ && Pass == 2 {
 	print	# print the line
 
 	print ""
+	print "@c Start extra commands added by jrweave\n"
 	@<Macro to hide email addresses in HTML@>
 	print ""
 	@<``FIXME'' macro@>
 	print ""
 	@<Macro for ``old style'' numbers@>
+	print "\n@c End extra commands added by jrweave"
 
 	next
 }
@@ -1807,7 +1858,12 @@ $0 ~ File_chunk_pattern {
 	if (Debug ~ /filename/)
 		printf("saw new filename %s\n", Source_file) > "/dev/stderr"
 
-	@<Store info for filename@>
+	# Create array
+	File_info[new_file][0]++
+	if (Pass == 1) {
+		@<Store info for filename@>
+	} else
+		File_info[new_file]["defn"]++
 
 	next
 }
@@ -1818,8 +1874,9 @@ count of how many times this file has been seen.  This running count
 is used to create an @code{@@anchor@{@}} for this definition.
 We also have a global running count of files.
 
+@vindex File_number
+@vindex File_info
 @<Store info for filename@>=
-File_info[new_file]["defn"]++
 if (! ("file_number" in File_info[new_file]))
 	File_info[new_file]["file_number"] = ++File_number
 @
@@ -1879,8 +1936,16 @@ Here is where we format the file chunks.
 fully print out code chunk names with their numbers. Sigh.}
 
 @<Process file chunks for @code{jrweave}@>=
-function end_file_gathering(	anchor_name, x, y)
+function end_file_gathering(	anchor_name, x, y, n, i, parts, names, name)
 {
+	if (Pass == 1) {
+		File_lines = ""
+		Flags["File_chunk"] = FALSE
+		return
+	}
+
+	# On the second pass, format the chunk
+
 	anchor_name = sanitize_name(Source_file)
 	printf("@anchor{%s-%d}\n", anchor_name, File_info[Source_file]["defn"])
 
@@ -1895,7 +1960,25 @@ function end_file_gathering(	anchor_name, x, y)
 
 	# convert lines
 	x = expand_tabs(File_lines, 4)
+	n = split(x, parts, Chunk_name_pattern, names)
+
+	# escape special chars in parts of code that aren't chunk names
+	for (i = 1; i in parts; i++)
+		parts[i] = gensub(/[@{}]/, "@&", "g", parts[i])
+
 	y = gensub(/[@{}]/, "@&", "g", x)
+
+	y = parts[1]
+	if (n > 1) {	# embedded chunk names
+		for (i = 1; i in names; i++) {
+			name = strip_out_name(names[i])
+			name = sprintf("@r{<@i{%s} @oldnum{%d}>}", name, Code_info[name]["code_number"])
+			y = y name
+			y = y parts[i+1]
+		}
+	}
+
+
 	printf("%s\n", y)
 
 	print "@end example"
@@ -1909,14 +1992,12 @@ function end_file_gathering(	anchor_name, x, y)
 @node jrweave code chunks
 @section Collecting and Formatting Code Chunks
 
-@FIXME{Temporary.}
-
 @(jrweave@) =
-$0 ~ Code_chunk_pattern {
-	print "@example"
-	x = gensub(/[@{}]/, "@&", "g")
-	print x
+@<Process code chunk for @command{jrweave}@>
+@
 
+@<Process code chunk for @command{jrweave}@> =
+$0 ~ Code_chunk_pattern {
 	new_code = gensub(Code_chunk_pattern, "\\1", 1)
 	if (Flags["Code_chunk"]) {
 		fatal(_"code start of %s found while still collecting %s\n",
@@ -1931,11 +2012,26 @@ $0 ~ Code_chunk_pattern {
 	if (Debug ~ /code/)
 		printf("saw new code chunk %s\n", Code_chunk) > "/dev/stderr"
 
+	# Create array
+	Code_info[new_code][0]++
+	if (Pass == 1) {
+		@<Store info for code chunk@>
+	} else
+		Code_info[new_code]["defn"]++
+
 	next
 }
+@
 
+@vindex Code_number
+@vindex Code_info
+@<Store info for code chunk@> =
+if (! ("code_number" in Code_info[new_code]))
+	Code_info[new_code]["code_number"] = ++Code_number
+@
+
+@<Process code chunk for @command{jrweave}@> =
 # Gather up the code segment.
-# Any embedded code segments are expanded at the end.
 
 Flags["Code_chunk"] {
 	if (Code_lines == "")
@@ -1945,19 +2041,47 @@ Flags["Code_chunk"] {
 	next
 }
 
-function end_code_gathering()
+function end_code_gathering(	i, j, n, chunk_name, x, parts, names, name)
 {
-	Flags["Code_chunk"] = FALSE
+	if (Pass == 1) {
+		Flags["Code_chunk"] = FALSE
+		Code_lines = ""
+		Code_chunk_start = ""
+		return
+	}
+
+	# In second pass, print the code
+	chunk_name = sanitize_name(Code_chunk)
+	printf("@anchor{%s-%d}\n", chunk_name, Code_info[Code_chunk]["defn"])
+	printf("@noindent\n<@i{%s} @oldnum{%d}> %s@equiv{}\n@example\n",
+		Code_chunk, Code_info[Code_chunk]["code_number"],
+		Code_info[Code_chunk]["defn"] == 1 ? "" : "+")
 
 	# print the code
 	x = expand_tabs(Code_lines, 4)
-	print gensub(/[@{}]/, "@&", "g", x)
 
-	print "@@"
+	n = split(x, parts, Chunk_name_pattern, names)
+
+	# escape special chars in parts of code that aren't chunk names
+	for (i = 1; i in parts; i++)
+		parts[i] = gensub(/[@{}]/, "@&", "g", parts[i])
+
+	y = parts[1]
+	if (n > 1) {	# embedded chunk names
+		for (i = 1; i in names; i++) {
+			name = strip_out_name(names[i])
+			name = sprintf("@r{<@i{%s} @oldnum{%d}>}", name, Code_info[name]["code_number"])
+			y = y name
+			y = y parts[i+1]
+		}
+	}
+
+	print y
 	print "@end example"
 
 	Code_lines = ""
 	Code_chunk_start = ""
+	Flags["Code_chunk"] = FALSE
 
 	if (Debug ~ /code/)
 		printf("finished collecting code %s\n", Code_chunk) > "/dev/stderr"
@@ -1986,7 +2110,7 @@ function end_code_gathering()
 }
 
 # FIXME: Make sure this is last
-{ print }
+Pass == 2 { print }
 @
 
 @node jrweave helper functions

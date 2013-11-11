@@ -1,3 +1,9 @@
+2013-11-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: jrweave done enough to produce a reasonable
+	looking document.  Lots of cleanup left to do, as well as
+	dumping the cross references.
+
 2013-11-10         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: jrweave done enough that what it produces
