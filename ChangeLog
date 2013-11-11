@@ -4,6 +4,8 @@
 	looking document.  Lots of cleanup left to do, as well as
 	dumping the cross references.
 
+	Fix up printing of leading macros; remove the original ones.
+
 2013-11-10         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: jrweave done enough that what it produces

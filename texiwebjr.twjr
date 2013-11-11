@@ -61,19 +61,6 @@
 @end macro
 @end ifnottex
 
-@c For HTML, spell out email addresses, to avoid problems with
-@c address harvesters for spammers.
-@ifhtml
-@macro EMAIL{real,spelled}
-``\spelled\''
-@end macro
-@end ifhtml
-@ifnothtml
-@macro EMAIL{real,spelled}
-@email{\real\}
-@end macro
-@end ifnothtml
-
 @ifnottex
 @macro MF{}
 @sc{METAFONT}
@@ -97,20 +84,6 @@
 @uref{\link\, \text\}
 @end macro
 @end ifclear
-
-@macro FIXME{text}
-@strong{FIXME}: \text\
-@end macro
-
-@tex
-\gdef\oldnum#1{\begingroup\oldstyle #1\endgroup}%
-@end tex
-
-@ifnottex
-@macro oldnum{value}
-\value\
-@end macro
-@end ifnottex
 
 @c Letting this into the text makes it come out on the short title page.
 @c @FIXME{This may need more work.}
@@ -1755,16 +1728,16 @@ And without a lot of fanfare, here is the code:
 
 Here are some additions to the Texinfo language that will
 ease both the formatting job and some of the authoring
-work. We add them to the output right after the title page.
+work. We add them to the output right before the title page.
+This is so that the @code{@@EMAIL@{@}} macro can be used
+on the title page without problems.
 
 @(jrweave@) =
 @<Texinfo authoring additions@>
 @
 
 @<Texinfo authoring additions@>=
-/^@end titlepage/ && Pass == 2 {
-	print	# print the line
-
+/^@titlepage/ && Pass == 2 {
 	print ""
 	print "@c Start extra commands added by jrweave\n"
 	@<Macro to hide email addresses in HTML@>
@@ -1773,6 +1746,9 @@ work. We add them to the output right after the title page.
 	print ""
 	@<Macro for ``old style'' numbers@>
 	print "\n@c End extra commands added by jrweave"
+
+	print ""
+	print	# print the line
 
 	next
 }
