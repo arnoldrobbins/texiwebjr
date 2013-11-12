@@ -511,14 +511,13 @@ a little psychology thrown in as well.}
 Let's get started.  Here is the code for @command{jrtangle}.
 
 The file starts with the obligatory @samp{#!} header and copyright
-statements, followed by functions common to both @command{jrtangle}
-and @command{jrweave}.
+statements, followed by code chunks and functions common to both
+@command{jrtangle} and @command{jrweave}.
 
 @post_create jrtangle chmod +x jrtangle
 @(jrtangle@) =
 @<Shebang header@>
 @<Common Chunks@>
-
 @<Common Functions@>
 @
 
@@ -526,15 +525,15 @@ On my system, the latest version of @command{gawk} lives
 in @file{/usr/local/bin}. This should be changed on
 your system if it's not correct.
 
-As a general note, @command{jrtangle} (@FIXME{and @command{jrweave}?})
+As a general note, @command{jrtangle} and @command{jrweave}
 need features introduced in @command{gawk} 4.0; previous versions will
 not work.
 
 @<Shebang header@>=
-#! /usr/bin/gawk -f
+#! /usr/local/bin/gawk -f
 @
 
-The common chunks functions are described later in this @value{CHAPTER}.
+The common chunks and functions are described later in this @value{CHAPTER}.
 However, we define one of them now, so that the license will come
 out at the top of the file. The actual license text is provided later.
 
@@ -549,6 +548,12 @@ out at the top of the file. The actual license text is provided later.
 #	6. Add a way to specify leading comment delimiter or to use what was
 #	   on invocation line.
 #	7. Add a way to turn on debugging of shell commands with set -x
+#	8. Option to change italic to roman in chunks
+#	9. Different format for file names, maybe {file} =   ?
+#	10. Review @samp vs @code.
+#	11. Option for initial setup stuff to be printed.
+#	12. jrweave output should go to a file that can be compared to avoid remaking.
+#	13. Merge file and code chunks by having chunk type? Would simplify code.
 @end ignore
 
 @menu
@@ -577,6 +582,7 @@ each one ignores what the other one passes through.
 @<Handle @code{ifweave} and @code{iftangle} for @code{jrtangle}@>
 @
 
+@cindex global variables, name convention
 The following code is straightforward. We see here the first instance
 of any global variables: @code{Line_numbers}. Instead of having lots
 of different global variables, they are grouped by function into
@@ -596,7 +602,7 @@ a capital letter.
 
 /^@ifweave[[:space:]]*$/, /^@end ifweave[[:space:]]*$/ {
 	if ("iftangle" in Line_numbers)
-		fatal(_"cannot nest @iftangle inside @ifweave\n")
+		fatal(_"cannot nest @ifweave inside @iftangle\n")
 
 	# start of construct, save line number
 	if (/^@ifweave[[:space:]]*$/)
@@ -615,7 +621,7 @@ a capital letter.
 
 /^@iftangle[[:space:]]*$/, /^@end iftangle[[:space:]]*$/ {
 	if ("ifweave" in Line_numbers)
-		fatal(_"cannot nest @ifweave inside @iftangle\n")
+		fatal(_"cannot nest @iftangle inside @ifweave\n")
 
 	# start of construct, save line number, skip this line
 	if (/^@iftangle[[:space:]]*$/) {
@@ -644,7 +650,7 @@ references to code chunks.
 @<Process file chunks for @code{jrtangle}@>
 @
 
-File chunks start with @samp{@@(filename.c) =} in column 1. Unlike TexiWeb
+File chunks start with @samp{@@(filename.c@@) =} in column 1. Unlike TexiWeb
 and like @command{noweb}, we don't require @samp{+=} to add more stuff to
 a definition. We just use @samp{=} and figure it out. File chunks end with
 a single @samp{@@} on a line by itself, with the @samp{@@} in column 1.
@@ -655,14 +661,17 @@ we're not already gathering a file; if we are someone left off a trailing
 @samp{@@} somewhere. The @code{check_unfinished()} function checks other
 possible things that may have gone wrong.
 
+@vindex Debug
+@cindex debugging, @code{Debug} variable
 The check against @code{Debug} uses a nice trick. By using
 @command{gawk}'s @option{-v} option, we can set @code{Debug} to any
-value, such as @samp{filename code} and debug as many different aspects
+value, such as @code{"filename code"} and debug as many different aspects
 of the program simultaneously as we might want.  Use of the @command{gawk}
-built-in debugger can also help.
+built-in debugger also helps considerably.
 
+@vindex Flags
 Similar to @code{Line_numbers}, @code{Flags} is a global array of
-flags indexed by strings indicating what we're doing.
+flags (boolean values) indexed by strings indicating what we're doing.
 
 @<Process file chunks for @code{jrtangle}@>=
 $0 ~ File_chunk_pattern {
@@ -698,6 +707,11 @@ BEGIN {
 
 Here is the @samp{@@} sign that ends the input file.
 It also ends code segments.
+Since we are manually simulating a range pattern,
+this @emph{must} come before the code that collects
+the lines in file and code chunks. Otherwise
+the collection will never stop!@footnote{Guess how I
+discovered that one@enddots{} Duh.}
 
 @<Process file chunks for @code{jrtangle}@>=
 /^@[[:space:]]*$/ {
@@ -763,10 +777,11 @@ The next major piece of logic is the collection of code chunks.
 Code chunks are like file chunks. They start with @samp{@@<chunk-name@@> =}
 and end with a standalone @samp{@@} sign. The logic and handling are similar
 to what we just did for files.
+
 First the pattern to match.
-Our first cut at a pattern was @samp{^@@<([^@@]+)@@>[[:space:]]*=[[:space:]]*$}
-but this didn't work as soon as we used a chunk name that included Texinfo
-commands.  Duh.  So now the pattern is more general.
+My first cut at a pattern was @samp{^@@<([^@@]+)@@>[[:space:]]*=[[:space:]]*$}
+but this didn't work as soon as I used a chunk name that included Texinfo
+commands.  Ooops.  So now the pattern is more general.
 
 Since we have to bootstrap from this file, and @samp{@@<(.+)@@>}
 looks like a code chunk name, we create it using string concatenation:
@@ -884,6 +899,7 @@ In particular, any expanded chunks may contain other chunks that
 need expanding. This naturally leads to a recursive implementation,
 which in turn will require checking that a code chunk's expansion
 does not include itself, either directly or indirectly.
+
 
 @(jrtangle@) =
 @<Expand code chunks@>
@@ -1566,11 +1582,7 @@ and then proceed to arrange to perform two passes over the input.
 @<Shebang header@>
 @<Common Chunks@>
 @<Set up two passes@>
-
-# debugging
-Pass == 2 && FNR == 1 {
-	junk++
-}
+@<Pass 2 debugging@>
 @
 
 @<Set up two passes@> =
@@ -1585,12 +1597,22 @@ BEGIN {
 }
 @
 
+This rule serves as a place to set a breakpoint in the
+@command{gawk} debugger for when we start the second pass
+through the @value{TWJR} source file.
+
+@<Pass 2 debugging@>=
+Pass == 2 && FNR == 1 && Debug ~ /pass2/ {
+	junk++
+}
+@
+
 @node jrweave initial code
 @section Initial Stuff and Printing A Warning
 
-We continue with the common code chunks, and then print an initial header
-to remind the user @emph{not} to edit the generated Texinfo file.
-Printing the header is independent of the two-pass nature of the program.
+We print an initial header
+to remind the user @emph{not} to edit the generated Texinfo file,
+and then continue with the helper functions.
 
 @(jrweave@) =
 @<Create ``do not edit'' warning@>
@@ -1601,6 +1623,9 @@ The generated Texinfo file should have a warning at the top
 not to edit the file, since this is an easy mistake to
 to make (having made it myself!).  We will make it a little
 fancy, just for the fun of it.
+
+Printing the header is independent of the two-pass nature of the program
+and thus can be done from a @code{BEGIN} block.
 
 @<Create ``do not edit'' warning@>=
 BEGIN {
@@ -2153,6 +2178,10 @@ May need to provide @samp{@@include} in order to scale to bigger programs.
 
 Tangle enhancements, in particular putting in @samp{#line} lines for C and C++.
 
+Copy / paste development causes problems - file and code are similar but not
+identical; so code highly similar and thus hard to get right. Original web didn't
+have this problem...
+
 @node Command summary
 @appendix Alphabetic List of @value{TWJR} Commands
 
@@ -2164,9 +2193,15 @@ Tangle enhancements, in particular putting in @samp{#line} lines for C and C++.
 Blah blah
 
 @menu
+* File Definitions::		Source files by definition.
 * Code Segment Definitions::	Code segments by definition.
 * Code Segment References::	Code segments by reference.
 @end menu
+
+@node File Definitions
+@appendixsec Source Files Definitions
+
+@code{@@print_file_defs}
 
 @node Code Segment Definitions
 @appendixsec Code Segment Definitions
