@@ -1,3 +1,11 @@
+2013-11-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Fix a number of problems in jrtangle and
+	lots of progress on jrweave. Use braces for file chunks.
+	Allow printing of initial setup script. Add debugging of shell
+	scripts (could use more work). Add more stuff to consider
+	doing. Also a fair amount of prose cleanups.
+
 2013-11-11         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: jrweave done enough to produce a reasonable

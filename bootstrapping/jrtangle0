@@ -456,6 +456,7 @@ function expand_one_line(input_line,	parts, chunk_names, nparts, num_names, code
 	}
 
 	code_lines = code_body(chunk_names[1])
+	delete Currently_expanding[strip_out_name(chunk_names[1])]
 
 	if (input_line !~ ("^" Chunk_name_pattern)) {
 		if (parts[1] ~ /^[[:space:]]+$/) {
@@ -468,8 +469,10 @@ function expand_one_line(input_line,	parts, chunk_names, nparts, num_names, code
 	
 	for (i = 2; i <= nparts; i++) {
 		code_lines = code_lines parts[i]
-		if (i in chunk_names)
+		if (i in chunk_names) {
 			code_lines = code_lines code_body(chunk_names[i])
+			delete Currently_expanding[strip_out_name(chunk_names[1])]
+		}
 	}
 
 	if (code_lines ~ Chunk_name_pattern)

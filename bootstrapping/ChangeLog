@@ -1,3 +1,8 @@
+2013-11-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* jrtangle0: Allow duplicating a referenced chunk in a callling
+	chunk (recursive expansion management).
+
 2013-11-08         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* jrtangle0: Bug fix for lines with multiple chunks.
