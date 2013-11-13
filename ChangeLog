@@ -1,3 +1,10 @@
+2013-11-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Improve shell debugging. Start on changing
+	duplicated code to instead use common chunks, after all this
+	is Literate Programming.  Some prose reformatting and
+	clean up.
+
 2013-11-12         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Fix a number of problems in jrtangle and

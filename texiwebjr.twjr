@@ -72,7 +72,6 @@
 @set PRINTEDOUTPUT
 @end iftex
 
-@c These could become part of the jrweave-generated prologue
 @ifset PRINTEDOUTPUT
 @macro UREF{link, text}
 \text\@footnote{@code{\link\}}
@@ -107,15 +106,14 @@
 Copyright @copyright{} 2013 @*
 Arnold David Robbins @*
 All Rights Reserved.
-@sp
+@sp 1
 The @command{jrtangle} and @command{jrweave} programs are copyright
 @copyright{} 2013 by Arnold David Robbins. They are published under
 the conditions of the GNU General Public License, version 3.
-@sp
+@sp 1
 The explanatory text provided in this document may be reproduced verbatim
 but may not be otherwise copied or modified.
 @sp 2
-
 This is Edition @value{EDITION} of @cite{@value{TITLE}}.
 @end copying
 
@@ -140,7 +138,6 @@ This is Edition @value{EDITION} of @cite{@value{TITLE}}.
 @vskip 0pt plus 1filll
 Published by:
 @sp 1
-
 Arnold David Robbins @*
 P.O. Box 354 @*
 Nof Ayalon @*
@@ -291,14 +288,13 @@ $ @kbd{echo hello on stderr 1>&2}
 
 @ifnotinfo
 In the text, command names appear in @code{this font}, while code segments
-appear in the same font and quoted, @samp{like this}.
-Options look like this: @option{-f}.
-Some things are
-emphasized @emph{like this}, and if a point needs to be made
-strongly, it is done @strong{like this}.  The first occurrence of
-a new term is usually its @dfn{definition} and appears in the same
-font as the previous occurrence of ``definition'' in this sentence.
-Finally, file names are indicated like this: @file{/path/to/ourfile}.
+appear in the same font and quoted, @samp{like this}.  Options look
+like this: @option{-f}.  Some things are emphasized @emph{like this},
+and if a point needs to be made strongly, it is done @strong{like this}.
+The first occurrence of a new term is usually its @dfn{definition} and
+appears in the same font as the previous occurrence of ``definition''
+in this sentence.  Finally, file names are indicated like this:
+@file{/path/to/ourfile}.
 @end ifnotinfo
 
 @FIXME{Do we need control characters in this document?}
@@ -381,11 +377,10 @@ Many literate programming tools have been developed since then.
 @command{noweb} makes a conscious attempt to provide a minimal additional
 markup over and above the documment formatting language. It also attempts
 to be portable to any markup language, not just @TeX{} or @LaTeX{},
-and to any programming language.
-Finally, it is programmable, with several stages in a pipeline and
-a documented intermediate format, making it easily extensible.
-It is the ``minimal additional markup'' aspect of @command{noweb}
-that I find particular appealing.
+and to any programming language.  Finally, it is programmable, with
+several stages in a pipeline and a documented intermediate format,
+making it easily extensible.  It is the ``minimal additional markup''
+aspect of @command{noweb} that I find particular appealing.
 
 TexiWeb was created by Ben Pfaff for writing his AVL library.
 (@FIXME{Link for the AVL library.})
@@ -407,27 +402,26 @@ towards two different ends.
 
 @table @dfn
 @item Weaving
-This process turns a literate program into a
-form that can be processed for printing.  Knuth's @command{WEB}
-provided @command{WEAVE}, which created a straight @TeX{} document.
-The @command{noweb} suite has @command{noweave}.
+This process turns a literate program into a form that can be processed
+for printing.  Knuth's @command{WEB} provided @command{WEAVE}, which
+created a straight @TeX{} document.  The @command{noweb} suite has
+@command{noweave}.
 
-The @value{TWJR} weaving program is called @command{jrweave}.
-It reads a @value{TWJR} document and produces a Texinfo document
-which can then be processed by @command{texi2dvi} or @command{texi2pdf}
-to produce a printable file. (It can also be processed with @command{makeinfo}
+The @value{TWJR} weaving program is called @command{jrweave}.  It reads
+a @value{TWJR} document and produces a Texinfo document which can then
+be processed by @command{texi2dvi} or @command{texi2pdf} to produce
+a printable file. (It can also be processed with @command{makeinfo}
 to produce Info, HTML, DocBook, or Texinfo XML.)
 
 @item Tangling
-This process turns a literate program into straight code
-that can be either run directly (scripting languages), or compiled
-(C, C++, etc.).  Knuth's @command{WEB}
-provided @command{TANGLE}, which created a straight Pascal program.
-The @command{noweb} suite has @command{notangle}.
+This process turns a literate program into straight code that can be
+either run directly (scripting languages), or compiled (C, C++, etc.).
+Knuth's @command{WEB} provided @command{TANGLE}, which created a straight
+Pascal program.  The @command{noweb} suite has @command{notangle}.
 
-The @value{TWJR} tangling program is called @command{jrtangle}.
-It reads a @value{TWJR} document and produces the source files
-for running or compiling.
+The @value{TWJR} tangling program is called @command{jrtangle}.  It reads
+a @value{TWJR} document and produces the source files for running or
+compiling.
 @end table
 
 By convention, @value{TWJR} files have a @file{.twjr} extension.
@@ -449,7 +443,7 @@ Why Texinfo?  Good question, I'm glad you asked.
 I have written books in @command{troff}, Texinfo, and DocBook (both SGML
 and XML).  I have also written a little bit in straight HTML. Of all
 of these, I find that Texinfo is the easiest to use.  It is expressive
-enough for designating the different kinds of things that need special
+enough for distinguishing the different kinds of things that need special
 designation in a printed document, and for structuring a document in
 the traditional way, without being so verbose that my fingers end up
 hurting when I'm done working on a document after a few hours.
@@ -463,11 +457,11 @@ system than to add a Texinfo backend to @command{noweb}.@footnote{The
 truth is that doing something like this has been in the back of my mind
 for close to 20 years; I finally decided to ``just do it.''}
 
-Similarly, TexiWeb already does what I would seem to need, but its lack of
-documentation makes it harder to use, and its enforced pretty-printing is
-definitely undesirable for code not written in C. I prefer
-code to look like code (constant-width font, no pretty-printing) and I
-want to be able to use any kind of code in my code chunks, including @command{awk},
+Similarly, TexiWeb already does what I would seem to need, but its lack
+of documentation makes it harder to use, and its enforced pretty-printing
+is definitely undesirable for code not written in C. I prefer code to
+look like code (constant-width font, no pretty-printing) and I want to be
+able to use any kind of code in my code chunks, including @command{awk},
 Makefiles, shell scripts, whatever.
 
 Additionally, TexiWeb seems focused primarily on @TeX{}.  The advantage
@@ -475,8 +469,8 @@ of Texinfo is that it can be translated into HTML and also DocBook XML,
 and I would like to preserve those advantages.
 
 Finally, I think it's better for the author to do the indexing manually
-than to rely on the literate programming tool, although that opinion may
-change as this evolves.
+than to rely on the literate programming tool, although that opinion
+may change as this evolves.
 
 @node Why awk
 @section Why Implement In @command{awk}
@@ -525,9 +519,8 @@ On my system, the latest version of @command{gawk} lives
 in @file{/usr/local/bin}. This should be changed on
 your system if it's not correct.
 
-As a general note, @command{jrtangle} and @command{jrweave}
-need features introduced in @command{gawk} 4.0; previous versions will
-not work.
+As a general note, @command{jrtangle} and @command{jrweave} need features
+introduced in @command{gawk} 4.0; previous versions will not work.
 
 @<Shebang header@>=
 #! /usr/local/bin/gawk -f
@@ -548,7 +541,6 @@ out at the top of the file. The actual license text is provided later.
 #	6. Add a way to specify leading comment delimiter or to use what was
 #	   on invocation line.
 #	8. Option to change italic to roman in chunks ??
-#	12. jrweave output should go to a file that can be compared to avoid remaking.
 #	13. Merge file and code chunks by having chunk type? Would simplify code.
 #	14. Let the user set the tab stop?
 #	15. Option to print out file update recipe
@@ -609,7 +601,7 @@ a capital letter.
 	# end of construct, delete line number
 	if (/^@end ifweave[[:space:]]*$/)
 		delete Line_numbers["ifweave"]
-	
+
 	# simply skip these lines, this is tangling
 	next
 }
@@ -667,28 +659,35 @@ value, such as @code{"filename code"} and debug as many different aspects
 of the program simultaneously as we might want.  Use of the @command{gawk}
 built-in debugger also helps considerably.
 
+It turns out that file chunk processing has some common bits
+for both @command{jrtangle} and @command{jrweave}.
+
+@<Process file chunks for @code{jrtangle}@>=
+$0 ~ File_chunk_pattern {
+	@<Common file chunk initial processing@>
+
+	next
+}
+@
+
 @vindex Flags
 Similar to @code{Line_numbers}, @code{Flags} is a global array of
 flags (boolean values) indexed by strings indicating what we're doing.
 
-@<Process file chunks for @code{jrtangle}@>=
-$0 ~ File_chunk_pattern {
-	new_file = gensub(File_chunk_pattern, "\\1", 1)
-	if (Flags["File_chunk"]) {
-		fatal(_"file start of %s found while still collecting %s\n",
-			Source_file, new_file)
-	}
-	check_unfinished()
-
-	Flags["File_chunk"] = TRUE
-	Line_numbers["File_chunk"] = (FILENAME ":" FNR)
-	Source_file = new_file
-
-	if (Debug ~ /filename/)
-		printf("saw new filename %s\n", Source_file) > "/dev/stderr"
-
-	next
+@<Common file chunk initial processing@> =
+new_file = gensub(File_chunk_pattern, "\\1", 1)
+if (Flags["File_chunk"]) {
+	fatal(_"file start of %s found while still collecting %s\n",
+		Source_file, new_file)
 }
+check_unfinished()
+
+Flags["File_chunk"] = TRUE
+Line_numbers["File_chunk"] = (FILENAME ":" FNR)
+Source_file = new_file
+
+if (Debug ~ /filename/)
+	printf("saw new filename %s\n", Source_file) > "/dev/stderr"
 @
 
 The @code{BEGIN} block sets up some constants. @code{File_chunk_pattern}
@@ -703,15 +702,20 @@ BEGIN {
 }
 @
 
-Here is the @samp{@@} sign that ends the input file.
-It also ends code segments.
-Since we are manually simulating a range pattern,
-this @emph{must} come before the code that collects
-the lines in file and code chunks. Otherwise
-the collection will never stop!@footnote{Guess how I
-discovered that one@enddots{} Duh.}
+Here is the @samp{@@} sign that ends the input file.  It also ends
+code segments.  Since we are manually simulating a range pattern, this
+@emph{must} come before the code that collects the lines in file and
+code chunks. Otherwise the collection will never stop!@footnote{Guess
+how I discovered that one@enddots{} Duh.}
+
+Here too, what to do upon seeing the terminating @samp{@@} is shared
+across @command{jrtangle} and @samp{jrweave}.
 
 @<Process file chunks for @code{jrtangle}@>=
+@<Handle terminating at-sign for file and chunks@>
+@
+
+@<Handle terminating at-sign for file and chunks@> =
 /^@[[:space:]]*$/ {
 	if (Flags["File_chunk"])
 		end_file_gathering()
@@ -719,14 +723,14 @@ discovered that one@enddots{} Duh.}
 		end_code_gathering()
 	else
 		warning(_"unmatched terminating @-sign: ignored\n")
-	
+
 	next
 }
 @
 
 After some experimentation, things are simplest if file contents and
-code chunks do @emph{not} have the final terminating newline. Code that outputs
-file contents must remember to add the final newline.
+code chunks do @emph{not} have the final terminating newline. Code that
+outputs file contents must remember to add the final newline.
 
 @<Process file chunks for @code{jrtangle}@>=
 # end_file_gathering ---finish up collecting a file
@@ -752,7 +756,13 @@ And finally, we have to collect the lines themselves.
 Doing so is simple. Collect each line and append it.
 Any embedded code chunks are expanded at the end.
 
+Collecting lines is also common.
+
 @<Process file chunks for @code{jrtangle}@>=
+@<Collect file chunk lines@>
+@
+
+@<Collect file chunk lines@> =
 Flags["File_chunk"] {
 	if (File_lines == "")
 		File_lines = $0
@@ -796,37 +806,47 @@ BEGIN {
 }
 @
 
-As a side note, the fact that @command{awk} lets you put
-functions anywhere in the file, along with allowing multiple @code{BEGIN}
-and @code{END} blocks anywhere in the file, mitigates some of the need
-for building up chunks in the way normally done with @command{WEB}-like
-tools.  When writing the bootstrap version of @command{jrtangle}, it was
-straightforward to write in a linear fashion and just drop in yet
+As a side note, the fact that @command{awk} lets you put functions
+anywhere in the file, along with allowing multiple @code{BEGIN} and
+@code{END} blocks anywhere in the file, mitigates some of the need for
+building up chunks in the way normally done with @command{WEB}-like
+tools.  When writing the bootstrap version of @command{jrtangle}, it
+was straightforward to write in a linear fashion and just drop in yet
 another @code{BEGIN} block.
 
-Next the logic:
+Next the logic. Here too, there are common bits shared between
+@command{jrtangle} and @command{jrweave}:
 
 @<Process code chunks for @code{jrtangle}@>=
 $0 ~ Code_chunk_pattern {
-	new_code = gensub(Code_chunk_pattern, "\\1", 1)
-	if (Flags["Code_chunk"]) {
-		fatal(_"code start of %s found while still collecting %s\n",
-			Code_chunk, new_code)
-	}
-	check_unfinished()
-
-	Flags["Code_chunk"] = TRUE
-	Code_chunk = new_code
-	Line_numbers["Code_chunk"] = (FILENAME ":" FNR)
-
-	if (Debug ~ /code/)
-		printf("saw new code chunk %s\n", Code_chunk) > "/dev/stderr"
+	@<Common code chunk initial processing@>
 
 	next
 }
+@
 
+@<Common code chunk initial processing@> =
+new_code = gensub(Code_chunk_pattern, "\\1", 1)
+if (Flags["Code_chunk"]) {
+	fatal(_"code start of %s found while still collecting %s\n",
+		Code_chunk, new_code)
+}
+check_unfinished()
+
+Flags["Code_chunk"] = TRUE
+Code_chunk = new_code
+Line_numbers["Code_chunk"] = (FILENAME ":" FNR)
+
+if (Debug ~ /code/)
+	printf("saw new code chunk %s\n", Code_chunk) > "/dev/stderr"
+@
+
+@<Process code chunks for @code{jrtangle}@>=
+@<Collect code chunk lines@>
+@
+
+@<Collect code chunk lines@> =
 # Gather up the code segment.
-# Any embedded code segments are expanded at the end.
 
 Flags["Code_chunk"] {
 	if (Code_lines == "")
@@ -836,7 +856,12 @@ Flags["Code_chunk"] {
 
 	next
 }
+@
 
+What to do after gathering the lines depends upon the program.
+For @command{jrtangle} we store the lines for later use.
+
+@<Process code chunks for @code{jrtangle}@>=
 # end_code_gathering --- complete process of collecting lines of code chunk
 
 function end_code_gathering()
@@ -859,21 +884,23 @@ function end_code_gathering()
 @node jrtangle error checking
 @section Checking for Errors
 
-Here is the error checking code. First add it to the file:
+Here is the error checking code. First add it to both files:
 
-@(jrtangle@) =
-@<Error checking for @code{jrtangle}@>
-@
-
-And now the code:
-
-@<Error checking for @code{jrtangle}@>=
+@<Common Chunks@>=
 # Error checking:
 
 END {
 	check_unfinished()
 }
+@
 
+Checking for unfinished segments is the same for both
+@command{jrtangle} and @command{jrweave}.
+
+@FIXME{Need to straighten out the common functions and the helper functions and what
+is used by which.}
+
+@<Helper Functions@> =
 # check_unfinished --- print a fatal error when an unfinished code or
 #			file section is detected. Also ifweave / iftangle.
 
@@ -920,8 +947,8 @@ y = func2()
 
 @noindent
 After expanding @code{@@<Do special task@@>} the first time, we have
-to forget that we've done it, so that we can safely expand it
-the second time.
+to forget that we've done it, so that we can safely expand it the
+second time.
 
 @(jrtangle@) =
 @<Expand code chunks@>
@@ -942,19 +969,19 @@ END {
 }
 @
 
-Of course, we have delayed the inevitable only a little bit.
-At the outermost level, the code loops through all the files and writes
-them out, letting @code{expand_code_chunks()} do the real work.
+Of course, we have delayed the inevitable only a little bit.  At the
+outermost level, the code loops through all the files and writes them out,
+letting @code{expand_code_chunks()} do the real work.
 
-In practice, if a source file's contents haven't changed we don't
-want to write them out again, since this could easily cause @command{make}
+In practice, if a source file's contents haven't changed we don't want
+to write them out again, since this could easily cause @command{make}
 to recompile a file that doesn't need recompiling. In large programs
 this is a Bad Thing.  We will deal later with this issue.
 
-As a side note, it may be that dumping all the files every time
-is a bad idea. If experience shows us that this is so, this is
-where to make the change, along with new code to take a command-line option
-indicating which file(s) to extract.
+As a side note, it may be that dumping all the files every time is a
+bad idea. If experience shows us that this is so, this is where to make
+the change, along with new code to take a command-line option indicating
+which file(s) to extract.
 
 @<Expand code chunks@>=
 # dump_filenames --- create files and update them as needed
@@ -969,8 +996,7 @@ function dump_filenames(	i, s, update_recipe)
 		close(update_recipe["output"])
 
 		# update the file if necessary
-		if (Debug ~ /shell/)
-			update_recipe["recipe"] = "set -x ; " update_recipe["recipe"]
+		update_recipe["recipe"] = (Shell_debug update_recipe["recipe"])
 		system(update_recipe["recipe"])
 
 		@<Run ``post create'' commands@>
@@ -993,14 +1019,13 @@ function expand_code_chunks(contents)
 @
 
 By the time we get here, it isn't actually so hard.
-@code{do_expand_code_chunks()} splits the file contents into
-individual lines. It then loops over the results.
-If a line does not contain any chunk names, then the result
-can be kept verbatim, and it is copied into the @code{results}
-array.
+@code{do_expand_code_chunks()} splits the file contents into individual
+lines. It then loops over the results.  If a line does not contain any
+chunk names, then the result can be kept verbatim, and it is copied into
+the @code{results} array.
 
-On the other hand, if it does, it has to be expanded, and that is
-done down in @code{expand_one_line()}.
+On the other hand, if it does, it has to be expanded, and that is done
+down in @code{expand_one_line()}.
 
 @<Expand code chunks@>=
 # do_expand_code_chunks --- do the actual work to expand code chunks
@@ -1033,11 +1058,10 @@ BEGIN {
 @<Function to expand one line@>
 @
 
-@code{expand_one_line()} does all the work to isolate chunk
-names, expand them, and put everything back together with reasonable
-indentation.  At the end, if the expanded line contains further code
-chunks, it recursively calls @code{do_expand_code_chunks()} to process
-them as well.
+@code{expand_one_line()} does all the work to isolate chunk names, expand
+them, and put everything back together with reasonable indentation.
+At the end, if the expanded line contains further code chunks, it
+recursively calls @code{do_expand_code_chunks()} to process them as well.
 
 @<Function to expand one line@> =
 # expand_one_line --- expand a line with code chunk references
@@ -1056,28 +1080,29 @@ function expand_one_line(input_line,	parts, chunk_names, nparts, num_names, code
 }
 @
 
-This uses the four-argument version of @code{split()}; the fourth argument
-is an array of strings where each element is what matched the separating
-regexp.  Element @var{i} in the @code{chunk_names} array is what came after element
-@var{i} in the @code{parts} array.
+This uses the four-argument version of @code{split()}; the fourth
+argument is an array of strings where each element is what matched the
+separating regexp.  Element @var{i} in the @code{chunk_names} array is
+what came after element @var{i} in the @code{parts} array.
 
 @<Split the input line into text parts and chunk names@> =
 nparts = split(input_line, parts, Chunk_name_pattern, chunk_names)
 num_names = length(chunk_names)
 @
 
-In our case, the split is made using @code{Chunk_name_pattern}, causing @code{parts}
-to contain the parts of the line before and after each chunk name. The fourth argument,
-@code{chunk_names}, will contain the names of the code chunks and there will
-be more than one element if there were several chunks referenced on the line.
-@code{num_names} tells us how many chunk names there are.
+In our case, the split is made using @code{Chunk_name_pattern}, causing
+@code{parts} to contain the parts of the line before and after each
+chunk name. The fourth argument, @code{chunk_names}, will contain the
+names of the code chunks and there will be more than one element if
+there were several chunks referenced on the line.  @code{num_names}
+tells us how many chunk names there are.
 
-After splitting, error checking looks to see if the chunk name is @emph{not} in
-@code{Code_contents}; if so, then it was never defined. (That is also an error.)
-Next, it checks to see if any of the found chunk names are already in
-the process of being expanded. This is done using a global array named
-@code{Currently_expanding}.  If present, it's an error; otherwise the
-name is entered into the array.
+After splitting, error checking looks to see if the chunk name
+is @emph{not} in @code{Code_contents}; if so, then it was never
+defined. (That is also an error.)  Next, it checks to see if any of the
+found chunk names are already in the process of being expanded. This is
+done using a global array named @code{Currently_expanding}.  If present,
+it's an error; otherwise the name is entered into the array.
 
 @<Check for recursive expansion@> =
 # check for recursive expansion
@@ -1259,7 +1284,7 @@ Just in case, we append a final newline to the text of
 @<Do any initial setup@>=
 if (length(Initial_setup) > 0) {
 	Initial_setup = Initial_setup "\n"
-	system((Debug ~ /shell/ ? "set -x ;" : "") Initial_setup)
+	system(Shell_debug Initial_setup)
 }
 @
 
@@ -1410,7 +1435,7 @@ function create_update_recipe(file, results,		source_file, dir, suffix, recipe)
 		source_file = file
 	else
 		source_file = "@default"
-	
+
 	dir = Update_value[source_file]["DIR"]
 	suffix = Update_value[source_file]["SUFFIX"]
 
@@ -1421,6 +1446,19 @@ function create_update_recipe(file, results,		source_file, dir, suffix, recipe)
 	results["recipe"] = recipe
 
 	results["output"] = (dir "/" file suffix)
+}
+@
+
+Later on, the recipe is prefixed with the value of @code{Shell_debug},
+which turns on execution tracing for shell commands.  Ths is set
+based on the debug variable. We rely on the fact that @command{awk}
+variables are initialized to the empty string.
+@code{Shell_debug} is used in a few other places as well.
+
+@(jrtangle@) =
+BEGIN {
+	if (Debug ~ /shell/)
+		Shell_debug = "set -x; "
 }
 @
 
@@ -1460,7 +1498,7 @@ And when dumping files, we run the associated command:
 @<Run ``post create'' commands@> =
 # run any "post create" command (such as changing mode)
 if (i in Post_create_commands)
-	system((Debug ~ /shell/ ? "set -x ;" : "") Post_create_commands[i])
+	system(Shell_debug Post_create_commands[i])
 @
 
 @node Common Chunks
@@ -1737,6 +1775,9 @@ must do the opposite here of what we did there.
 
 And without a lot of fanfare, here is the code:
 
+@vindex Line_numbers
+@cindex @code{@@ifweave} command, @command{jrweave}
+@cindex @code{@@iftangle} command, @command{jrweave}
 @<Handle @code{ifweave} and @code{iftangle} for @code{jrweave}@>=
 # iftangle lines should be removed
 
@@ -1754,7 +1795,7 @@ And without a lot of fanfare, here is the code:
 	# end of construct, delete line number
 	if (/^@end iftangle[[:space:]]*$/)
 		delete Line_numbers["iftangle"]
-	
+
 	# simply skip these lines, this is weaving
 	next
 }
@@ -1882,19 +1923,7 @@ a common chunk.})
 
 @<Process file chunks for @code{jrweave}@>=
 $0 ~ File_chunk_pattern {
-	new_file = gensub(File_chunk_pattern, "\\1", 1)
-	if (Flags["File_chunk"]) {
-		fatal(_"file start of %s found while still collecting %s\n",
-			Source_file, new_file)
-	}
-	check_unfinished()
-
-	Flags["File_chunk"] = TRUE
-	Line_numbers["File_chunk"] = (FILENAME ":" FNR)
-	Source_file = new_file
-
-	if (Debug ~ /filename/)
-		printf("saw new filename %s\n", Source_file) > "/dev/stderr"
+	@<Common file chunk initial processing@>
 
 	# Create array
 	File_info[new_file][0]++
@@ -1919,53 +1948,9 @@ if (! ("file_number" in File_info[new_file]))
 	File_info[new_file]["file_number"] = ++File_number
 @
 
-@FIXME{This is identical to code for @command{jrtangle}.}
-
 @<Process file chunks for @code{jrweave}@>=
-# FIXME: This must come before the check of the Flags
-/^@[[:space:]]*$/ {
-	if (Flags["File_chunk"])
-		end_file_gathering()
-	else if (Flags["Code_chunk"])
-		end_code_gathering()
-	else
-		warning(_"unmatched terminating @-sign: ignored\n")
-	
-	next
-}
-
-Flags["File_chunk"] {
-	if (File_lines == "")
-		File_lines = $0
-	else
-		File_lines = File_lines "\n" $0
-
-	next
-}
-@
-
-@FIXME{So is this one.}
-
-@<Process file chunks for @code{jrweave}@>=
-# check_unfinished --- print a fatal error when an unfinished code or
-#			file section is detected. Also ifweave / iftangle.
-
-function check_unfinished()
-{
-	if (Flags["File_chunk"])
-		fatal(_"unfinished file section (started at %s)\n",
-			Line_numbers["File_chunk"])
-	else if (Flags["Code_chunk"])
-		fatal(_"unfinished code section (started at %s)\n",
-			Line_numbers["Code_chunk"])
-
-	if ("ifweave" in Line_numbers)
-		fatal(_"unfinished @ifweave section (started at %s)\n",
-			Line_numbers["ifweave"])
-	if ("iftangle" in Line_numbers)
-		fatal(_"unfinished @iftangle section (started at %s)\n",
-			Line_numbers["iftangle"])
-}
+@<Handle terminating at-sign for file and chunks@>
+@<Collect file chunk lines@>
 @
 
 Here is where we format the file chunks.
@@ -2026,19 +2011,7 @@ function end_file_gathering(	anchor_name, x, y, n, i, parts, names, name)
 
 @<Process code chunk for @command{jrweave}@> =
 $0 ~ Code_chunk_pattern {
-	new_code = gensub(Code_chunk_pattern, "\\1", 1)
-	if (Flags["Code_chunk"]) {
-		fatal(_"code start of %s found while still collecting %s\n",
-			Code_chunk, new_code)
-	}
-	check_unfinished()
-
-	Flags["Code_chunk"] = TRUE
-	Code_chunk = new_code
-	Line_numbers["Code_chunk"] = (FILENAME ":" FNR)
-
-	if (Debug ~ /code/)
-		printf("saw new code chunk %s\n", Code_chunk) > "/dev/stderr"
+	@<Common code chunk initial processing@>
 
 	# Create array
 	Code_info[new_code][0]++
@@ -2058,16 +2031,11 @@ if (! ("code_number" in Code_info[new_code]))
 	Code_info[new_code]["code_number"] = ++Code_number
 @
 
-@<Process code chunk for @command{jrweave}@> =
-# Gather up the code segment.
+For weaving, we collect the code lines and then when
+done, print out the chunk nicely formatted.
 
-Flags["Code_chunk"] {
-	if (Code_lines == "")
-		Code_lines = $0
-	else
-		Code_lines = Code_lines "\n" $0
-	next
-}
+@<Process code chunk for @command{jrweave}@> =
+@<Collect code chunk lines@>
 
 function end_code_gathering(	i, j, n, chunk_name, x, parts, names, name)
 {
@@ -2248,6 +2216,8 @@ Which came first, the chicken or the egg?@footnote{@code{http://www.gagcartoons.
 
 Design decision to produce every file and let user code check if duplicated.
 
+Design decision to send .texi file to standard output instead of to a file that can cpif'ed.
+
 May need to provide @code{@@include} in order to scale to bigger programs.
 
 Tangle enhancements, in particular putting in @code{#line} lines for C and C++.
@@ -2351,6 +2321,6 @@ TODO:
 - Full indexing of variables and functions
 - Adding URLs where needed.
 - Review patterns to allow trailing whitespace
-
 - Function to format anchars
 - Function to format tags
+- Merge constants into one chunk inside one BEGIN block
