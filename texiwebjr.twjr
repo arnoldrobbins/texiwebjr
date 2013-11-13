@@ -172,19 +172,53 @@ on top of the Texinfo document formatting markup language.
 @end ifnottex
 
 @menu
-* Preface::                 Preface.
-* Introduction::            Introduction.
-* jrtangle code::           The code for @command{jrtangle}.
-* jrwreave code::           The code for @command{jrwreave}.
-* Bootstrapping::           Chicken and egg issues.
-* Evaluation and Futures::  Evaluation and future work.
-* Command summary::         Alphabetic list of @value{TWJR} commands.
-* Code Segment Summaries::  Alpabetic lists of code segments
-                            by defintion and by reference.
+* Preface::                        Preface.
+* Introduction::                   Introduction.
+* jrtangle code::                  The code for @command{jrtangle}.
+* jrweave code::                   The code for @command{jrwreave}.
+* Bootstrapping::                  Chicken and egg issues.
+* Evaluation and Futures::         Evaluation and future work.
+* Command summary::                Alphabetic list of @value{TWJR} commands.
+* Code Segment Summaries::         Alpabetic lists of code segments by
+                                   defintion and by reference.
 * Use of @command{gawk} features:: Features Specific to @command{gawk}.
-* Bibliography::            Reference material.
-* Concept Index::           The concept index.
+* Bibliography::                   Reference material.
+* Concept Index::                  The concept index.
+
 @detailmenu
+* Audience::                     Who should read this @value{DOCUMENT}.
+* Overview::                     An overview of the @value{DOCUMENT}.
+* Conventions::                  Typographical conventions.
+* Acknowledgements::             Acknowledgements.
+* Litprog intro::                Quick intro to Literate Programming.
+* Processing a document::        Creating code and documentation.
+* Why texinfo::                  Why build on top of Texinfo.
+* Why awk::                      Why implement in @command{awk}.
+* jrtangle ifweave iftangle::    Text inclusion/exclusion for
+                                 @command{jrtangle}.
+* jrtangle file chunks::         Processing file chunks for
+                                 @command{jrtangle}.
+* jrtangle code chunks::         Processing code chunks for
+                                 @command{jrtangle}.
+* jrtangle error checking::      Checking for errors in @command{jrtangle}.
+* Expanding code chunks::        Expanding code chunks into straight code.
+* jrtangle before everything::   Doing something before extracting any files.
+* jrtangle avoiding update::     Leaving unchanged files alone.
+* jrtangle after creation::      Doing something after creating a file.
+* Common Chunks::                Common code chunks and functions.
+* jrweave two passes::           Two pass design.
+* jrweave initial code::         Initial Stuff and Printing A Warning.
+* jrweave ifweave iftangle::     Text inclusion/exclusion for
+                                 @command{jrwaeave}.
+* jrweave language additions::   Extra stuff for authors.
+* jrweave file chunks::          Collecting and formatting file chunks.
+* jrweave code chunks::          Collecting and formatting code chunks.
+* jrweave print setup recipe::   Printing the initial setup recipe.
+* jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
+* jrweave helper functions::     Helper functions for @command{jrweave}.
+* File Definitions::             Source files by definition.
+* Code Segment Definitions::     Code segments by definition.
+* Code Segment References::      Code segments by reference.
 @end detailmenu
 @end menu
 
@@ -215,10 +249,10 @@ This @value{DOCUMENT} describes @value{TWJR}, a system that provides
 literate programming on top of the Texinfo markup language.
 
 @menu
-* Audience::            Who should read this @value{DOCUMENT}.
-* Overview::            An overview of the @value{DOCUMENT}.
-* Conventions::         Typographical conventions.
-* Acknowledgements::    Acknowledgements.
+* Audience::                    Who should read this @value{DOCUMENT}.
+* Overview::                    An overview of the @value{DOCUMENT}.
+* Conventions::                 Typographical conventions.
+* Acknowledgements::            Acknowledgements.
 @end menu
 
 @node Audience
@@ -547,15 +581,16 @@ out at the top of the file. The actual license text is provided later.
 @end ignore
 
 @menu
-* jrtangle ifweave iftangle::      Text inclusion/exclusion for @command{jrtangle}.
-* jrtangle file chunks::           Processing file chunks for @command{jrtangle}.
-* jrtangle code chunks::           Processing code chunks for @command{jrtangle}.
-* jrtangle error checking::        Checking for errors in @command{jrtangle}.
-* Expanding code chunks::          Expanding code chunks into straight code.
-* jrtangle before everything::     Doing something before extracting any files.
-* jrtangle avoiding update::       Leaving unchanged files alone.
-* jrtangle after creation::        Doing something after creating a file.
-* Common Chunks::                  Common code chunks and functions.
+* jrtangle ifweave iftangle::   Text inclusion/exclusion for
+                                @command{jrtangle}.
+* jrtangle file chunks::        Processing file chunks for @command{jrtangle}.
+* jrtangle code chunks::        Processing code chunks for @command{jrtangle}.
+* jrtangle error checking::     Checking for errors in @command{jrtangle}.
+* Expanding code chunks::       Expanding code chunks into straight code.
+* jrtangle before everything::  Doing something before extracting any files.
+* jrtangle avoiding update::    Leaving unchanged files alone.
+* jrtangle after creation::     Doing something after creating a file.
+* Common Chunks::               Common code chunks and functions.
 @end menu
 
 @node jrtangle ifweave iftangle
@@ -1633,13 +1668,16 @@ have to remove any lines that are just for @command{jrtangle},
 since Texinfo won't know what to do with them.
 
 @menu
-* jrweave two passes::            Two pass design.
-* jrweave initial code::          Initial Stuff and Printing A Warning.
-* jrweave ifweave iftangle::      Text inclusion/exclusion for @command{jrwaeave}.
-* jrweave language additions::    Extra stuff for authors.
-* jrweave file chunks::           Collecting and formatting file chunks.
-* jrweave code chunks::           Collecting and formatting code chunks.
-* jrweave delete jrtangle code::  Removing stuff for @command{jrtangle}.
+* jrweave two passes::           Two pass design.
+* jrweave initial code::         Initial Stuff and Printing A Warning.
+* jrweave ifweave iftangle::     Text inclusion/exclusion for
+                                 @command{jrwaeave}.
+* jrweave language additions::   Extra stuff for authors.
+* jrweave file chunks::          Collecting and formatting file chunks.
+* jrweave code chunks::          Collecting and formatting code chunks.
+* jrweave print setup recipe::   Printing the initial setup recipe.
+* jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
+* jrweave helper functions::     Helper functions for @command{jrweave}.
 @end menu
 
 @node jrweave two passes
@@ -2206,7 +2244,7 @@ function sanitize_name(file_name)
 @chapter Bootstrapping The System
 
 @quotation
-Which came first, the chicken or the egg?@footnote{@code{http://www.gagcartoons.com/cartoons/171/}.}
+Which came first, the chicken or the egg?@footnote{@url{http://www.gagcartoons.com/cartoons/171/}.}
 @end quotation
 
 @FIXME{Put an initial setup recipe here?}
@@ -2223,8 +2261,8 @@ May need to provide @code{@@include} in order to scale to bigger programs.
 Tangle enhancements, in particular putting in @code{#line} lines for C and C++.
 
 Copy / paste development causes problems - file and code are similar but not
-identical; so code highly similar and thus hard to get right. Original web didn't
-have this problem...
+identical; so code highly similar and thus hard to get right. Original
+web didn't have this problem...
 
 @node Command summary
 @appendix Alphabetic List of @value{SHORTTITLE} Commands
@@ -2237,9 +2275,9 @@ have this problem...
 Blah blah
 
 @menu
-* File Definitions::		Source files by definition.
-* Code Segment Definitions::	Code segments by definition.
-* Code Segment References::	Code segments by reference.
+* File Definitions::            Source files by definition.
+* Code Segment Definitions::    Code segments by definition.
+* Code Segment References::     Code segments by reference.
 @end menu
 
 @node File Definitions
