@@ -1440,11 +1440,13 @@ function create_update_recipe(file, results,		source_file, dir, suffix, recipe)
 	suffix = Update_value[source_file]["SUFFIX"]
 
 	delete results
-	recipe = gensub(/@DIR@/, dir, "g", Update_recipe)
-	recipe = gensub(/@FILE@/, file, "g", recipe)
-	recipe = gensub(/@SUFFIX@/, suffix, "g", recipe)
-	results["recipe"] = recipe
 
+	recipe = Update_recipe
+	gsub(/@DIR@/, dir, recipe)
+	gsub(/@FILE@/, file, recipe)
+	gsub(/@SUFFIX@/, suffix, recipe)
+
+	results["recipe"] = recipe
 	results["output"] = (dir "/" file suffix)
 }
 @
@@ -1980,9 +1982,7 @@ function end_file_gathering(	anchor_name, x, y, n, i, parts, names, name)
 
 	# escape special chars in parts of code that aren't chunk names
 	for (i = 1; i in parts; i++)
-		parts[i] = gensub(/[@{}]/, "@&", "g", parts[i])
-
-	y = gensub(/[@{}]/, "@&", "g", x)
+		gsub(/[@{}]/, "@&", parts[i])
 
 	y = parts[1]
 	if (n > 1) {	# embedded chunk names
@@ -2060,7 +2060,7 @@ function end_code_gathering(	i, j, n, chunk_name, x, parts, names, name)
 
 	# escape special chars in parts of code that aren't chunk names
 	for (i = 1; i in parts; i++)
-		parts[i] = gensub(/[@{}]/, "@&", "g", parts[i])
+		gsub(/[@{}]/, "@&", parts[i])
 
 	y = parts[1]
 	if (n > 1) {	# embedded chunk names
@@ -2124,8 +2124,8 @@ document has provided the initial text.
 		print "@end example"
 	} else {
 		x = expand_tabs($0, 4)
-		y = gensub(/[@{}]/, "@&", "g", x)
-		print y
+		gsub(/[@{}]/, "@&", x)
+		print x
 	}
 
 	next
@@ -2194,11 +2194,11 @@ function expand_tabs(string, tabstop,	chars, out, i, j, k, n)
 	return join(out, 0, j, SUBSEP)
 }
 
-function sanitize_name(file_name,	ret)
+function sanitize_name(file_name)
 {
-	ret = gensub(/[^[:alnum:]]/, "-", "g", file_name)
+	gsub(/[^[:alnum:]]/, "-", file_name)
 
-	return ret
+	return file_name
 }
 @
 
