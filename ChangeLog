@@ -1,3 +1,8 @@
+2013-11-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Use functions for generating anchor names
+	and chunk names. First step towards merging the processing.
+
 2013-11-13         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Improve shell debugging. Start on changing

@@ -1996,7 +1996,7 @@ if (! ("file_number" in File_info[new_file]))
 Here is where we format the file chunks.
 
 @<Process file chunks for @code{jrweave}@>=
-function end_file_gathering(	anchor_name, x, y, n, i, parts, names, name)
+function end_file_gathering(	x, y, n, i, parts, names, name)
 {
 	if (Pass == 1) {
 		File_lines = ""
@@ -2006,11 +2006,10 @@ function end_file_gathering(	anchor_name, x, y, n, i, parts, names, name)
 
 	# On the second pass, format the chunk
 
-	anchor_name = sanitize_name(Source_file)
-	printf("@anchor{%s-%d}\n", anchor_name, File_info[Source_file]["defn"])
+	printf("%s\n", format_anchor(Source_file, File_info[Source_file]["defn"]))
 
-	printf("@noindent\n@{@file{%s} @oldnum{%d}@} %s@equiv{}\n@example\n",
-		Source_file, File_info[Source_file]["file_number"],
+	printf("@noindent\n%s %s@equiv{}\n@example\n",
+		format_tag(Source_file, File_info[Source_file]["file_number"], "file"),
 		File_info[Source_file]["defn"] == 1 ? "" : "+")
 
 	# convert lines
@@ -2026,7 +2025,7 @@ function end_file_gathering(	anchor_name, x, y, n, i, parts, names, name)
 	if (n > 1) {	# embedded chunk names
 		for (i = 1; i in names; i++) {
 			name = strip_out_name(names[i])
-			name = sprintf("@r{<@i{%s} @oldnum{%d}>}", name, Code_info[name]["code_number"])
+			name = format_tag(name, Code_info[name]["code_number"], "code")
 			y = y name
 			y = y parts[i+1]
 		}
@@ -2075,7 +2074,7 @@ done, print out the chunk nicely formatted.
 @<Process code chunk for @command{jrweave}@> =
 @<Collect code chunk lines@>
 
-function end_code_gathering(	i, j, n, chunk_name, x, parts, names, name)
+function end_code_gathering(	i, j, n, x, parts, names, name)
 {
 	if (Pass == 1) {
 		Flags["Code_chunk"] = FALSE
@@ -2085,10 +2084,9 @@ function end_code_gathering(	i, j, n, chunk_name, x, parts, names, name)
 	}
 
 	# In second pass, print the code
-	chunk_name = sanitize_name(Code_chunk)
-	printf("@anchor{%s-%d}\n", chunk_name, Code_info[Code_chunk]["defn"])
-	printf("@noindent\n<@i{%s} @oldnum{%d}> %s@equiv{}\n@example\n",
-		Code_chunk, Code_info[Code_chunk]["code_number"],
+	printf("%s\n", format_anchor(Code_chunk, Code_info[Code_chunk]["defn"]))
+	printf("@noindent\n%s %s@equiv{}\n@example\n",
+		format_tag(Code_chunk, Code_info[Code_chunk]["code_number"], "code"),
 		Code_info[Code_chunk]["defn"] == 1 ? "" : "+")
 
 	# print the code
@@ -2104,7 +2102,7 @@ function end_code_gathering(	i, j, n, chunk_name, x, parts, names, name)
 	if (n > 1) {	# embedded chunk names
 		for (i = 1; i in names; i++) {
 			name = strip_out_name(names[i])
-			name = sprintf("@r{<@i{%s} @oldnum{%d}>}", name, Code_info[name]["code_number"])
+			name = format_tag(name, Code_info[name]["code_number"], "code")
 			y = y name
 			y = y parts[i+1]
 		}
@@ -2144,6 +2142,9 @@ document has provided the initial text.
 		$0 = $0
 		Initial_setup_name = $0
 	}
+	else
+		Initial_setup_name = "Initial setup"
+
 	next
 }
 
@@ -2152,11 +2153,8 @@ document has provided the initial text.
 		next
 
 	if (/^@initial_setup$/) {
-		# FIXME: Format the chunk name, need a function to do that.
-		printf("@anchor{jrweave-initial-setup}\n")
-		if (length(Initial_setup_name) > 0) {
-			printf("@noindent\n<@i{%s}> @equiv{}\n", Initial_setup_name)
-		}
+		printf("%s\n", format_anchor(Initial_setup_name, 0))
+		printf("@noindent\n<@i{%s}> @equiv{}\n", Initial_setup_name)
 		print "@example"
 	} else if (/^@end initial_setup$/) {
 		print "@end example"
@@ -2237,6 +2235,35 @@ function sanitize_name(file_name)
 	gsub(/[^[:alnum:]]/, "-", file_name)
 
 	return file_name
+}
+
+function format_anchor(name, defn,	clean_name, result)
+{
+	clean_name = sanitize_name(name)
+	if (defn > 0)
+		result = sprintf("@anchor{%s-%d}", clean_name, defn)
+	else
+		result = sprintf("@anchor{%s}", clean_name)
+
+	return result
+}
+
+function format_tag(name, count, type,		result, left, right, style)
+{
+	if (type == "file") {
+		left = "@{"
+		right = "@}"
+		style = "file"
+	} else if (type == "code") {
+		left = "<"
+		right = ">"
+		style = "i"
+	} else
+		fatal(_"format_tag: Unknown chunk type `%s'\n", type)
+
+	result = sprintf("@r{%s@%s{%s} @oldnum{%d}%s}", left, style, name, count, right)
+
+	return result
 }
 @
 
@@ -2359,6 +2386,4 @@ TODO:
 - Full indexing of variables and functions
 - Adding URLs where needed.
 - Review patterns to allow trailing whitespace
-- Function to format anchars
-- Function to format tags
 - Merge constants into one chunk inside one BEGIN block
