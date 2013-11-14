@@ -2,6 +2,8 @@
 
 	* texiwebjr.twjr: Use functions for generating anchor names
 	and chunk names. First step towards merging the processing.
+	Merge constants into one chunk inside one BEGIN block.
+	Reviewed patterns to allow trailing whitespace.
 
 2013-11-13         Arnold D. Robbins     <arnold@skeeve.com>
 
