@@ -571,11 +571,9 @@ out at the top of the file. The actual license text is provided later.
 @ignore
 
 # FIXME:
-#	5. Add a command to do chunks in smallexample.
 #	6. Add a way to specify leading comment delimiter or to use what was
 #	   on invocation line.
 #	13. Merge file and code chunks by having chunk type. Would simplify code.
-#	14. Let the user set the tab stop.
 #	15. Option to print out file update recipe?
 @end ignore
 
@@ -1661,6 +1659,7 @@ since Texinfo won't know what to do with them.
 @menu
 * jrweave two passes::           Two pass design.
 * jrweave initial code::         Initial Stuff and Printing A Warning.
+* jrweave choosing code size::   Choosing the code size.
 * jrweave ifweave iftangle::     Text inclusion/exclusion for
                                  @command{jrwaeave}.
 * jrweave language additions::   Extra stuff for authors.
@@ -1668,6 +1667,7 @@ since Texinfo won't know what to do with them.
 * jrweave code chunks::          Collecting and formatting code chunks.
 * jrweave print setup recipe::   Printing the initial setup recipe.
 * jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
+* jrweave expanding tabs::       Expanding tabs.
 * jrweave helper functions::     Helper functions for @command{jrweave}.
 @end menu
 
@@ -1791,6 +1791,56 @@ for (i = 1; i <= l + 4; i++)
 	printf("%%")
 printf "\n"
 @
+
+@node jrweave choosing code size
+@section Choosing The Code Size
+
+Sometimes, code is just too wide for Texinfo's @code{@@example}
+sections and it is better to use @code{@@smallexample}.  The
+@code{@@use_smallexample} statement causes @command{jrweave}
+to use @code{@@smallexample} for all the file and code chunks.
+
+Initially this is a global setting, made once at the start of
+processing.  It might be worthwhile to make it dynamic with
+an addition @code{@@use_example} statement that switches back
+to @code{@@example}.
+
+@FIXME{Comments from reviewers welcome about this.}
+
+@(jrweave@) =
+@<Switch example environment@>
+@
+
+A @code{BEGIN} block sets the default:
+
+@<Switch example environment@> =
+BEGIN {
+	Example_start = "@example"
+	Example_end = "@end example"
+}
+@
+
+And then we can switch to the other size at will.
+By checking during the first pass, the statement can be placed
+anywhere in the @value{TWJR} source file, and it will be
+in effect by the time @command{jrweave} produces any output.
+
+@<Switch example environment@> =
+/^@use_smallexample[[:space:]]*$/ {
+	if (Pass == 1) {
+			Example_start = "@smallexample"
+			Example_end = "@end smallexample"
+	}
+	next
+}
+@
+
+@noindent
+@code{Example_start} and @code{Example_end} are then used throughout
+the rest of the program.
+
+@c And now let's try it out!
+@use_smallexample
 
 @node jrweave ifweave iftangle
 @section Document Sections Exclusive to Weaving and Tangling
@@ -1999,12 +2049,13 @@ function end_file_gathering(	x, y, n, i, parts, names, name)
 
 	printf("%s\n", format_anchor(Source_file, File_info[Source_file]["defn"]))
 
-	printf("@noindent\n%s %s@equiv{}\n@example\n",
+	printf("@noindent\n%s %s@equiv{}\n",
 		format_tag(Source_file, File_info[Source_file]["file_number"], "file"),
 		File_info[Source_file]["defn"] == 1 ? "" : "+")
+	print Example_start
 
 	# convert lines
-	x = expand_tabs(File_lines, 4)
+	x = expand_tabs(File_lines, Tabstop)
 	# extract code chunks
 	n = split(x, parts, Chunk_name_pattern, names)
 
@@ -2023,7 +2074,7 @@ function end_file_gathering(	x, y, n, i, parts, names, name)
 	}
 
 	printf("%s\n", y)
-	print "@end example"
+	print Example_end
 
 	File_lines = ""
 	Flags["File_chunk"] = FALSE
@@ -2076,12 +2127,13 @@ function end_code_gathering(	i, j, n, x, parts, names, name)
 
 	# In second pass, print the code
 	printf("%s\n", format_anchor(Code_chunk, Code_info[Code_chunk]["defn"]))
-	printf("@noindent\n%s %s@equiv{}\n@example\n",
+	printf("@noindent\n%s %s@equiv{}\n",
 		format_tag(Code_chunk, Code_info[Code_chunk]["code_number"], "code"),
 		Code_info[Code_chunk]["defn"] == 1 ? "" : "+")
+	print Example_start
 
 	# print the code
-	x = expand_tabs(Code_lines, 4)
+	x = expand_tabs(Code_lines, Tabstop)
 
 	n = split(x, parts, Chunk_name_pattern, names)
 
@@ -2100,7 +2152,7 @@ function end_code_gathering(	i, j, n, x, parts, names, name)
 	}
 
 	print y
-	print "@end example"
+	print Example_end
 
 	Code_lines = ""
 	Code_chunk_start = ""
@@ -2146,11 +2198,11 @@ document has provided the initial text.
 	if (/^@initial_setup[[:space:]]*$/) {
 		printf("%s\n", format_anchor(Initial_setup_name, 0))
 		printf("@noindent\n<@i{%s}> @equiv{}\n", Initial_setup_name)
-		print "@example"
+		print Example_start
 	} else if (/^@end initial_setup[[:space:]]*$/) {
-		print "@end example"
+		print Example_end
 	} else {
-		x = expand_tabs($0, 4)
+		x = expand_tabs($0, Tabstop)
 		gsub(/[@{}]/, "@&", x)
 		print x
 	}
@@ -2181,14 +2233,71 @@ document has provided the initial text.
 Pass == 2 { print }
 @
 
-@node jrweave helper functions
-@section Helper Functions For @command{jrweave}
+@node jrweave expanding tabs
+@section Expanding Tabs
+
+@TeX{} treats tabs like single spaces.  However, people writing
+code like to use tabs to handle indentation.  There are two
+ways to manage this: either set your editor to expand tabs to
+spaces upon input, or use real tabs, and expand them when
+creating the document with @command{jrweave}.
+Since I happen to like using tabs@footnote{A habit of over 30
+years that is just too hard to break.}, I have chosen the latter.
 
 @(jrweave@) =
-@<Helper functions for @command{jrweave}@>
+@<Expand tabs for @command{jrweave}@>
 @
 
-@<Helper functions for @command{jrweave}@> =
+Although POSIX-style systems usually expand tabs to every eight spaces,
+that's a bit much for printed documents like what Texinfo produces.
+So, I have chosen to set tabs at every four columns. It can be
+adjusted using the @option{-v} option to @command{gawk}.
+
+@<Expand tabs for @command{jrweave}@> =
+BEGIN {
+	if (Tabstop == 0)
+		Tabstop = 4		# default tab stops
+}
+@
+
+I recommend using whatever appropriate magic in the @value{TWJR}
+document that will set the tab stop to whatever you prefer
+in your favorite editor.  For @UREF{http://www.vim.org, Vim},
+I use this line, which also switches on syntax highlighting
+appropriate to Texinfo:
+
+@example
+@@c vim: filetype=texinfo tabstop=4
+@end example
+
+The code that expands tabs is fairly straightforward. It first makes
+sure that the chosen tabstop is at least two or more.  Next it splits
+the string into an input array, @code{chars}, and starts copying the
+input to the output (@code{out}) one character at a time. The cases
+are as follows:
+
+@table @asis
+@item A newline
+Upon encountering a newline, we must reset our idea of the output
+column back to zero. This is the variable @code{k}.
+
+@item A non-tab
+Copy the character to the output and increase @code{k} by one.
+
+@item A tab
+Replaces the tab with a space and then add spaces until the
+output column has reached the next tab stop.
+
+The algorithm is borrowed from the original Berkeley Unix
+@command{expand} program, written in C, where arrays are zero-based,
+and the check can be made using the bitwise-and operator to see
+if more characters remain.
+@end table
+
+At the end, we call @code{join()} to convert the @code{out}
+array into a single string which can be returned.
+
+@<Expand tabs for @command{jrweave}@> =
 # expand_tabs --- expand tabs in the string
 
 function expand_tabs(string, tabstop,	chars, out, i, j, k, n)
@@ -2220,6 +2329,20 @@ function expand_tabs(string, tabstop,	chars, out, i, j, k, n)
 
 	return join(out, 0, j, SUBSEP)
 }
+@
+
+(I suppose this could have been broken out into small chunks
+with preceding explanatory text; I'm not sure it would have
+made a big difference since this is not a big function.)
+
+@node jrweave helper functions
+@section Helper Functions For @command{jrweave}
+
+@(jrweave@) =
+@<Helper functions for @command{jrweave}@>
+@
+
+@<Helper functions for @command{jrweave}@> =
 
 function sanitize_name(file_name)
 {
@@ -2297,6 +2420,8 @@ web didn't have this problem...
 @appendix Alphabetic List of @value{SHORTTITLE} Commands
 
 @FIXME{Write me.}
+
+Include variables that can be set with -v: Tabstop, Debug.
 
 @node Code Segment Summaries
 @appendix Code Segment Summaries

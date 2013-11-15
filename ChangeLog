@@ -1,3 +1,9 @@
+2013-11-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Let the user set the tabstop.
+	Includes adding prose for expanding tabs.
+	Add a command to move to @smallexample.
+
 2013-11-14         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Use functions for generating anchor names
