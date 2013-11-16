@@ -383,9 +383,10 @@ of appeal. This doesn't take away from its usefulness as an approach.
 @end quotation
 
 @dfn{Literate programming} is a programming style invented by
-Professor Donald E.@: Knuth of Stanford University for implementing
-the @TeX{} document formatter and @MF{} font-creation programs.
-(@FIXME{Web links for Knuth and for the @TeX{} and @MF{} books}.)
+@UREF{http://www-cs-faculty.stanford.edu/~knuth/, Professor Donald E.@: Knuth}
+of Stanford University for implementing the
+@UREF{http://www-cs-faculty.stanford.edu/~knuth/abcde.html,
+@TeX{} document formatter and @MF{} font-creation programs}.
 
 A literate program is a mixture of program fragments that do some
 particular task, and explanatory prose describing what the code is
@@ -404,9 +405,10 @@ uses @command{CWEB}, which is similar to the original @command{WEB}
 but is intended for use with C.)
 
 Many literate programming tools have been developed since then.
-@value{TWJR} is inspired by two in particular: Norman Ramsey's
-@command{noweb}, and Ben Pfaff's TexiWeb.
-(@FIXME{web links needed})
+@value{TWJR} is inspired by two in particular:
+@UREF{http://www.cs.tufts.edu/~nr/noweb/, Norman Ramsey's @command{noweb}},
+and
+@UREF{http://searchcode.com/codesearch/view/14097352, Ben Pfaff's TexiWeb}.
 
 @command{noweb} makes a conscious attempt to provide a minimal additional
 markup over and above the documment formatting language. It also attempts
@@ -416,8 +418,8 @@ several stages in a pipeline and a documented intermediate format,
 making it easily extensible.  It is the ``minimal additional markup''
 aspect of @command{noweb} that I find particular appealing.
 
-TexiWeb was created by Ben Pfaff for writing his AVL library.
-(@FIXME{Link for the AVL library.})
+TexiWeb was created by Ben Pfaff for writing his
+@UREF{http://adtinfo.org/, AVL library}.
 It builds on the Texinfo markup language, which at first glance is
 exactly what I was looking for: Texinfo + Literate Programming.
 However, TexiWeb has two drawbacks: it is poorly documented,
@@ -511,11 +513,12 @@ may change as this evolves.
 
 Why write in @command{awk}? Good question. I glad you asked this one too.
 
-I got involved with the GNU Awk project (@FIXME{link here}) late in
-1987.  I have been the sole maintainer and the primary author of its
-documentation since 1994.  The language is small, elegant, and generally
-quite powerful.  @command{gawk}, in particular, adds many useful features
-over the original Unix (and POSIX standard) @command{awk}.
+I got involved with the
+@UREF{http://www.gnu.org/software/gawk/, GNU Awk project}
+late in 1987.  I have been the sole maintainer and the primary author
+of its documentation since 1994.  The language is small, elegant, and
+generally quite powerful.  @command{gawk}, in particular, adds many
+useful features over the original Unix (and POSIX standard) @command{awk}.
 
 Part of what makes maintaining @command{gawk} enjoyable is that I like
 using the language itself, on a daily basis.
@@ -1475,15 +1478,21 @@ function create_update_recipe(file, results,		source_file, dir, suffix, recipe)
 @
 
 Later on, the recipe is prefixed with the value of @code{Shell_debug},
-which turns on execution tracing for shell commands.  Ths is set
-based on the debug variable. We rely on the fact that @command{awk}
-variables are initialized to the empty string.
+which turns on execution tracing for shell commands.
 @code{Shell_debug} is used in a few other places as well.
+
+The value is set based on the @code{Debug} variable. We rely on the
+fact that @command{awk} variables are initialized to the empty string.
+However, if the user has provided a value (via @command{gawk}'s
+@option{-v} option) we don't change it.  This is useful in non-POSIX
+environments, for example.
+
 
 @(jrtangle@) =
 BEGIN {
 	if (Debug ~ /shell/)
-		Shell_debug = "set -x; "
+		if (length(Shell_debug) == 0)
+			Shell_debug = "set -x; "
 }
 @
 
@@ -1800,12 +1809,10 @@ sections and it is better to use @code{@@smallexample}.  The
 @code{@@use_smallexample} statement causes @command{jrweave}
 to use @code{@@smallexample} for all the file and code chunks.
 
-Initially this is a global setting, made once at the start of
-processing.  It might be worthwhile to make it dynamic with
-an addition @code{@@use_example} statement that switches back
-to @code{@@example}.
-
-@FIXME{Comments from reviewers welcome about this.}
+After some experimentation, it makes the most sense to make this
+be dynamic, allowing the author to switch things back
+and forth.  To that end there is also a @code{@@use_example}
+statement.
 
 @(jrweave@) =
 @<Switch example environment@>
@@ -1820,17 +1827,18 @@ BEGIN {
 }
 @
 
-And then we can switch to the other size at will.
-By checking during the first pass, the statement can be placed
-anywhere in the @value{TWJR} source file, and it will be
-in effect by the time @command{jrweave} produces any output.
+And then we can switch sizes at will.
 
 @<Switch example environment@> =
-/^@use_smallexample[[:space:]]*$/ {
-	if (Pass == 1) {
-			Example_start = "@smallexample"
-			Example_end = "@end smallexample"
-	}
+Pass == 2 && /^@use_smallexample[[:space:]]*$/ {
+	Example_start = "@smallexample"
+	Example_end = "@end smallexample"
+	next
+}
+
+Pass == 2 && /^@use_example[[:space:]]*$/ {
+	Example_start = "@example"
+	Example_end = "@end example"
 	next
 }
 @
@@ -1838,9 +1846,6 @@ in effect by the time @command{jrweave} produces any output.
 @noindent
 @code{Example_start} and @code{Example_end} are then used throughout
 the rest of the program.
-
-@c And now let's try it out!
-@use_smallexample
 
 @node jrweave ifweave iftangle
 @section Document Sections Exclusive to Weaving and Tangling
@@ -2388,6 +2393,10 @@ function format_tag(name, count, type,		result, left, right, style)
 Which came first, the chicken or the egg?@footnote{@url{http://www.gagcartoons.com/cartoons/171/}.}
 @end quotation
 
+@quotation
+Who will compile the compiler?
+@end quotation
+
 Placeholder chapter at the moment.
 
 @FIXME{Put an initial setup recipe here?}
@@ -2421,7 +2430,7 @@ web didn't have this problem...
 
 @FIXME{Write me.}
 
-Include variables that can be set with -v: Tabstop, Debug.
+Include variables that can be set with -v: Tabstop, Debug, Shell_debug.
 
 @node Code Segment Summaries
 @appendix Code Segment Summaries
@@ -2481,6 +2490,9 @@ tabs. This would have to be done differently in a standard @command{awk}.
 This one is easy. A translatable string looks like the concatenation of
 a variable named @samp{_} with a string constant. Such constructs should
 work as-is in other @command{awk} versions.
+Of course, it would be nice if I were to follow through by setting
+@code{TEXTDOMAIN} and setting up the @file{Makefile} to produce the
+@file{texiwebjr.pot} file. Let's just move on, shall we?
 
 @item Multidimensional Arrays
 Here too, the standard syntax could be made to work, by contorting
@@ -2511,4 +2523,3 @@ ISBN-13: 978-0937073803.
 
 TODO:
 - Full indexing of variables and functions
-- Adding URLs where needed.

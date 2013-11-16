@@ -1,3 +1,9 @@
+2013-11-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Add a command to switch back to @example.
+	Add lots of URLs. Allow user to set Shell_debug from the
+	command line; good for non-POSIX environments.
+
 2013-11-15         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Let the user set the tabstop.
