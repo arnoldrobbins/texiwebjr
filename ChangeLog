@@ -1,3 +1,8 @@
+2013-11-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Add list of commands. Some minor formatting
+	cleanups.
+
 2013-11-16         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Add a command to switch back to @example.

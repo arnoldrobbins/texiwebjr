@@ -288,7 +288,7 @@ with @command{make}.
 
 @FIXME{Write me.}
 
-This is the list of chapter by chapter summaries, using @samp{@@table @dots{} @@end table}.
+This is the list of chapter by chapter summaries, using @samp{@@table @r{@dots{}} @@end table}.
 
 @node Conventions
 @unnumberedsec Typographical Conventions
@@ -596,8 +596,8 @@ out at the top of the file. The actual license text is provided later.
 @node jrtangle ifweave iftangle
 @section Document Sections Exclusive to Tangling and Weaving
 
-One nice thing in TexiWeb are @samp{@@iftangle @dots{} @@end iftangle} and
-@samp{@@ifweave @dots{} @@end ifweave} bracketing commands.  Those should
+One nice thing in TexiWeb are @samp{@@iftangle @r{@dots{}} @@end iftangle} and
+@samp{@@ifweave @r{@dots{}} @@end ifweave} bracketing commands.  Those should
 be dealt with early on.  They do the obvious thing: include lines that
 should be used only for one operation or the other.  Note that these
 have to be done differently for @command{jrtangle} and @command{jrweave};
@@ -1247,7 +1247,7 @@ logical to want to have subdirectories of different kinds for
 different files, and perhaps to run some kind of configuration
 or other initialization programs.  To that end, the author of
 the document can provide a script (or command invoking a script)
-bracketed @samp{@@initial_setup @dots{} @@end initial_setup} lines.
+bracketed @samp{@@initial_setup @r{@dots{}} @@end initial_setup} lines.
 
 Such lines must first be gathered, using the now familiar collection
 pattern:
@@ -1294,7 +1294,7 @@ For example, when creating directories, it is better to write something like
 this:
 
 @example
-for i in src doc support @dots{}
+for i in src doc support @r{@dots{}}
 if [ ! -d $i ]
 then
     mkdir $i
@@ -1349,7 +1349,7 @@ make the substitutions in the template in order to do the update.
 We will define a default template, with the option for the user
 to override it.
 
-The template is defined with @samp{@@file_update_recipe @dots{}
+The template is defined with @samp{@@file_update_recipe @r{@dots{}}
 @@end file_update_recipe}, and each file supplies values to the
 template with a line like this:
 
@@ -1851,8 +1851,8 @@ the rest of the program.
 @section Document Sections Exclusive to Weaving and Tangling
 
 As in @ref{jrtangle ifweave iftangle}, we need to process
-@samp{@@iftangle @dots{} @@end iftangle} and
-@samp{@@ifweave @dots{} @@end ifweave}. However, we
+@samp{@@iftangle @r{@dots{}} @@end iftangle} and
+@samp{@@ifweave @r{@dots{}} @@end ifweave}. However, we
 must do the opposite here of what we did there.
 
 @(jrweave@) =
@@ -2431,6 +2431,76 @@ web didn't have this problem...
 @FIXME{Write me.}
 
 Include variables that can be set with -v: Tabstop, Debug, Shell_debug.
+
+@table @code
+@item @@(@var{filename}@@) =
+Start or add to the definition of @var{filename}'s contents.
+@xref{jrtangle file chunks}.
+
+@item @@<@var{chunkname}@@> =
+Start or add to the definition of a code chunk named @var{chunkname}.
+@xref{jrtangle code chunks}.
+
+@item @@file_update @var{file} @var{directory} @var{suffix}
+Set the @var{directory} and @var{suffix} parameters to use for @var{file}'s
+file update reciple. @xref{jrtangle avoiding update}.
+
+@item @@file_update_recipe @r{@dots{}} @@end file_update_recipe
+Replace the default file update recipe with the enclosed code lines.
+@xref{jrtangle avoiding update}.
+
+@item @@iftangle @r{@dots{}} @@end iftangle
+Pass the enclosed lines through when tangling and delete
+them when weaving.
+@xref{jrtangle ifweave iftangle}, and
+@ref{jrweave ifweave iftangle}.
+
+@item @@ifweave @r{@dots{}} @@end ifweave
+Pass the enclosed lines through when weaving and delete
+them when tangling.
+@xref{jrtangle ifweave iftangle}, and
+@ref{jrweave ifweave iftangle}.
+
+@item @@initial_setup @r{@dots{}} @@end initial_setup
+Define the actions to be done before @command{jrtangle}
+creates any files. @xref{jrtangle before everything}.
+
+@item @@post_create @var{filename} @var{command to run}
+Arrange to run @var{command to run} after @var{filename}
+has been created. @xref{jrtangle after creation}.
+
+@item @@print_code_defs
+Print an alphabetically sorted list of code chunk definitions
+at this point in the document.
+@FIXME{Add an xref.}
+
+@item @@print_code_refs
+Print an alphabetically sorted list of code chunk references
+at this point in the document.
+@FIXME{Add an xref.}
+
+@item @@print_file_defs
+Print an alphabetically sorted list of file chunk definitions
+at this point in the document.
+@FIXME{Add an xref.}
+
+@item @@print_initial_setup
+Print the initial setup code at this point in the document.
+@xref{jrweave print setup recipe}.
+
+@item @@use_example
+After occurrences of this command, code is formatted
+using @code{@@example}, until a subsequent @code{@@use_smallexample}
+command. The initial default is to use @code{@@example}.
+@xref{jrweave choosing code size}.
+
+@item @@use_smallexample
+After occurrences of this command, code is formatted
+using @code{@@smallexample}, until a subsequent @code{@@use_example}
+command. The initial default is to use @code{@@example}.
+@xref{jrweave choosing code size}.
+
+@end table
 
 @node Code Segment Summaries
 @appendix Code Segment Summaries
