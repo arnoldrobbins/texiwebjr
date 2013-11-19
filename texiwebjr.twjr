@@ -2391,24 +2391,76 @@ function format_tag(name, count, type,		result, left, right, style)
 
 @quotation
 Which came first, the chicken or the egg?@footnote{@url{http://www.gagcartoons.com/cartoons/171/}.}
-@end quotation
-
-@quotation
+@sp 1
 Who will compile the compiler?
 @end quotation
 
-Placeholder chapter at the moment.
+This @value{CHAPTER} discusses the initial bootstrapping process,
+and also presents a @file{Makefile} for ongoing maintenance.
 
-@FIXME{Put an initial setup recipe here?}
+@menu
+* Initial boostrapping::  Bringing up the system from scratch.
+* The Makefile::          Keeping the system going.
+@end menu
 
-As a side note, the fact that @command{awk} lets you put functions
-anywhere in the file, along with allowing multiple @code{BEGIN} and
-@code{END} blocks anywhere in the file, mitigates some of the need for
-building up chunks in the way normally done with @command{WEB}-like
-tools.  When writing the bootstrap version of @command{jrtangle}, it
-was straightforward to write in a linear fashion and just drop in yet
-another @code{BEGIN} block.
+@node Initial boostrapping
+@section Bringing Up The System From Scratch
 
+Any literate programming system needs to be bootstrapped. As a first step,
+the tangle program, if it is compiled, must be given to the compiler as
+straight code.  This is true also if it is written in a scripting language.
+
+Once you have a working tangle program, you can generate the final one from
+the literate program, and also extract the weave program. Once you have the
+weave program, you can generate a document to be formatted with @TeX{},
+@LaTeX{}, @command{troff}, a DocBook processor, or whatever.  So that's
+the basic idea.
+
+How did I bootstrap things?
+
+Initially, I wrote a minimal version of @command{jrtangle}, called
+@command{jrtangle0}.  I wrote this in straight @command{gawk}, but with
+many more comments than usual.  This was not so hard: The fact that
+@command{awk} lets you put functions anywhere in the file, along with
+allowing multiple @code{BEGIN} and @code{END} blocks anywhere in the file,
+mitigates some of the need for building up chunks in the way that is
+normally done with @command{WEB}-like tools.  When writing the bootstrap
+version of @command{jrtangle}, it was straightforward to write in a linear
+fashion and just drop in yet another @code{BEGIN} block.
+
+The next step was then to take @command{jrtangle0}, integrate it into
+@file{texiwebjr.twjr} and start breaking it up into chunks and adding
+more prose.  From that point on I could add enhancements as well.
+I continued to use @command{jrtangle0} until @command{jrtangle} could
+bootstrap itself.  This is established when the following works:
+
+@example
+jrtangle0 texiwebjr.twjr    @ii{Create jrtangle}
+mv jrtangle jrtangle1       @ii{Rename it}
+./jrtangle1 texiwebjr.twjr  @ii{Run it}
+cmp jrtangle jrtangle1      @ii{Should produce no output}
+@end example
+
+Once @command{jrtangle} is functional, the next step is to write
+@command{jrweave}.  This, of course, could be done from the start
+in a literate fashion, since @command{jrtangle} creates it for us.
+
+The initial version of @command{jrweave} was pretty simple. It handled
+@samp{@@ifweave @r{@dots{}} @@end ifweave} and
+@samp{@@iftangle @r{@dots{}} @@end iftangle}, and the earliest supported
+additional commands (@code{@@post_create}). It then simply formatted the
+file and code chunks using @code{@@example}, escaping the characters
+@samp{@@}, @samp{@{}, and @samp{@}}, and expanding tabs.  This was enough
+to produce a straight Texinfo document that could be formatted and viewed
+onscreen (say, with a PDF viewer).
+
+From that point on, I could add one feature at a time, and test the
+features as I went along.
+
+@node The Makefile
+@section Keeping Things Going With @command{make}
+
+@FIXME{Write me.}
 
 @node Evaluation and Futures
 @chapter Evaluation and Future Work
