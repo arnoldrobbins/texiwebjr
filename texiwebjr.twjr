@@ -2540,6 +2540,8 @@ features as I went along.
 
 @FIXME{Write me.}
 
+@FIXME{Add a section on download from git.}
+
 @node Evaluation and Futures
 @chapter Evaluation and Future Work
 
@@ -2745,3 +2747,4 @@ ISBN-13: 978-0937073803.
 
 TODO:
 - Full indexing of variables and functions
+- Write a script to create texiwebjr.pot ?
