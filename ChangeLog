@@ -1,3 +1,10 @@
+2013-11-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Add in sidebar handling in prose, break up
+	authoring additions section into two subsections.
+	Add macros and sidebar to list of new commands.
+	Run a spell check.
+
 2013-11-18         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Start on bootstrapping chapter.

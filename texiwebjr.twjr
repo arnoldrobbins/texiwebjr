@@ -125,7 +125,9 @@ This is Edition @value{EDITION} of @cite{@value{TITLE}}.
 @c during editing and review.
 @c @setchapternewpage odd
 
-@shorttitlepage @value{SHORTTITLE}
+@c Uncomment this if it's ever printed as a real book(let).
+@c @shorttitlepage @value{SHORTTITLE}
+
 @titlepage
 @title @value{TITLE}
 @subtitle @value{UPDATE-MONTH}
@@ -149,10 +151,12 @@ URL: @url{http://www.skeeve.com/} @*
 @insertcopying
 @end titlepage
 
+@set DRAFT @i{DRAFT}
+
 @iftex
 @headings off
-@evenheading @thispage@ @ @ @strong{@value{SHORTTITLE}} @| @|
-@oddheading  @| @| @strong{@thischapter}@ @ @ @thispage
+@evenheading @thispage@ @ @value{DRAFT} @| @| @strong{@value{SHORTTITLE}}
+@oddheading  @strong{@thischapter} @| @| @value{DRAFT}@ @ @thispage
 @end iftex
 
 @ifnottex
@@ -175,12 +179,12 @@ on top of the Texinfo document formatting markup language.
 * Preface::                        Preface.
 * Introduction::                   Introduction.
 * jrtangle code::                  The code for @command{jrtangle}.
-* jrweave code::                   The code for @command{jrwreave}.
+* jrweave code::                   The code for @command{jrweave}.
 * Bootstrapping::                  Chicken and egg issues.
 * Evaluation and Futures::         Evaluation and future work.
 * Command summary::                Alphabetic list of @value{TWJR} commands.
-* Code Segment Summaries::         Alpabetic lists of code segments by
-                                   defintion and by reference.
+* Code Segment Summaries::         Alphabetic lists of code segments by
+                                   definition and by reference.
 * Use of @command{gawk} features:: Features Specific to @command{gawk}.
 * Bibliography::                   Reference material.
 * Concept Index::                  The concept index.
@@ -209,7 +213,7 @@ on top of the Texinfo document formatting markup language.
 * jrweave two passes::           Two pass design.
 * jrweave initial code::         Initial Stuff and Printing A Warning.
 * jrweave ifweave iftangle::     Text inclusion/exclusion for
-                                 @command{jrwaeave}.
+                                 @command{jrweave}.
 * jrweave language additions::   Extra stuff for authors.
 * jrweave file chunks::          Collecting and formatting file chunks.
 * jrweave code chunks::          Collecting and formatting code chunks.
@@ -235,14 +239,14 @@ on top of the Texinfo document formatting markup language.
 Literate programming is a programming style created originally by
 Professor Donald E.@: Knuth, of Stanford University.
 Programming well this way requires the author of a program to
-present not clear explanations of both how his program functions
+present clear explanations of both how his program functions
 and why it is written in the way it is. The discipline involved
 thus leads to better programs.
 
 The Texinfo markup language is the official documentation markup
 language of the GNU Project. It makes writing program documentation
 pleasant. In addition, these documents can be converted to multiple
-formats for end use. The two most important formats (in the author's
+formats for end use. The two most important formats (in my
 opinion) are HTML for viewing with a Web browser, and @TeX{} for printing.
 
 This @value{DOCUMENT} describes @value{TWJR}, a system that provides
@@ -271,6 +275,8 @@ large programs.
 You may also find this @value{DOCUMENT} interesting if you
 like programming using scripting languages, as most of the
 code is written in @command{awk}, the author's favorite hammer.
+
+@FIXME{xkcd cartoon and some text here, along with a link.}
 
 You should be familiar with the Texinfo markup language,
 and also be familiar with the @command{awk} programming language.
@@ -328,7 +334,7 @@ and if a point needs to be made strongly, it is done @strong{like this}.
 The first occurrence of a new term is usually its @dfn{definition} and
 appears in the same font as the previous occurrence of ``definition''
 in this sentence.  Finally, file names are indicated like this:
-@file{/path/to/ourfile}.
+@file{/path/to/our/file}.
 @end ifnotinfo
 
 @FIXME{Do we need control characters in this document?}
@@ -411,7 +417,7 @@ and
 @UREF{http://searchcode.com/codesearch/view/14097352, Ben Pfaff's TexiWeb}.
 
 @command{noweb} makes a conscious attempt to provide a minimal additional
-markup over and above the documment formatting language. It also attempts
+markup over and above the document formatting language. It also attempts
 to be portable to any markup language, not just @TeX{} or @LaTeX{},
 and to any programming language.  Finally, it is programmable, with
 several stages in a pipeline and a documented intermediate format,
@@ -489,7 +495,7 @@ familiar with it, it does not support Texinfo. Even though @LaTeX{} is a
 more powerful markup language, I didn't want to climb that learning curve
 just to use @command{noweb}.  Also, I felt that it might be easier---and
 certainly more @emph{fun}---to write my own small literate programming
-system than to add a Texinfo backend to @command{noweb}.@footnote{The
+system than to add a Texinfo back end to @command{noweb}.@footnote{The
 truth is that doing something like this has been in the back of my mind
 for close to 20 years; I finally decided to ``just do it.''}
 
@@ -1670,7 +1676,7 @@ since Texinfo won't know what to do with them.
 * jrweave initial code::         Initial Stuff and Printing A Warning.
 * jrweave choosing code size::   Choosing the code size.
 * jrweave ifweave iftangle::     Text inclusion/exclusion for
-                                 @command{jrwaeave}.
+                                 @command{jrweave}.
 * jrweave language additions::   Extra stuff for authors.
 * jrweave file chunks::          Collecting and formatting file chunks.
 * jrweave code chunks::          Collecting and formatting code chunks.
@@ -1690,7 +1696,7 @@ same number.  The numbering is managed by the weaving process; the author
 of a literate program does not have to manage this.
 
 An important part of the literate style is that a code chunk may be
-refereced before it is defined; in fact this is usually the case.
+referenced before it is defined; in fact this is usually the case.
 This raises a difficulty; @command{jrweave} cannot print a chunk
 with its associated number if it hasn't yet seen its definition.
 
@@ -1903,7 +1909,7 @@ And without a lot of fanfare, here is the code:
 	}
 
 	# end of construct, delete line number, skip this line
-	if (/^@end iftweave[[:space:]]*$/) {
+	if (/^@end ifweave[[:space:]]*$/) {
 		delete Line_numbers["ifweave"]
 		next
 	}
@@ -1917,7 +1923,18 @@ And without a lot of fanfare, here is the code:
 
 Here are some additions to the Texinfo language that will
 ease both the formatting job and some of the authoring
-work. We add them to the output right before the title page.
+work.
+
+@menu
+* jrweave additional macros:: Macros for writing documents.
+* jrweave sidebars::          Providing sidebars.
+@end menu
+
+@node jrweave additional macros
+@subsection Macros for Writing Documents
+
+The first addition are some macros.
+We add them to the output right before the title page.
 This is so that the @code{@@EMAIL@{@}} macro can be used
 on the copyright page without problems.
 
@@ -1992,6 +2009,62 @@ print "\\value\\"
 print "@end macro"
 print "@end ifnottex"
 @
+
+@node jrweave sidebars
+@subsection Providing Sidebars
+
+Sidebars are blocks of text with a title that are set off to the side in
+a printed book (or magazine). They address topics of tangential interest
+that are worth discussing but not necessarily part of the main flow of
+a section.  Since Texinfo doesn't support them, and I want to be able
+to have them, this code provides them. It collects the title and text,
+and outputs them twice, once for DocBook, and once for everything
+else using Texinfo's @code{@@cartouche} environment.
+The title is provided on the opening @code{@@sidebar} line.
+
+@<Texinfo authoring additions@>=
+Pass == 2 && /^@sidebar[[:space:]]+/ {
+	sub(/^@sidebar[[:space:]]+/, "", $0)
+	Sidebar_title = $0
+	Sidebar_body = ""
+	Collecting_sidebar = TRUE
+	next
+}
+
+Pass == 2 && /^@end[[:space:]]+sidebar[[:space:]]*$/ {
+	Collecting_sidebar = FALSE
+	printf "@cindex sidebar, %s\n", Sidebar_title
+	printf "@ifdocbook\n"
+		printf "@docbook\n"
+		printf "<sidebar><title>%s</title>\n", Sidebar_title
+		printf "@end docbook\n"
+			print Sidebar_body
+		print ""
+		printf "@docbook\n"
+		printf "</sidebar>\n"
+		printf "@end docbook\n"
+	printf "@end ifdocbook\n\n"
+
+	printf "@ifnotdocbook\n"
+		printf "@cartouche\n"
+		printf "@center @b{%s}\n\n", Sidebar_title
+			print Sidebar_body
+		printf "@end cartouche\n"
+	printf "@end ifnotdocbook\n"
+	Sidebar_body = ""
+	next
+}
+
+Pass == 2 && Collecting_sidebar == 1 {
+	Sidebar_body = Sidebar_body RS $0
+	next
+}
+@
+
+@sidebar Test Sidebar
+This is a test sidebar, just to show what one looks like,
+and to make sure that the @command{jrweave} code works.
+@end sidebar
 
 @node jrweave file chunks
 @section Collecting and Formatting File Chunks
@@ -2241,21 +2314,25 @@ Pass == 2 { print }
 @node jrweave expanding tabs
 @section Expanding Tabs
 
-@TeX{} treats tabs like single spaces.  However, people writing
-code like to use tabs to handle indentation.  There are two
-ways to manage this: either set your editor to expand tabs to
-spaces upon input, or use real tabs, and expand them when
-creating the document with @command{jrweave}.
-Since I happen to like using tabs@footnote{A habit of over 30
-years that is just too hard to break.}, I have chosen the latter.
+@TeX{} treats tabs like single spaces.  However, people writing code
+like to use tabs to handle indentation.  There are two ways to manage
+having real tabs: either set your editor to expand tabs to spaces upon
+input, or use real tabs, and expand them when creating the document with
+@command{jrweave}.  Since I happen to like using tabs@footnote{A habit of
+over 30 years that is just too hard to break.}, I have chosen the latter.
+
+In addition, having literal tabs in a file can be critical: this is most
+applicable to @file{Makefile} files but perhaps matters for other kinds
+of files as well.
+
 
 @(jrweave@) =
 @<Expand tabs for @command{jrweave}@>
 @
 
-Although POSIX-style systems usually expand tabs to every eight spaces,
+Although POSIX-style systems usually expand tabs to every eight columns,
 that's a bit much for printed documents like what Texinfo produces.
-So, I have chosen to set tabs at every four columns. It can be
+So, I have chosen to set tabs at every four columns. This choice can be
 adjusted using the @option{-v} option to @command{gawk}.
 
 @<Expand tabs for @command{jrweave}@> =
@@ -2269,14 +2346,15 @@ I recommend using whatever appropriate magic in the @value{TWJR}
 document that will set the tab stop to whatever you prefer
 in your favorite editor.  For @UREF{http://www.vim.org, Vim},
 I use this line, which also switches on syntax highlighting
-appropriate to Texinfo:
+appropriate to Texinfo. It must be placed within the first four
+or so lines of the file.
 
 @example
 @@c vim: filetype=texinfo tabstop=4
 @end example
 
 The code that expands tabs is fairly straightforward. It first makes
-sure that the chosen tabstop is at least two or more.  Next it splits
+sure that the chosen tab stop is at least two or more.  Next it splits
 the string into an input array, @code{chars}, and starts copying the
 input to the output (@code{out}) one character at a time. The cases
 are as follows:
@@ -2290,12 +2368,12 @@ column back to zero. This is the variable @code{k}.
 Copy the character to the output and increase @code{k} by one.
 
 @item A tab
-Replaces the tab with a space and then add spaces until the
+Replace the tab with a space and then add spaces until the
 output column has reached the next tab stop.
 
 The algorithm is borrowed from the original Berkeley Unix
 @command{expand} program, written in C, where arrays are zero-based,
-and the check can be made using the bitwise-and operator to see
+and the check can be made using the bitwise AND operator to see
 if more characters remain.
 @end table
 
@@ -2338,7 +2416,7 @@ function expand_tabs(string, tabstop,	chars, out, i, j, k, n)
 
 (I suppose this could have been broken out into small chunks
 with preceding explanatory text; I'm not sure it would have
-made a big difference since this is not a big function.)
+made a noticeable difference since this is not a big function.)
 
 @node jrweave helper functions
 @section Helper Functions For @command{jrweave}
@@ -2399,11 +2477,11 @@ This @value{CHAPTER} discusses the initial bootstrapping process,
 and also presents a @file{Makefile} for ongoing maintenance.
 
 @menu
-* Initial boostrapping::  Bringing up the system from scratch.
+* Initial bootstrapping:: Bringing up the system from scratch.
 * The Makefile::          Keeping the system going.
 @end menu
 
-@node Initial boostrapping
+@node Initial bootstrapping
 @section Bringing Up The System From Scratch
 
 Any literate programming system needs to be bootstrapped. As a first step,
@@ -2493,9 +2571,20 @@ Start or add to the definition of @var{filename}'s contents.
 Start or add to the definition of a code chunk named @var{chunkname}.
 @xref{jrtangle code chunks}.
 
+@item @@EMAIL@{@var{real}, @var{spelled}@}
+Use @var{spelled} as the email address for HTML output.
+Use @var{real} as the email address for anything else.
+This is to help avoid having one's email address harvested
+by spammers.
+
+@item @@FIXME@{@var{text}@}
+Add a ``FIXME'' note to the text for use during writing.
+In theory, none of these notes should be left by the time
+the document is finished.
+
 @item @@file_update @var{file} @var{directory} @var{suffix}
 Set the @var{directory} and @var{suffix} parameters to use for @var{file}'s
-file update reciple. @xref{jrtangle avoiding update}.
+file update recipe. @xref{jrtangle avoiding update}.
 
 @item @@file_update_recipe @r{@dots{}} @@end file_update_recipe
 Replace the default file update recipe with the enclosed code lines.
@@ -2516,6 +2605,11 @@ them when tangling.
 @item @@initial_setup @r{@dots{}} @@end initial_setup
 Define the actions to be done before @command{jrtangle}
 creates any files. @xref{jrtangle before everything}.
+
+@item @@oldnum@{@var{number}@}
+Set @var{number} in @TeX's @code{\oldstyle} font. This
+is meant to be used by @command{jrweave}, and not directly
+by the author of a document.
 
 @item @@post_create @var{filename} @var{command to run}
 Arrange to run @var{command to run} after @var{filename}
@@ -2539,6 +2633,12 @@ at this point in the document.
 @item @@print_initial_setup
 Print the initial setup code at this point in the document.
 @xref{jrweave print setup recipe}.
+
+@item @@sidebar @var{title} @r{@dots{}} @@end sidebar
+Create a sidebar named @var{title}.
+For DocBook output, create a real @code{<sidebar>} element.
+For anything else, fake it using Texinfo's @code{@@cartouche}
+environment.
 
 @item @@use_example
 After occurrences of this command, code is formatted
