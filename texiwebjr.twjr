@@ -1167,7 +1167,7 @@ There are several helper functions used in expanding code chunks:
 The first one is @code{strip_out_name()}, which pulls out the name
 of the chunk from in between the @samp{@@<} and the @samp{@@>}:
 
-@<Expansion helper functions@> =
+@<Helper Functions@>=
 # strip_out_name --- get the name from name
 
 function strip_out_name(name, l)
