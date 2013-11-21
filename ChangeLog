@@ -1,3 +1,10 @@
+2013-11-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Lots of progress. Code almost completely
+	refactored in order to share common segments; this was a major
+	effort. Printing file and code definitions done.
+	Added an initial setup section, just to test the code.
+
 2013-11-20         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Comment out short title page and summary contents

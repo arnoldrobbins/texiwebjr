@@ -1294,11 +1294,10 @@ pattern:
 
 @<Collect initial setup lines@>=
 /^@initial_setup[[:space:]]*$/, /^@end initial_setup[[:space:]]*$/ {
-	if ("initial_setup" in Line_numbers)
-		fatal(_"cannot nest @initial_setup inside another @initial_setup\n")
-
 	# start of construct, save line number, skip this line
 	if (/^@initial_setup[[:space:]]*$/) {
+			if ("initial_setup" in Line_numbers)
+				fatal(_"cannot nest @initial_setup inside another @initial_setup\n")
 		Line_numbers["initial_setup"] = (FILENAME ":" FNR)
 		Initial_setup = ""
 		next
@@ -2286,8 +2285,6 @@ into the @value{TWJR} document on a line by itself.
 If no @var{chunkname} is provided, then the chunk is
 named ``Initial setup.''
 
-@FIXME{This chunk needs to be tracked in the defininitions for printing out later.}
-
 @(jrweave@) =
 @<Handle the initial setup chunk for @code{jrweave}@>
 @
@@ -2307,12 +2304,17 @@ named ``Initial setup.''
 }
 
 /^@initial_setup[[:space:]]*$/, /^@end initial_setup[[:space:]]*$/ {
-	if (! Print_initial_setup || Pass == 1)
+	if (Pass == 1)
 		next
 
+	if (! Print_initial_setup)
+		next
+
+	Chunk_info[Initial_setup_name]["type"] = "code chunk"
+	Chunk_info[Initial_setup_name]["defn"] = 1
 	if (/^@initial_setup[[:space:]]*$/) {
-		printf("%s\n", format_anchor(Initial_setup_name, 0))
-		printf("@noindent\n%s @equiv{}\n", format_tag(Initial_setup_name, 0, "chunk"))
+		printf("%s\n", format_anchor(Initial_setup_name, 1))
+		printf("@noindent\n%s @equiv{}\n", format_tag(Initial_setup_name, 0, "code chunk"))
 		print Example_start
 	} else if (/^@end initial_setup[[:space:]]*$/) {
 		print Example_end
@@ -2388,12 +2390,12 @@ tag = format_tag(name, Chunk_info[name]["chunk number"], Chunk_info[name]["type"
 if (j == Chunk_info[name]["defn"])
 	print "and"
 printf("@item %s\n", tag)
-printf("Definitions occur in\n")
+printf("One or more definitions occur in\n")
 n = Chunk_info[name]["defn"]
 for (j = 1; j <= n; j++) {
 	printf("%s", format_xref(name, j))
 	if (j == n-1)
-		printf("\nand\n")
+		printf(",\nand\n")
 	else if (j < n-1)
 		printf(",\n")
 }
@@ -2435,7 +2437,7 @@ asort(Sorted_code_names)	# Sorted by value
 Next, we have to loop through the names and print out
 the relevant info. We do it in a Texinfo @code{@@table}.
 
-@<Print file chunk definition list@> =
+@<Print code chunk definition list@> =
 print "@table @asis"
 for (i = 1; i in Sorted_code_names; i++) {
 	name = Sorted_code_names[i]
@@ -2589,28 +2591,25 @@ function sanitize_name(file_name)
 	return file_name
 }
 
-# FIXME: Merge these two functions
-
-function format_xref(name, defn,	clean_name, result)
+function format_anchor_or_ref(type, name, defn,	clean_name, result)
 {
 	clean_name = sanitize_name(name)
 	if (defn > 0)
-		result = sprintf("@ref{%s-%d}", clean_name, defn)
+		result = sprintf("@%s{%s-%d}", type, clean_name, defn)
 	else
-		result = sprintf("@ref{%s}", clean_name)
+		result = sprintf("@%s{%s}", type, clean_name)
 
 	return result
 }
 
+function format_xref(name, defn)
+{
+	return format_anchor_or_ref("ref", name, defn)
+}
+
 function format_anchor(name, defn,	clean_name, result)
 {
-	clean_name = sanitize_name(name)
-	if (defn > 0)
-		result = sprintf("@anchor{%s-%d}", clean_name, defn)
-	else
-		result = sprintf("@anchor{%s}", clean_name)
-
-	return result
+	return format_anchor_or_ref("anchor", name, defn)
 }
 
 function format_tag(name, count, type,		result, left, right, style)
@@ -2626,7 +2625,10 @@ function format_tag(name, count, type,		result, left, right, style)
 	} else
 		fatal(_"format_tag: Unknown chunk type `%s'\n", type)
 
-	result = sprintf("@r{%s@%s{%s} @oldnum{%d}%s}", left, style, name, count, right)
+	if (count > 0)
+		result = sprintf("@r{%s@%s{%s} @oldnum{%d}%s}", left, style, name, count, right)
+	else
+		result = sprintf("@r{%s@%s{%s}%s}", left, style, name, right)
 
 	return result
 }
@@ -2710,6 +2712,20 @@ features as I went along.
 
 @FIXME{Add a section on download from git.}
 
+And for fun, we print the initial setup:
+
+@initial_setup
+if [ ! -d bin ]
+then
+#	echo making bin
+	mkdir bin
+# else
+#	echo bin is there
+fi
+@end initial_setup
+
+@print_initial_setup
+
 @node Evaluation and Futures
 @chapter Evaluation and Future Work
 
@@ -2728,11 +2744,7 @@ identical; so code highly similar and thus hard to get right. Original
 web didn't have this problem...
 
 @node Command summary
-@appendix Alphabetic List of @value{SHORTTITLE} Commands
-
-@FIXME{Write me.}
-
-Include variables that can be set with -v: Tabstop, Debug, Shell_debug.
+@appendix Alphabetic List of @value{SHORTTITLE} Commands and Variables
 
 Here is the complete list of commands that @value{TWJR}
 adds to the Texinfo markup language.  Note that due to the
@@ -2799,17 +2811,17 @@ has been created. @xref{jrtangle after creation}.
 @item @@print_code_defs
 Print an alphabetically sorted list of code chunk definitions
 at this point in the document.
-@FIXME{Add an xref.}
+@xref{jrweave code defs and refs}.
 
 @item @@print_code_refs
 Print an alphabetically sorted list of code chunk references
 at this point in the document.
-@FIXME{Add an xref.}
+@xref{jrweave code defs and refs}.
 
 @item @@print_file_defs
 Print an alphabetically sorted list of file chunk definitions
 at this point in the document.
-@FIXME{Add an xref.}
+@xref{jrweave file defs}.
 
 @item @@print_initial_setup
 Print the initial setup code at this point in the document.
@@ -2833,6 +2845,24 @@ using @code{@@smallexample}, until a subsequent @code{@@use_example}
 command. The initial default is to use @code{@@example}.
 @xref{jrweave choosing code size}.
 
+@end table
+
+The following @command{awk} variables can be set on the
+command line with the @option{-v} option to change how
+@command{jrtangle} and @command{jrweave} behave:
+
+@table @code
+@item Debug
+This should be one or more keywords which are searched for regexp match.
+If there's a match, an appropriate debugging message is printed.
+
+@item Shell_debug
+This can be set to an arbitrary string that is prefixed
+to any commands to be run by @code{system()}. If you do so,
+it is up to you to get the command syntax right.
+
+@item Tabstop
+This controls how many spaces are used to expand real tab characters.
 @end table
 
 @node Code Segment Summaries
