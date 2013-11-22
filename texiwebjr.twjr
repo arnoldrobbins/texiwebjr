@@ -280,7 +280,7 @@ code is written in @command{awk}, the author's favorite hammer.
 @c and regular.  TeX will scale height also automatically.
 @float Figure,third-way
 @caption{Third Way (@url{http://xkcd.com/1285})}
-@center @image{third_way, 4.5in, , Third Way}
+@center @image{third_way, 5in, , Third Way}
 @end float
 
 Many people today are used to using WYSIWYG document creation
@@ -307,9 +307,47 @@ with @command{make}.
 @node Overview
 @unnumberedsec What Is Covered
 
-@FIXME{Write me.}
+This @value{DOCUMENT} provides the full source and description
+of the @value{TWJR} literate programming system.
+The @value{CHAPTER}s and what they cover are as follows.
 
-This is the list of chapter by chapter summaries, using @samp{@@table @r{@dots{}} @@end table}.
+@ref{Introduction}, briefly introduces literate programming
+and describes some of the motivation for @value{TWJR}.
+
+@ref{jrtangle code}, presents the code for @command{jrtangle}, the
+``tangling'' component of @value{TWJR}.
+
+@ref{jrweave code}, presents the code for @command{jrtangle}, the
+``weaving'' component of @value{TWJR}.
+
+@ref{Bootstrapping}, describes the issues involved in bringing
+up a literate programming system from scratch. It also presents
+the @file{Makefile} used for ongoing maintenance, and for lack of
+a better places, descibes how to obtain the source for the system
+using @command{git}.
+
+@ref{Evaluation and Futures}, provides some brief discussion
+of various design decisions, as well as looking at possible
+future features to add.
+
+@ref{Command summary}, presents an alphabetic list of all
+the @value{TWJR} commands. It also lists the variables that
+a user may set using @command{gawk}'s @option{-v} option to
+affect the behavior of the programs.
+
+@ref{Code Segment Summaries}, provides
+alphabetic lists of source files by definition, and of
+code segments by definition and by reference.
+
+@ref{Use of @command{gawk} features}, looks at the
+@command{gawk}-specific features that are used with a brief
+description of what to use instead if you wish to use a
+standard version of @command{awk} instead of @command{gawk}.@footnote{Although
+why anyone would want to do so is beyond me.}
+
+@ref{Bibliography}, lists books that may be of interest.
+
+At least one index follows the bibliography.
 
 @node Conventions
 @unnumberedsec Typographical Conventions
@@ -352,6 +390,7 @@ in this sentence.  Finally, file names are indicated like this:
 @file{/path/to/our/file}.
 @end ifnotinfo
 
+@ignore
 @FIXME{Do we need control characters in this document?}
 
 Characters that you type at the keyboard look @kbd{like this}.  In particular,
@@ -360,8 +399,9 @@ characters that you type by holding down both the @kbd{CONTROL} key and
 another key, at the same time.  For example, a @kbd{Ctrl-d} is typed
 by first pressing and holding the @kbd{CONTROL} key, next
 pressing the @kbd{d} key and finally releasing both keys.
+@end ignore
 
-Finally, I will sometimes break with tradition, and write in the first
+Finally, I sometimes break with tradition, and write in the first
 person, instead of using ``the royal we.''  However, use of ``we''
 is appropriate during discussional prose; I would like you, the reader,
 to feel as if you're engaging in a conversation with me, the author.
@@ -406,8 +446,8 @@ of appeal. This doesn't take away from its usefulness as an approach.
 @dfn{Literate programming} is a programming style invented by
 @UREF{http://www-cs-faculty.stanford.edu/~knuth/, Professor Donald E.@: Knuth}
 of Stanford University for implementing the
-@UREF{http://www-cs-faculty.stanford.edu/~knuth/abcde.html,
-@TeX{} document formatter and @MF{} font-creation programs}.
+@UREF{http://www.tug.org, @TeX{} document formatter}
+and @MF{} font-creation programs.
 
 A literate program is a mixture of program fragments that do some
 particular task, and explanatory prose describing what the code is
@@ -585,7 +625,7 @@ As a general note, @command{jrtangle} and @command{jrweave} need features
 introduced in @command{gawk} 4.0; previous versions will not work.
 
 The common chunks and functions are described later in this @value{CHAPTER}.
-However, we define one of them now, so that the license will come
+However, we define one of them now, so that the license comes
 out at the top of the file. The actual license text is provided later.
 
 @<Common Chunks@>=
@@ -798,7 +838,7 @@ File_chunk_pattern = "^@\\(([^)]+)@\\)[[:space:]]*=[[:space:]]*$"
 Here is the @samp{@@} sign that ends the input file.  It also ends
 code segments.  Since we are manually simulating a range pattern, this
 @emph{must} come before the code that collects the lines in file and
-code chunks. Otherwise the collection will never stop!@footnote{Guess
+code chunks. Otherwise the collection never stops!@footnote{Guess
 how I discovered that one@enddots{} Duh.}
 
 @<Process file chunks for @code{jrtangle}@>=
@@ -959,6 +999,12 @@ Here is the error checking code. First add it to both files:
 @<Common Chunks@>=
 # Error checking:
 
+# Use brackets to avoid triggering the warning on ourselves!
+/(^<[@])|(>[@]([[:space:]]*=[[:space:]]*)?$)/	{
+	# Ditto, with concatenation
+	warning(_"<" "@ or >" "@ used instead of @" "< or @" ">\n\t%s\n", $0)
+}
+
 END {
 	check_unfinished()
 }
@@ -1004,7 +1050,7 @@ recursion carefully; after a chunk has been expanded we must
 clear our record of it. For example, consider a chunk like this:
 
 @noindent
-<@i{example chunk} @oldnum{42}> @equiv{}
+@:<@i{example chunk} @oldnum{42}> @equiv{}
 @example
 x = func1()
 @r{<@i{Do special task} @oldnum{57}>}
@@ -1161,8 +1207,8 @@ num_names = length(chunk_names)
 
 In our case, the split is made using @code{Chunk_name_pattern}, causing
 @code{parts} to contain the parts of the line before and after each
-chunk name. The fourth argument, @code{chunk_names}, will contain the
-names of the code chunks and there will be more than one element if
+chunk name. The fourth argument, @code{chunk_names}, contains the
+names of the code chunks and there is more than one element if
 there were several chunks referenced on the line.  @code{num_names}
 tells us how many chunk names there are.
 
@@ -1353,7 +1399,14 @@ if (length(Initial_setup) > 0) {
 @node jrtangle avoiding update
 @section Leaving Unchanged Files Alone
 
-@FIXME{Need a problem statement here.}
+When working with @command{make}, especially in large programs,
+it is vital that source files be recompiled only if they have
+changed. If @command{jrtangle} was to blindly recreate every
+file every time it's run, @command{make} will constantly
+recompile everything from scratch.  This could potentially be
+a huge waste of time, even on today's very fast multicore
+processors.  So, we have to find some way to only revise
+a file on disk when it has actually changed.
 
 This should get interesting.  First, let's talk about 
 what @command{noweb} does.  To extract a file, you
@@ -1368,7 +1421,7 @@ existing file on disk.  It goes something like this:
 notangle -Rfoo.c foo.nw | cpif foo.c
 @end example
 
-Then, if @file{foo.c} has not changed, it will not be updated.
+Then, if @file{foo.c} has not changed, it is not updated.
 This is most useful in @file{Makefile} rules, since it prevents
 @command{make} from recompiling @file{foo.c} unnecessarily.
 
@@ -1383,7 +1436,7 @@ that describes how to update a file using system-level (shell)
 commands.  Then for each file, the author can specify how to
 make the substitutions in the template in order to do the update.
 
-We will define a default template, with the option for the user
+We define a default template, with the option for the user
 to override it.
 
 The template is defined with @samp{@@file_update_recipe @r{@dots{}}
@@ -1399,7 +1452,7 @@ template with a line like this:
 @
 
 Let's start with the default template. Taking a page from
-Autoconf's book, we will use @samp{@@@var{param}@@} to
+Autoconf's book, we use @samp{@@@var{param}@@} to
 specify the parameters. The possible parameters have hard-coded
 names: @code{DIR}, @code{FILE}, and @code{SUFFIX}.
 Note the quoting of shell expansions in case (somehow) any of
@@ -1425,7 +1478,7 @@ BEGIN {
 @
 
 The user can override this template.
-The collection code will look familiar by now:
+The collection code should look familiar by now:
 
 @<File update recipe handling@>=
 /^@file_update_recipe[[:space:]]*$/, /^@end file_update_recipe[[:space:]]*$/ {
@@ -1625,7 +1678,7 @@ documentation).
 @end table
 
 Since @command{gawk} does not have a ``varargs'' facility,
-we simply supply 10 arguments; the extras will be ignored if the
+we simply supply 10 arguments; the extras are ignored if the
 format string does not reference them.
 
 @<Common Functions@>=
@@ -1641,7 +1694,6 @@ function message(msg, format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
 {
 	printf("%s:%d: %s: " format, FILENAME, FNR, msg,
 		a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) > "/dev/stderr"
-	exit 1
 }
 
 # fatal --- print a fatal error message and exit.
@@ -1679,14 +1731,19 @@ function join(array, start, end, sep,    result, i)
 }
 @
 
-@FIXME{Move this to a more appropriate section.}
+We have a need for at least one debugging helper
+function.
+
+@(jrtangle@) =
+@<Expansion debugging functions@>
+@
 
 The @code{dump_chunks()} function may be called if debugging.
 Although this is something of a ``helper'' function, as it's
 specific to @command{jrtangle}, it should not be included in
 the same chunk with the other functions in this @value{SECTION}.
 
-@<Expansion helper functions@> =
+@<Expansion debugging functions@> =
 # dump_chunks --- print out all the chunks
 
 function dump_chunks(	i, format)
@@ -1703,7 +1760,7 @@ function dump_chunks(	i, format)
 
 Weaving a @value{TWJR} document is in fact the more challenging task.
 We want the output to look good, and we also want to keep track of
-where chunks are defined and referenced. In addition, we will
+where chunks are defined and referenced. In addition, we
 have to remove any lines that are just for @command{jrtangle},
 since Texinfo won't know what to do with them.
 
@@ -1720,6 +1777,7 @@ since Texinfo won't know what to do with them.
 * jrweave file defs::            Printing file definitions.
 * jrweave code defs and refs::   Printing code definitions and references.
 * jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
+* jrweave last bit::             Passing everything else through.
 * jrweave expanding tabs::       Expanding tabs.
 * jrweave helper functions::     Helper functions for @command{jrweave}.
 @end menu
@@ -1958,7 +2016,7 @@ And without a lot of fanfare, here is the code:
 @node jrweave language additions
 @section Additions For Writing Documents
 
-Here are some additions to the Texinfo language that will
+Here are some additions to the Texinfo language that
 ease both the formatting job and some of the authoring
 work.
 
@@ -2085,6 +2143,8 @@ Pass == 2 && /^@end[[:space:]]+sidebar[[:space:]]*$/ {
 	printf "@ifnotdocbook\n"
 		printf "@cartouche\n"
 		printf "@center @b{%s}\n\n", Sidebar_title
+			print "@noindent"
+			sub(/^\n*/, "", Sidebar_body)	# remove initial newlines
 			print Sidebar_body
 		printf "@end cartouche\n"
 	printf "@end ifnotdocbook\n"
@@ -2101,12 +2161,15 @@ Pass == 2 && Collecting_sidebar == 1 {
 @sidebar Test Sidebar
 This is a test sidebar, just to show what one looks like,
 and to make sure that the @command{jrweave} code works.
+
+And here is a second paragraph, to show that the first paragraph
+of a sidebar is not indented, whereas subsequent ones are.
 @end sidebar
 
 @node jrweave file chunks
 @section Collecting and Formatting File Chunks for @command{jrweave}
 
-Now comes the hard part. We will do the same process for file chunks
+Now comes the hard part. We use the same process for file chunks
 and for code chunks, although each will be tracked separately.
 
 @(jrweave@) =
@@ -2128,7 +2191,7 @@ We need the following information: The file's name, and a running
 count of how many times this file has been seen.  This running count
 is used to create an @code{@@anchor@{@}} for this definition.
 We also have a global running count of files.
-In addition, we will need to save the file's name for and
+In addition, we need to save the file's name and
 the current anchor value for when we build the list of where
 each code chunk is referenced; this list is can then be printed
 later with the @code{@@print_code_refs} command.
@@ -2405,6 +2468,17 @@ print ".\n"
 @node jrweave code defs and refs
 @section Printing Code Definitions and References
 
+Unlike files, for code we want to print both
+definitions and references.
+
+@menu
+* jrweave print code defs::  Printing code definitions.
+* jrweave print code refs::  Printing code references.
+@end menu
+
+@node jrweave print code defs
+@subsection  Printing Code Definitions
+
 Printing code definitions is almost identical to printing
 file definitions.
 
@@ -2446,12 +2520,26 @@ for (i = 1; i in Sorted_code_names; i++) {
 print "@end table"
 @
 
+@node jrweave print code refs
+@subsection  Printing Code References
+
+@FIXME{Write me.}
+
 @node jrweave delete jrtangle code
 @section Removing Stuff For @command{jrtangle}
+
+As with any literate programming system, some commands are only for
+tangling, and others are only for weaving.  Although the tangle component
+only has to pull out source files and expand code, the the weaving
+component has to also recognize commands for the tangling component,
+in order to keep them out of the document formatter's way.
 
 @(jrweave@) =
 @<Remove @code{jrtangle} segments for weaving@>
 @
+
+There are only three such commands, and all we have to
+do is skip over them with @code{next}.
 
 @<Remove @code{jrtangle} segments for weaving@> =
 /^@file_update_recipe[[:space:]]*$/, /^@end file_update_recipe[[:space:]]*$/ {
@@ -2463,8 +2551,24 @@ print "@end table"
 /^@post_create[[:space:]]+/ {
 	next
 }
+@
 
-# FIXME: Make sure this is last
+@node jrweave last bit
+@section Passing Everything Else Through
+
+Any line in the input document that doesn't match
+one of the commands described in the previous section
+should be left alone.
+
+@(jrweave@) =
+@<Default @code{print} statement for @command{jrweave}@>
+@
+
+Thus, the final thing to do is to pass all other lines on through
+to the output.  This statement @emph{must} be the last
+active rule in @command{jrweave}.
+
+@<Default @code{print} statement for @command{jrweave}@> =
 Pass == 2 { print }
 @
 
@@ -2583,7 +2687,6 @@ made a noticeable difference since this is not a big function.)
 @
 
 @<Helper functions for @command{jrweave}@> =
-
 function sanitize_name(file_name)
 {
 	gsub(/[^[:alnum:]]/, "-", file_name)
@@ -2638,9 +2741,8 @@ function format_tag(name, count, type,		result, left, right, style)
 @chapter Bootstrapping The System
 
 @quotation
-Which came first, the chicken or the egg?@footnote{@url{http://www.gagcartoons.com/cartoons/171/}.}
-@sp 1
 Who will compile the compiler?
+@author{Lady Ada Lovelace}
 @end quotation
 
 This @value{CHAPTER} discusses the initial bootstrapping process,
@@ -2736,6 +2838,8 @@ Design decision to produce every file and let user code check if duplicated.
 Design decision to send .texi file to standard output instead of to a file that can cpif'ed.
 
 May need to provide @code{@@include} in order to scale to bigger programs.
+
+May need to track current node to do references really well.
 
 Tangle enhancements, in particular putting in @code{#line} lines for C and C++.
 
@@ -2868,7 +2972,9 @@ This controls how many spaces are used to expand real tab characters.
 @node Code Segment Summaries
 @appendix Code Segment Summaries
 
-Blah blah
+This @value{APPENDIX} presents alphabetical lists of
+all the file definitions, the code chunk definitions,
+and the code chunk references.
 
 @menu
 * File Definitions::            Source files by definition.
@@ -2938,12 +3044,59 @@ the code slightly. However, the multidimensional arrays are cleaner.
 @enumerate
 
 @item
-@uref{http://www.amazon.com/Literate-Programming-Center-Language-Information/dp/0937073806/ref=sr_1_1?s=books&ie=UTF8&qid=1383293813&sr=1-1&keywords=Literate+Programming,
+@uref{http://www-cs-faculty.stanford.edu/~knuth/lp.html,
 @cite{Literate Programming}},
 Donald E.@: Knuth,
 Center for the Study of Language and Information, 1992.
 ISBN-10: 0937073806,
 ISBN-13: 978-0937073803.
+
+@item
+@uref{http://www.gnu.org/software/gawk/manual/,
+@cite{GAWK: Effective AWK Programming}},
+Arnold D. Robbins,
+Free Software Foundation, Cambridge, Massachusetts, 2013.
+Distributed with the source code for @command{gawk}.
+
+@item
+@uref{http://www-cs-faculty.stanford.edu/~knuth/abcde.html,
+@cite{Computers & Typesetting}}
+
+@enumerate a
+@item
+Volume A, @cite{The TeXbook},
+Donald E.@: Knuth,
+Addison-Wesley, Reading, Massachusetts, 1984.
+ISBN 0-201-13447-0.
+
+@item
+Volume B, @cite{TeX: The Program},
+Donald E.@: Knuth,
+Addison-Wesley, Reading, Massachusetts, 1986.
+ISBN 0-201-13437-3.
+
+@item
+Volume C, @cite{The @MF{}book},
+Donald E.@: Knuth,
+Addison-Wesley, Reading, Massachusetts, 1986.
+ISBN 0-201-13445-4.
+
+@item
+Volume D, @cite{@MF{}: The Program},
+Donald E.@: Knuth,
+Addison-Wesley, Reading, Massachusetts, 1986.
+ISBN 0-201-13438-1.
+
+@item
+Volume E, @cite{Computer Modern Typefaces},
+Donald E.@: Knuth,
+Addison-Wesley, Reading, Massachusetts, 1986.
+ISBN 0-201-13446-2.
+@end enumerate
+
+@item
+@uref{http://www.ctan.org,
+The Comprehensive @TeX{} Archive Network}.
 
 @end enumerate
 
@@ -2961,6 +3114,3 @@ TODO:
   on chunk reference line.
 - Option to print out file update recipe?
 - Checking for chunks that were defined but not expanded.
-- Add citations for tex and metafont books to bibliography
-- Change tex/mf links to tug.org and cpan.org
-- Look for "will".

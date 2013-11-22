@@ -1,3 +1,9 @@
+2013-11-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: More progress, mostly filling in missing prose.
+	Added some error checking, more stuff in the bibliography.
+	* third_way.png: New file.  From http://xkcd.com/1285.
+
 2013-11-21         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Lots of progress. Code almost completely
