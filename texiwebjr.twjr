@@ -2281,6 +2281,7 @@ y = parts[1]
 if (n > 1) {	# embedded chunk names
 	for (i = 1; i in names; i++) {
 		name = strip_out_name(names[i])
+		@<Collect chunk reference information@>
 		tagname = format_tag(name, Chunk_info[name]["chunk number"], "code chunk")
 		y = y tagname
 		y = y parts[i+1]
@@ -2540,7 +2541,43 @@ We start by pretending that we have the information we need,
 and printing it out.
 
 @<Print code chunk references list@> =
-# FIXME: Write this.
+print "@table @asis"
+# FIXME: Need to do sorting first.
+for (i in Chunk_info) {
+	if (Chunk_info[i]["type"] == "file chunk")
+		continue
+
+	n = Chunk_info[i]["numrefs"]
+	if (n == 0)		# warning printed elsewhere
+		continue
+
+	tag = format_tag(i, Chunk_info[i]["chunk number"], Chunk_info[i]["type"])
+	printf("@item %s\n", tag)
+	print "This chunk is referenced in"
+	for (j = 1; j <= n; j++) {
+		printf("%s", Chunk_info[i]["refs"][j])	# will be an anchor
+		if (j + 1 == n)
+			printf(",\nand\n")
+		else if (j < n)
+			printf(",\n")
+	}
+	printf(".\n\n")
+}
+print "@end table"
+@
+
+@<Collect chunk reference information@> =
+xref = format_xref(Current_chunk, Chunk_info[Current_chunk]["defn"])
+if (! ("numrefs" in Chunk_info[name])) {
+	nrefs = Chunk_info[name]["numrefs"] = 1
+	Chunk_info[name]["refs"][nrefs] = xref
+} else {
+	nrefs = Chunk_info[name]["numrefs"]
+	if (Chunk_info[name]["refs"][nrefs] != xref) {
+		Chunk_info[name]["refs"][++nrefs] = xref
+		Chunk_info[name]["numrefs"] = nrefs
+	}
+}
 @
 
 @node jrweave delete jrtangle code
@@ -2760,7 +2797,7 @@ function format_tag(name, count, type,		result, left, right, style)
 
 @quotation
 Who will compile the compiler?
-@author{Lady Ada Lovelace}
+@author{Lady Ada Lovelace}@footnote{Yes, I made this up.}
 @end quotation
 
 This @value{CHAPTER} discusses the initial bootstrapping process,
@@ -3013,7 +3050,7 @@ and the code chunk references.
 @node Code Segment References
 @appendixsec Code Segment References
 
-@code{@@print_code_refs}
+@print_code_refs
 
 @node Use of @command{gawk} features
 @appendix Features Specific to @command{gawk}
