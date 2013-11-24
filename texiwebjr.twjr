@@ -323,7 +323,7 @@ and describes some of the motivation for @value{TWJR}.
 @ref{Bootstrapping}, describes the issues involved in bringing
 up a literate programming system from scratch. It also presents
 the @file{Makefile} used for ongoing maintenance, and for lack of
-a better places, descibes how to obtain the source for the system
+a better place, describes how to obtain the source for the system
 using @command{git}.
 
 @ref{Evaluation and Futures}, provides some brief discussion
@@ -3230,3 +3230,5 @@ TODO:
   on chunk reference line.
 - Option to print out file update recipe?
 - Checking for chunks that were defined but not expanded.
+
+descibes
