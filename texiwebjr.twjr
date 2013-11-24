@@ -2498,6 +2498,10 @@ We first build a sorted array of code chunk names,
 and then print out the definitions in order.
 
 @<Print code chunk definition list@> =
+@<Create @code{Sorted_code_names}@>
+@
+
+@<Create @code{Sorted_code_names}@> =
 delete Sorted_code_names
 j = 1
 for (i in Chunk_info) {
@@ -2532,6 +2536,7 @@ First, recognize the @code{@@print_code_refs} command:
 
 @<Handle @code{@@print_code_refs}@> =
 Pass == 2 && /^@print_code_refs[[:space:]]*$/ {
+	@<Create @code{Sorted_code_names}@>
 	@<Print code chunk references list@>
 	next
 }
@@ -2543,19 +2548,20 @@ and printing it out.
 @<Print code chunk references list@> =
 print "@table @asis"
 # FIXME: Need to do sorting first.
-for (i in Chunk_info) {
-	if (Chunk_info[i]["type"] == "file chunk")
+for (i = 1; i in Sorted_code_names; i++) {
+	name = Sorted_code_names[i]
+	if (Chunk_info[name]["type"] == "file chunk")
 		continue
 
-	n = Chunk_info[i]["numrefs"]
+	n = Chunk_info[name]["numrefs"]
 	if (n == 0)		# warning printed elsewhere
 		continue
 
-	tag = format_tag(i, Chunk_info[i]["chunk number"], Chunk_info[i]["type"])
+	tag = format_tag(name, Chunk_info[name]["chunk number"], Chunk_info[name]["type"])
 	printf("@item %s\n", tag)
 	print "This chunk is referenced in"
 	for (j = 1; j <= n; j++) {
-		printf("%s", Chunk_info[i]["refs"][j])	# will be an anchor
+		printf("%s", Chunk_info[name]["refs"][j])	# will be an anchor
 		if (j + 1 == n)
 			printf(",\nand\n")
 		else if (j < n)
