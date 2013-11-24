@@ -3,6 +3,10 @@
 	* texiwebjr.twjr: Add code references.  We're now at feature
 	complete!
 
+	Further work on prose: remove some FIXMEs that are handled,
+	jrweave helper functions, put initial setup into its own node,
+	git download.
+
 2013-11-23         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Some fixes, not quite a start on printing

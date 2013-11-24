@@ -390,17 +390,6 @@ in this sentence.  Finally, file names are indicated like this:
 @file{/path/to/our/file}.
 @end ifnotinfo
 
-@ignore
-@FIXME{Do we need control characters in this document?}
-
-Characters that you type at the keyboard look @kbd{like this}.  In particular,
-there are special characters called ``control characters.''  These are
-characters that you type by holding down both the @kbd{CONTROL} key and
-another key, at the same time.  For example, a @kbd{Ctrl-d} is typed
-by first pressing and holding the @kbd{CONTROL} key, next
-pressing the @kbd{d} key and finally releasing both keys.
-@end ignore
-
 Finally, I sometimes break with tradition, and write in the first
 person, instead of using ``the royal we.''  However, use of ``we''
 is appropriate during discussional prose; I would like you, the reader,
@@ -2547,7 +2536,6 @@ and printing it out.
 
 @<Print code chunk references list@> =
 print "@table @asis"
-# FIXME: Need to do sorting first.
 for (i = 1; i in Sorted_code_names; i++) {
 	name = Sorted_code_names[i]
 	if (Chunk_info[name]["type"] == "file chunk")
@@ -2743,9 +2731,15 @@ made a noticeable difference since this is not a big function.)
 @node jrweave helper functions
 @section Helper Functions For @command{jrweave}
 
+We finish up with the helper functions needed
+by @command{jrweave}.
+
 @(jrweave@) =
 @<Helper functions for @command{jrweave}@>
 @
+
+The first is a simple function to remove non-alphanumeric
+characters from chunk names:
 
 @<Helper functions for @command{jrweave}@> =
 function sanitize_name(file_name)
@@ -2754,8 +2748,15 @@ function sanitize_name(file_name)
 
 	return file_name
 }
+@
 
-function format_anchor_or_ref(type, name, defn,	clean_name, result)
+Next are functions to do various kinds of formatting.
+Since formatting anchors and references are similar,
+a helper function does the work, with the main functions
+delegating to it:
+
+@<Helper functions for @command{jrweave}@> =
+function format_anchor_or_ref(type, name, defn,		clean_name, result)
 {
 	clean_name = sanitize_name(name)
 	if (defn > 0)
@@ -2771,11 +2772,16 @@ function format_xref(name, defn)
 	return format_anchor_or_ref("ref", name, defn)
 }
 
-function format_anchor(name, defn,	clean_name, result)
+function format_anchor(name, defn)
 {
 	return format_anchor_or_ref("anchor", name, defn)
 }
+@
 
+Finally, the formatting of tags (chunk names) varies based on whether
+it is file chunk or a code chunk.
+
+@<Helper functions for @command{jrweave}@> =
 function format_tag(name, count, type,		result, left, right, style)
 {
 	if (type == "file chunk") {
@@ -2790,7 +2796,8 @@ function format_tag(name, count, type,		result, left, right, style)
 		fatal(_"format_tag: Unknown chunk type `%s'\n", type)
 
 	if (count > 0)
-		result = sprintf("@r{%s@%s{%s} @oldnum{%d}%s}", left, style, name, count, right)
+		result = sprintf("@r{%s@%s{%s} @oldnum{%d}%s}",
+						left, style, name, count, right)
 	else
 		result = sprintf("@r{%s@%s{%s}%s}", left, style, name, right)
 
@@ -2803,7 +2810,7 @@ function format_tag(name, count, type,		result, left, right, style)
 
 @quotation
 Who will compile the compiler?
-@author{Lady Ada Lovelace}@footnote{Yes, I made this up.}
+@author{Lady Ada Lovelace}@footnote{Yes, I made that up.}
 @end quotation
 
 This @value{CHAPTER} discusses the initial bootstrapping process,
@@ -2811,7 +2818,9 @@ and also presents a @file{Makefile} for ongoing maintenance.
 
 @menu
 * Initial bootstrapping:: Bringing up the system from scratch.
+* The initial setup::     The initial setup.
 * The Makefile::          Keeping the system going.
+* Downloading from git::  Downloading from the @command{git} Repository.
 @end menu
 
 @node Initial bootstrapping
@@ -2852,6 +2861,11 @@ mv jrtangle jrtangle1       @ii{Rename it}
 cmp jrtangle jrtangle1      @ii{Should produce no output}
 @end example
 
+Occasionally, I found a bug or more general case that I had
+not handled in @command{jrtangle0}. In such cases, I went
+back and fixed the problem there too, so that I could continue
+to bootstrap from ground zero.
+
 Once @command{jrtangle} is functional, the next step is to write
 @command{jrweave}.  This, of course, can be done from the start
 in a literate fashion, since @command{jrtangle} creates it for us.
@@ -2868,14 +2882,11 @@ onscreen (say, with a PDF viewer).
 From that point on, I could add one feature at a time, and test the
 features as I went along.
 
-@node The Makefile
-@section Keeping Things Going With @command{make}
+@node The initial setup
+@section The Initial Setup
 
-@FIXME{Write me.}
-
-@FIXME{Add a section on download from git.}
-
-And for fun, we print the initial setup:
+Mainly to check out the code, we provide an initial setup recipe.
+And for fun, we print it:
 
 @initial_setup
 if [ ! -d bin ]
@@ -2888,6 +2899,50 @@ fi
 @end initial_setup
 
 @print_initial_setup
+
+@node The Makefile
+@section Keeping Things Going With @command{make}
+
+@FIXME{Write me.}
+
+@node Downloading from git
+@section Downloading From The @command{git} Repository
+
+The code for @value{TWJR} is available from GitHub.
+To get it, you will need a @UREF{http://git-scm.org, @command{git}}
+client of some kind.  The instructions here presume a command-line
+style client.
+
+@example
+git clone https://github.com/arnoldrobbins/texiwebjr
+cd texiwebjr
+./bootstrapping/jrtangle0 texiwebjr.twjr
+./jrweave texiwebjr.twjr > texiwebjr.texi
+./bootstrapping/makepdf0
+@end example
+
+When you're done, you will have @command{jrweave} and @command{jrtangle}
+in your current directory and a @file{texiwebjr.pdf} PDF file as
+well.  This file may be printed or viewed on screen with a PDF viewer.
+
+You will need to have a working @TeX{} installation, and also a version
+of @command{texi2pdf} and @command{makeinfo}.
+
+Of course, these instructions assume that you have @command{gawk} version 4.0
+or later installed in @file{/usr/local/bin}. If not you will have to
+use something like @samp{gawk -f ./jrweave @r{@dots{}}} (assuming that
+@command{gawk} 4.0 or later is in your search path somewhere).
+
+And of course, if you don't have @command{gawk}, the canonical
+incantation is:
+
+@example
+wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.0.tar.gz
+gzip -d < gawk-4.1.0.tar.gz | tar -xpf -
+cd gawk-4.1.0
+./configure && make
+# magic here to install, often sudo make install
+@end example
 
 @node Evaluation and Futures
 @chapter Evaluation and Future Work
