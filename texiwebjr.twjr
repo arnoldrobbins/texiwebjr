@@ -2443,15 +2443,13 @@ the relevant info. We do it in a Texinfo @code{@@table}.
 print "@table @asis"
 for (i = 1; i in Sorted_file_names; i++) {
 	name = Sorted_file_names[i]
-	@<Format and print chunk reference list@>
+	@<Format and print chunk definition list@>
 }
 print "@end table"
 @
 
-@<Format and print chunk reference list@> =
+@<Format and print chunk definition list@> =
 tag = format_tag(name, Chunk_info[name]["chunk number"], Chunk_info[name]["type"])
-if (j == Chunk_info[name]["defn"])
-	print "and"
 printf("@item %s\n", tag)
 printf("One or more definitions occur in\n")
 n = Chunk_info[name]["defn"]
@@ -2515,7 +2513,7 @@ the relevant info. We do it in a Texinfo @code{@@table}.
 print "@table @asis"
 for (i = 1; i in Sorted_code_names; i++) {
 	name = Sorted_code_names[i]
-	@<Format and print chunk reference list@>
+	@<Format and print chunk definition list@>
 }
 print "@end table"
 @
@@ -2523,7 +2521,27 @@ print "@end table"
 @node jrweave print code refs
 @subsection  Printing Code References
 
-@FIXME{Write me.}
+Printing code references is the flip side of printing code references.
+
+@(jrweave@) =
+@<Handle @code{@@print_code_refs}@>
+@
+
+First, recognize the @code{@@print_code_refs} command:
+
+@<Handle @code{@@print_code_refs}@> =
+Pass == 2 && /^@print_code_refs[[:space:]]*$/ {
+	@<Print code chunk references list@>
+	next
+}
+@
+
+We start by pretending that we have the information we need,
+and printing it out.
+
+@<Print code chunk references list@> =
+# FIXME: Write this.
+@
 
 @node jrweave delete jrtangle code
 @section Removing Stuff For @command{jrtangle}
