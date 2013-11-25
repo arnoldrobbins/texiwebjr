@@ -48,13 +48,6 @@
 @end ifdocbook
 
 @c some special symbols
-@iftex
-@set PI @math{@pi}
-@end iftex
-@ifnottex
-@set PI @i{pi}
-@end ifnottex
-
 @ifnottex
 @macro ii{text}
 @i{\text\}
@@ -264,7 +257,7 @@ literate programming on top of the Texinfo markup language.
 
 @quotation
 When all you have is a hammer, everything looks like a nail.
-@author{Anonymous}
+@author Anonymous
 @end quotation
 
 You should read this @value{DOCUMENT} if you are interested in
@@ -399,7 +392,32 @@ To that end, ``we'' is entirely correct.
 @node Acknowledgements
 @unnumberedsec Acknowledgements
 
-@FIXME{Write me.}
+I would like to acknowledge the following people.
+
+@itemize @bullet
+@item
+Alfred V.@: Aho, Peter J.@: Weinberger, and Brian W.@: Kernighan,
+for inventing the @command{awk} language.
+
+@item
+Richard M.@: Stallman for inventing the Texinfo markup language.
+
+@item
+Donald E.@: Knuth for inventing literate programming.
+
+@item
+Norman Ramsey for inventing @command{noweb}.
+
+@item
+Ben Pfaff for inventing the original TexiWeb.
+
+@item
+Karl Berry for his infinite patience with my questions about
+and suggestions for Texinfo.
+
+@item
+Reviewers here @enddots{}
+@end itemize
 
 @node Introduction
 @chapter Introduction
@@ -429,7 +447,7 @@ and discipline. The mainstream is established by people who want fast
 results while using roughly the same methods that everyone else seems
 to be using, and literate programming is never going to have that kind
 of appeal. This doesn't take away from its usefulness as an approach.
-@author{Patrick TJ McPhee}
+@author Patrick TJ McPhee
 @end quotation
 
 @dfn{Literate programming} is a programming style invented by
@@ -2809,8 +2827,8 @@ function format_tag(name, count, type,		result, left, right, style)
 @chapter Bootstrapping The System
 
 @quotation
-Who will compile the compiler?
-@author{Lady Ada Lovelace}@footnote{Yes, I made that up.}
+Who will compile the compiler?@footnote{Yes, I made that up.}
+@author Lady Ada Lovelace
 @end quotation
 
 This @value{CHAPTER} discusses the initial bootstrapping process,
@@ -3020,7 +3038,7 @@ Define the actions to be done before @command{jrtangle}
 creates any files. @xref{jrtangle before everything}.
 
 @item @@oldnum@{@var{number}@}
-Set @var{number} in @TeX's @code{\oldstyle} font. This
+Set @var{number} in @TeX{}'s @code{\oldstyle} font. This
 is meant to be used by @command{jrweave}, and not directly
 by the author of a document.
 
