@@ -1,3 +1,9 @@
+2013-11-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Update menus. Disallow stdin for jrweave input.
+	Write a makefile. Write the evaluation and futures chapter.
+	Minor improvements in the bibliography.
+
 2013-11-25         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Add acknowledgements. Fix use of @author.

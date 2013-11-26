@@ -183,39 +183,59 @@ on top of the Texinfo document formatting markup language.
 * Concept Index::                  The concept index.
 
 @detailmenu
-* Audience::                     Who should read this @value{DOCUMENT}.
-* Overview::                     An overview of the @value{DOCUMENT}.
-* Conventions::                  Typographical conventions.
-* Acknowledgements::             Acknowledgements.
-* Litprog intro::                Quick intro to Literate Programming.
-* Processing a document::        Creating code and documentation.
-* Why texinfo::                  Why build on top of Texinfo.
-* Why awk::                      Why implement in @command{awk}.
-* jrtangle ifweave iftangle::    Text inclusion/exclusion for
-                                 @command{jrtangle}.
-* jrtangle file chunks::         Processing file chunks for
-                                 @command{jrtangle}.
-* jrtangle code chunks::         Processing code chunks for
-                                 @command{jrtangle}.
-* jrtangle error checking::      Checking for errors in @command{jrtangle}.
-* Expanding code chunks::        Expanding code chunks into straight code.
-* jrtangle before everything::   Doing something before extracting any files.
-* jrtangle avoiding update::     Leaving unchanged files alone.
-* jrtangle after creation::      Doing something after creating a file.
-* Common Chunks::                Common code chunks and functions.
-* jrweave two passes::           Two pass design.
-* jrweave initial code::         Initial Stuff and Printing A Warning.
-* jrweave ifweave iftangle::     Text inclusion/exclusion for
-                                 @command{jrweave}.
-* jrweave language additions::   Extra stuff for authors.
-* jrweave file chunks::          Collecting and formatting file chunks.
-* jrweave code chunks::          Collecting and formatting code chunks.
-* jrweave print setup recipe::   Printing the initial setup recipe.
-* jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
-* jrweave helper functions::     Helper functions for @command{jrweave}.
-* File Definitions::             Source files by definition.
-* Code Segment Definitions::     Code segments by definition.
-* Code Segment References::      Code segments by reference.
+* Audience::                       Who should read this @value{DOCUMENT}.
+* Overview::                       An overview of the @value{DOCUMENT}.
+* Conventions::                    Typographical conventions.
+* Acknowledgements::               Acknowledgements.
+* Litprog intro::                  Quick intro to Literate Programming.
+* Processing a document::          Creating code and documentation.
+* Why texinfo::                    Why build on top of Texinfo.
+* Why awk::                        Why implement in @command{awk}.
+* jrtangle ifweave iftangle::      Text inclusion/exclusion for
+                                   @command{jrtangle}.
+* jrtangle file chunks::           Processing file chunks for
+                                   @command{jrtangle}.
+* jrtangle start chunk collection:: Starting chunk collection.
+* jrtangle finish chunk collection:: Finishing file and code chunk collection.
+* jrtangle collecting chunk lines:: Collecting chunk lines.
+* jrtangle finish file chunk::     Completing file collection for
+                                   @command{jrtangle}.
+* jrtangle code chunks::           Processing code chunks for
+                                   @command{jrtangle}.
+* jrtangle error checking::        Checking for errors in @command{jrtangle}.
+* Expanding code chunks::          Expanding code chunks into straight code.
+* jrtangle before everything::     Doing something before extracting any
+                                   files.
+* jrtangle avoiding update::       Leaving unchanged files alone.
+* jrtangle after creation::        Doing something after creating a file.
+* Common Chunks::                  Common code chunks and functions.
+* jrweave two passes::             Two pass design.
+* jrweave initial code::           Initial Stuff and Printing A Warning.
+* jrweave choosing code size::     Choosing the code size.
+* jrweave ifweave iftangle::       Text inclusion/exclusion for
+                                   @command{jrweave}.
+* jrweave language additions::     Extra stuff for authors.
+* jrweave additional macros::      Macros for writing documents.
+* jrweave sidebars::               Providing sidebars.
+* jrweave file chunks::            Collecting and formatting file chunks.
+* jrweave code chunks::            Collecting and formatting code chunks.
+* jrweave print setup recipe::     Printing the initial setup recipe.
+* jrweave file defs::              Printing file definitions.
+* jrweave code defs and refs::     Printing code definitions and references.
+* jrweave print code defs::        Printing code definitions.
+* jrweave print code refs::        Printing code references.
+* jrweave delete jrtangle code::   Removing stuff for @command{jrtangle}.
+* jrweave last bit::               Passing everything else through.
+* jrweave expanding tabs::         Expanding tabs.
+* jrweave helper functions::       Helper functions for @command{jrweave}.
+* Initial bootstrapping::          Bringing up the system from scratch.
+* The initial setup::              The initial setup.
+* The Makefile::                   Keeping the system going.
+* Downloading from git::           Downloading from the @command{git}
+                                   Repository.
+* File Definitions::               Source files by definition.
+* Code Segment Definitions::       Code segments by definition.
+* Code Segment References::        Code segments by reference.
 @end detailmenu
 @end menu
 
@@ -731,10 +751,11 @@ specify the name of a file and include straight code intermixed with
 references to code chunks.
 
 @menu
-* jrtangle start chunk collection:: Starting chunk collection.
+* jrtangle start chunk collection::  Starting chunk collection.
 * jrtangle finish chunk collection:: Finishing file and code chunk collection.
-* jrtangle collecting chunk lines:: Collecting chunk lines.
-* jrtangle finish file chunk:: Completing file collection for @command{jrtangle}.
+* jrtangle collecting chunk lines::  Collecting chunk lines.
+* jrtangle finish file chunk::       Completing file collection for
+                                     @command{jrtangle}.
 @end menu
 
 @node jrtangle start chunk collection
@@ -1825,11 +1846,20 @@ BEGIN {
 	if (ARGC != 2)
 		fatal(_"usage: jrweave file.twjr\n")
 
+	@<Disallow standard input for @command{jrweave}@>
 	Pass = 1
 	ARGV[2] = "Pass=2"
 	ARGV[3] = ARGV[1]
 	ARGC = 4
 }
+@
+
+Because of the two-pass nature of the code, we can't
+accept standard input:
+
+@<Disallow standard input for @command{jrweave}@> =
+if (ARGV[1] == "-" || ARGV[1] == "/dev/stdin")
+	fatal(_"usage: jrweave /path/to/file.twjr: standard input not allowed\n");
 @
 
 This rule serves as a place to set a breakpoint in the
@@ -2028,8 +2058,8 @@ ease both the formatting job and some of the authoring
 work.
 
 @menu
-* jrweave additional macros:: Macros for writing documents.
-* jrweave sidebars::          Providing sidebars.
+* jrweave additional macros::   Macros for writing documents.
+* jrweave sidebars::            Providing sidebars.
 @end menu
 
 @node jrweave additional macros
@@ -2478,8 +2508,8 @@ Unlike files, for code we want to print both
 definitions and references.
 
 @menu
-* jrweave print code defs::  Printing code definitions.
-* jrweave print code refs::  Printing code references.
+* jrweave print code defs::     Printing code definitions.
+* jrweave print code refs::     Printing code references.
 @end menu
 
 @node jrweave print code defs
@@ -2827,18 +2857,20 @@ function format_tag(name, count, type,		result, left, right, style)
 @chapter Bootstrapping The System
 
 @quotation
-Who will compile the compiler?@footnote{Yes, I made that up.}
+Who will compile the compiler?@footnote{Yes, I made up this quote.}
 @author Lady Ada Lovelace
 @end quotation
 
 This @value{CHAPTER} discusses the initial bootstrapping process,
-and also presents a @file{Makefile} for ongoing maintenance.
+presents the initial setup recipe for the @value{TWJR} software,
+presents a @file{Makefile} for ongoing maintenance, and describes
+how to access the software using @command{git}.
 
 @menu
-* Initial bootstrapping:: Bringing up the system from scratch.
-* The initial setup::     The initial setup.
-* The Makefile::          Keeping the system going.
-* Downloading from git::  Downloading from the @command{git} Repository.
+* Initial bootstrapping::       Bringing up the system from scratch.
+* The initial setup::           The initial setup.
+* The Makefile::                Keeping the system going.
+* Downloading from git::        Downloading from the @command{git} Repository.
 @end menu
 
 @node Initial bootstrapping
@@ -2921,7 +2953,36 @@ fi
 @node The Makefile
 @section Keeping Things Going With @command{make}
 
-@FIXME{Write me.}
+Of course, no project would be complete without a @file{Makefile}.
+
+@FIXME{Need to add more prose here. Also maybe make the Makefile
+depend on the .twjr file.}
+
+@(Makefile@) =
+@<GPL 3 Copyright statement@>
+
+SOURCE = texiwebjr.twjr
+TEXISOURCE = texiwebjr.texi
+
+all: jrweave jrtangle texiwebjr.pdf
+
+jrweave jrtangle: $(SOURCE)
+	./bootstrapping/jrtangle0 $(SOURCE)
+
+$(TEXISOURCE): $(SOURCE) jrweave
+	./jrweave $(SOURCE) > $(TEXISOURCE)
+
+texiwebjr.pdf: $(TEXISOURCE)
+	texi2dvi --pdf --batch --build-dir=texiwebjr.t2p -o texiwebjr.pdf texiwebjr.texi
+
+docbook: texiwebjr.xml
+
+texiwebjr.xml: $(TEXISOURCE)
+	makeinfo --docbook $(TEXISOURCE)
+
+dbpdf: docbook
+	dblatex texiwebjr.xml
+@
 
 @node Downloading from git
 @section Downloading From The @command{git} Repository
@@ -2965,21 +3026,112 @@ cd gawk-4.1.0
 @node Evaluation and Futures
 @chapter Evaluation and Future Work
 
-What you see is the final product; it evolved during development...
+At this point, we can stop and look at what we've accomplished. Together
+@command{jrtangle} and @command{jrweave} comprise around 1,150 lines of
+code.  That's a substantial amount of @command{awk}.@footnote{Especially
+as Brian Kernighan keeps insisting that two lines is the optimal size
+for an @command{awk} program!} Nonetheless, I think that the literate
+programming style eased the development and makes understanding the
+program pretty easy.  What follows are some semi-random thoughts.
 
-Design decision to produce every file and let user code check if duplicated.
+What you see is the final product; it evolved during development.
+Unfortunately, there is no good way to present, in a static document
+like this one, the dynamics of the software development, and to show
+how the program changed as it grew.  The best I can do is make some
+appropriate notes in the prose in the right places; e.g., that chunks
+are stored without the final newline.
 
-Design decision to send .texi file to standard output instead of to a file that can cpif'ed.
+Additionally, I don't claim that there is anything earth-shaking or
+stunningly innovative here.  What I have done is show that a useful,
+usable literate programming system can be created in a few weeks of
+spare-time work, with under 1,200 lines of @command{awk}. That's pretty
+good.  Of course, ``the proof is in the pudding;'' I won't know how good
+a job I've really done until I use @value{TWJR} to write something else,
+of medium to large size.
 
-May need to provide @code{@@include} in order to scale to bigger programs.
+There are a few design decisions that might need revisiting once
+I start using @value{TWJR} for ``real work.''
 
-May need to track current node to do references really well.
+@itemize @bullet
+@item
+Always producing every file and letting the user supply code to
+deal with updating it may be too time consuming. On the other hand,
+when compared with actual compilation time for large C and C++ files,
+the time in this step may turn out to be neglible.
 
-Tangle enhancements, in particular putting in @code{#line} lines for C and C++.
+@item
+Right now @command{jrweave} always sends the generated Texinfo file to
+standard output. Perhaps instead the output file should be derived from
+the name of the input file with the same kind of ``did it change?'' checking
+being done by @command{jrweave}, instead of this having to be in the
+@file{Makefile}.
 
-Copy / paste development causes problems - file and code are similar but not
-identical; so code highly similar and thus hard to get right. Original
-web didn't have this problem...
+@item
+For very large programs, some kind of @code{@@include} preprocessing
+step may be needed.  If so, the code from @command{igawk} in the
+@command{gawk} distribution would be a good place to start.
+
+Alternatively, @code{jrtangle} would work by simply listing multiple
+files in the right order on the command line; @command{jrweave} could
+be easily modified to adjust @code{ARGC} and @code{ARGV} to do a second
+pass over multiple files.  That is likely the simpler option.
+
+@item
+The generated list of file definitions, and of chunk definitions and references 
+aren't wonderful. It might be necessary to track the current @code{@@node}
+and maybe chapter / section / subsection to do this really well.
+
+@end itemize
+
+I can think of several possible future enhancements.
+
+@itemize @bullet
+@item
+Some kind of general mechanism for adding in @code{#line}
+statements for C and C++.
+
+@item
+Similar to @command{noweb}, the ability to include leading prose
+in the generated code as a comment.
+
+@item
+A way to specify that a chunk should include the leading text on
+all expanded lines.  This would be useful, for example, with the
+GPL copyright block.  In a @code{Makefile} or shell script I could
+perhaps do something like this:
+
+@example
+#! /bin/sh
+#
+# @@<GPL 3 Copyright statement@@>	@@c jrtangle_use_prefix
+#
+@end example
+
+@noindent
+This would precede all the lines of the copyright block with @samp{#}, whereas
+in C or C++ code, it would look like this:
+
+@example
+/*
+ * @@<GPL 3 Copyright statement@@>	@@c jrtangle_use_prefix
+ */
+@end example
+
+@item
+One thing that definitely still needs doing is to check
+for chunks that were defined but not expanded.
+
+@item
+Another thing is to look for case differences and or whitespace
+differences (that is, typos) in chunk names. Neither program is
+very robust about this right now.
+@end itemize
+
+One thing I noted during development: Copy / paste development causes problems.
+The original code for file chunks and code chunks were similar but not identical.
+This made it hard to get the code right and ultimately led to a large refactoring
+of the whole business (file + code) x (@command{jrtangle} + @command{jrweave}).
+Of course, ultimately, this was a major improvement.
 
 @node Command summary
 @appendix Alphabetic List of @value{SHORTTITLE} Commands and Variables
@@ -3194,38 +3346,47 @@ Distributed with the source code for @command{gawk}.
 
 @item
 @uref{http://www-cs-faculty.stanford.edu/~knuth/abcde.html,
-@cite{Computers & Typesetting}}
+@cite{Computers & Typesetting}}. This five-volume boxed set of hardback
+books contains the documentation and source for both @TeX{} and @MF{},
+as well as the Computer Modern fonts.  It is worthwhile to obtain the
+``millineum edition'' which includes fixes for all known issues up to
+the last time it was printed.  My copy is dated 2011.
 
 @enumerate a
 @item
-Volume A, @cite{The TeXbook},
+Volume A, @cite{The @TeX{}book},
 Donald E.@: Knuth,
 Addison-Wesley, Reading, Massachusetts, 1984.
-ISBN 0-201-13447-0.
+ISBN-10 0-201-13447-0.
+ISBN-13: 978-0201134476.
 
 @item
-Volume B, @cite{TeX: The Program},
+Volume B, @cite{@TeX{}: The Program},
 Donald E.@: Knuth,
 Addison-Wesley, Reading, Massachusetts, 1986.
-ISBN 0-201-13437-3.
+ISBN-10: 0-201-13437-3.
+ISBN-13: 978-0201134377.
 
 @item
 Volume C, @cite{The @MF{}book},
 Donald E.@: Knuth,
 Addison-Wesley, Reading, Massachusetts, 1986.
-ISBN 0-201-13445-4.
+ISBN-10: 0-201-13445-4.
+ISBN-13: 978-0201134452.
 
 @item
 Volume D, @cite{@MF{}: The Program},
 Donald E.@: Knuth,
 Addison-Wesley, Reading, Massachusetts, 1986.
-ISBN 0-201-13438-1.
+ISBN-10: 0-201-13438-1.
+ISBN-13: 978-0201134384.
 
 @item
 Volume E, @cite{Computer Modern Typefaces},
 Donald E.@: Knuth,
 Addison-Wesley, Reading, Massachusetts, 1986.
-ISBN 0-201-13446-2.
+ISBN-10: 0-201-13446-2.
+ISBN-13: 978-0201134469.
 @end enumerate
 
 @item
@@ -3244,9 +3405,5 @@ The Comprehensive @TeX{} Archive Network}.
 TODO:
 - Full indexing of variables and functions
 - Write a script to create texiwebjr.pot ?
-- Add a way to specify leading comment delimiter or to use what was
-  on chunk reference line.
 - Option to print out file update recipe?
-- Checking for chunks that were defined but not expanded.
-
-descibes
+- Footnotes inside or outside of punctuation
