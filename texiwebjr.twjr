@@ -367,7 +367,7 @@ At least one index follows the bibliography.
 
 @c Copied mostly verbatim from the gawk manual.
 
-@cindex Texinfo
+@cindex Texinfo document formatting language
 This @value{DOCUMENT} is written in an enhanced version of
 @UREF{http://www.gnu.org/software/texinfo/, Texinfo},
 the GNU documentation formatting language.
@@ -633,6 +633,7 @@ The file starts with the obligatory @samp{#!} header and copyright
 statements, followed by code chunks and functions common to both
 @command{jrtangle} and @command{jrweave}.
 
+@cindex @code{@@post_create} command, @command{jrtangle}
 @post_create jrtangle chmod +x jrtangle
 @(jrtangle@) =
 @<Shebang header@>
@@ -697,7 +698,8 @@ it's processing an @code{@@iftangle} block, then something got messed
 up somewhere.  Note also the convention that global variables start with
 a capital letter.
 
-@vindex Line_numbers
+@vindex @code{Line_numbers} variable
+@vindex variable, @code{Line_numbers}
 @cindex @code{@@ifweave} command, @command{jrtangle}
 @cindex @code{@@iftangle} command, @command{jrtangle}
 
@@ -792,7 +794,8 @@ we're not already gathering a chunk; if we are someone left off a trailing
 @samp{@@} somewhere. The @code{check_unfinished()} function checks other
 possible things that may have gone wrong.
 
-@vindex Debug
+@vindex @code{Debug} variable
+@vindex variable, @code{Debug}
 @cindex debugging, @code{Debug} variable
 The check against @code{Debug} uses a nice trick. By using
 @command{gawk}'s @option{-v} option, we can set @code{Debug} to any value,
@@ -821,7 +824,8 @@ Debug_pat = "filename"
 @<Common chunk initial processing@>
 @
 
-@vindex Flags
+@vindex @code{Flags} variable
+@vindex variable, @code{Flags}
 Similar to @code{Line_numbers}, @code{Flags} is a global array of
 flags (boolean values) indexed by strings indicating what we're doing.
 
@@ -932,6 +936,7 @@ Once we have all the lines, we save them in @code{File_contents},
 which is an associative array whose indices are the file names
 and the corresponding values are each file's lines.
 
+@findex @code{end_file_gathering()} function, @command{jrtangle}
 @<Process file chunks for @code{jrtangle}@>=
 # end_file_gathering ---finish up collecting a file
 
@@ -1000,6 +1005,7 @@ Debug_pat = "code"
 What to do after gathering the lines depends upon the program.
 For @command{jrtangle} we store the lines for later use.
 
+@findex @code{end_code_gathering()} function, @command{jrtangle}
 @<Process code chunks for @code{jrtangle}@>=
 # end_code_gathering --- complete process of collecting lines of code chunk
 
@@ -1041,6 +1047,7 @@ END {
 Checking for unfinished segments is the same for both
 @command{jrtangle} and @command{jrweave}.
 
+@findex @code{check_unfinished()} function
 @<Helper Functions@> =
 # check_unfinished --- print a fatal error when an unfinished code or
 #			file section is detected. Also ifweave / iftangle.
@@ -1126,6 +1133,7 @@ bad idea. If experience shows us that this is so, this is where to make
 the change, along with new code to take a command-line option indicating
 which file(s) to extract.
 
+@findex @code{dump_files()} function, @command{jrtangle}
 @<Expand code chunks@>=
 # dump_files --- create files and update them as needed
 
@@ -1150,6 +1158,7 @@ function dump_files(	i, s, update_recipe)
 In turn, @code{expand_code_chunks()} initializes for recursion checking
 and then passes the buck to @code{do_expand_code_chunks()}.
 
+@findex @code{expand_code_chunks()} function, @command{jrtangle}
 @<Expand code chunks@>=
 # expand_code_chunks --- expand embedded code chunks. this is the hard part
 
@@ -1170,6 +1179,7 @@ the @code{results} array.
 On the other hand, if it does, it has to be expanded, and that is done
 down in @code{expand_one_line()}.
 
+@findex @code{do_expand_code_chunks()} function, @command{jrtangle}
 @<Expand code chunks@>=
 # do_expand_code_chunks --- do the actual work to expand code chunks
 
@@ -1204,6 +1214,7 @@ them, and put everything back together with reasonable indentation.
 At the end, if the expanded line contains further code chunks, it
 recursively calls @code{do_expand_code_chunks()} to process them as well.
 
+@findex @code{expand_one()} function, @command{jrtangle}
 @<Function to expand one line@> =
 # expand_one_line --- expand a line with code chunk references
 
@@ -1280,6 +1291,7 @@ There are several helper functions used in expanding code chunks:
 The first one is @code{strip_out_name()}, which pulls out the name
 of the chunk from in between the @samp{@@<} and the @samp{@@>}:
 
+@findex @code{strip_out_name()} function
 @<Helper Functions@>=
 # strip_out_name --- get the name from name
 
@@ -1340,6 +1352,7 @@ with a chunk name. Since @code{Code_contents} is indexed by chunk names
 without the enclosing brackets, this just strips them off using
 @code{strip_out_name()}.
 
+@findex @code{code_body()} function, @command{jrtangle}
 @<Expansion helper functions@> =
 # code_body --- get the code body associated with name
 
@@ -1508,6 +1521,7 @@ BEGIN {
 The user can override this template.
 The collection code should look familiar by now:
 
+@cindex @code{@@file_update_recipe} command, @command{jrtangle}
 @<File update recipe handling@>=
 /^@file_update_recipe[[:space:]]*$/, /^@end file_update_recipe[[:space:]]*$/ {
 	if ("file_update_recipe" in Line_numbers)
@@ -1554,6 +1568,7 @@ that, it could be done by changing this code to use @command{gawk}'s
 
 And @emph{now} we can deal with the user's values:
 
+@cindex @code{@@file_update} command, @command{jrtangle}
 @<File update recipe handling@>=
 /^@file_update / {
 	if (NF != 4)
@@ -1571,6 +1586,7 @@ string and the name of the destination file (a temporary one)
 in which to place the output.
 This function is called in @ref{Expanding code chunks}.
 
+@findex @code{create_update_recipe()} function, @command{jrtangle}
 @<File update recipe handling@>=
 # create_update_recipe --- create update recipe per file, return dest filename
 
@@ -1713,6 +1729,10 @@ format string does not reference them.
 @<Helper Functions@>
 @
 
+@findex @code{message()} function
+@findex @code{fatal()} function
+@findex @code{warning()} function
+@findex @code{join()} function
 @<Helper Functions@>=
 # Helper functions
 
@@ -1771,6 +1791,7 @@ Although this is something of a ``helper'' function, as it's
 specific to @command{jrtangle}, it should not be included in
 the same chunk with the other functions in this @value{SECTION}.
 
+@findex @code{dump_chunks()} function, @command{jrtangle}
 @<Expansion debugging functions@> =
 # dump_chunks --- print out all the chunks
 
@@ -1891,6 +1912,7 @@ fancy, just for the fun of it.
 Printing the header is independent of the two-pass nature of the program
 and thus can be done from a @code{BEGIN} block.
 
+@findex @code{print_do_not_edit()} function, @command{jrweave}
 @<Create ``do not edit'' warning@>=
 BEGIN {
 	print_do_not_edit(ARGV[1])
@@ -1967,6 +1989,8 @@ BEGIN {
 
 And then we can switch sizes at will:
 
+@cindex @code{@@use_example} command, @command{jrweave}
+@cindex @code{@@use_smallexample} command, @command{jrweave}
 @<Switch example environment@> =
 Pass == 2 && /^@use_smallexample[[:space:]]*$/ {
 	Example_start = "@smallexample"
@@ -1999,7 +2023,8 @@ must do the opposite here of what we did there.
 
 And without a lot of fanfare, here is the code:
 
-@vindex Line_numbers
+@vindex @code{Line_numbers} variable
+@vindex variable, @code{Line_numbers}
 @cindex @code{@@ifweave} command, @command{jrweave}
 @cindex @code{@@iftangle} command, @command{jrweave}
 @<Handle @code{ifweave} and @code{iftangle} for @code{jrweave}@>=
@@ -2098,6 +2123,8 @@ address harvesters and receiving even more spam. To that end
 the document can use @samp{@@EMAIL@{arnold@@skeeve.com, arnold AT skeeve.com@}}
 and things will happen the way we want them to.
 
+@cindex @code{@@EMAIL} macro, @command{jrweave}
+@cindex macro, @command{jweave}, @code{@@EMAIL}
 @<Macro to hide email addresses in HTML@>=
 print "@c For HTML, spell out email addresses, to avoid problems with"
 print "@c address harvesters for spammers."
@@ -2119,6 +2146,8 @@ something else that needs more work, but I don't want to detour to that
 second thing at the moment. This way I can leave myself a note
 that will appear in the output so that I will remember to tend to it.
 
+@cindex @code{@@FIXME} macro, @command{jrweave}
+@cindex macro, @command{jweave}, @code{@@FIXME}
 @<FIXME macro@>=
 print "@macro FIXME{text}"
 print "@strong{FIXME}: \\text\\"
@@ -2130,6 +2159,8 @@ numbering the code chunks.  We have to do this in two steps:
 first define a macro for @TeX{} itself, and then define a macro
 for use in the other formats, which will be just the number itself.
 
+@cindex @code{@@oldnum} macro, @command{jrweave}
+@cindex macro, @command{jweave}, @code{@@oldnum}
 @<Macro for ``old style'' numbers@>=
 print "@tex"
 print "\\gdef\\oldnum#1{\\begingroup\\oldstyle #1\\endgroup}%"
@@ -2154,6 +2185,7 @@ and outputs them twice, once for DocBook, and once for everything
 else using Texinfo's @code{@@cartouche} environment.
 The title is provided on the opening @code{@@sidebar} line.
 
+@cindex @code{@@sidebar} command, @command{jrweave}
 @<Texinfo authoring additions@>=
 Pass == 2 && /^@sidebar[[:space:]]+/ {
 	sub(/^@sidebar[[:space:]]+/, "", $0)
@@ -2259,6 +2291,7 @@ if (! ("chunk number" in Chunk_info[Current_chunk])) {
 
 Here is where we format the file chunks.
 
+@findex @code{end_file_gathering()} function, @command{jrweave}
 @<Process file chunks for @code{jrweave}@>=
 function end_file_gathering(	x, y, n, i, parts, names, name, anchor, tagname)
 {
@@ -2359,6 +2392,7 @@ $0 ~ Code_chunk_pattern {
 For weaving, we collect the code lines and then when
 done, print out the chunk nicely formatted.
 
+@findex @code{end_code_gathering()} function, @command{jrweave}
 @<Process code chunk for @command{jrweave}@> =
 function end_code_gathering(	i, j, n, x, parts, names, name, anchor)
 {
@@ -2390,6 +2424,8 @@ named ``Initial setup.''
 @<Handle the initial setup chunk for @code{jrweave}@>
 @
 
+@cindex @code{@@print_initial_setup} command, @command{jrweave}
+@cindex @code{@@initial_setup} command, @command{jrweave}
 @<Handle the initial setup chunk for @code{jrweave}@> =
 /^@print_initial_setup([[:space:]]+.*|[[:space:]]*)$/ {
 	Print_initial_setup = TRUE
@@ -2454,6 +2490,7 @@ we'll write here for the code definitions as well.
 
 This is done in the second pass:
 
+@cindex @code{@@print_file_defs} command, @command{jrweave}
 @<Handle @code{@@print_file_defs}@> =
 Pass == 2 && /^@print_file_defs[[:space:]]*$/ {
 	@<Print file chunk definition list@>
@@ -2524,6 +2561,7 @@ file definitions.
 
 This too is done in the second pass:
 
+@cindex @code{@@print_code_defs} command, @command{jrweave}
 @<Handle @code{@@print_code_defs}@> =
 Pass == 2 && /^@print_code_defs[[:space:]]*$/ {
 	@<Print code chunk definition list@>
@@ -2571,6 +2609,7 @@ Printing code references is the flip side of printing code references.
 
 First, recognize the @code{@@print_code_refs} command:
 
+@cindex @code{@@print_code_refs} command, @command{jrweave}
 @<Handle @code{@@print_code_refs}@> =
 Pass == 2 && /^@print_code_refs[[:space:]]*$/ {
 	@<Create @code{Sorted_code_names}@>
@@ -2638,6 +2677,9 @@ in order to keep them out of the document formatter's way.
 There are only three such commands, and all we have to
 do is skip over them with @code{next}.
 
+@cindex @code{@@file_update_recipe} command, @command{jrweave}
+@cindex @code{@@file_update} command, @command{jrweave}
+@cindex @code{@@post_create} command, @command{jrweave}
 @<Remove @code{jrtangle} segments for weaving@> =
 /^@file_update_recipe[[:space:]]*$/, /^@end file_update_recipe[[:space:]]*$/ {
 	next
@@ -2738,6 +2780,7 @@ if more characters remain.
 At the end, we call @code{join()} to convert the @code{out}
 array into a single string which can be returned.
 
+@findex @code{expand_tabs()} function, @command{jrweave}
 @<Expand tabs for @command{jrweave}@> =
 # expand_tabs --- expand tabs in the string
 
@@ -2789,6 +2832,7 @@ by @command{jrweave}.
 The first is a simple function to remove non-alphanumeric
 characters from chunk names:
 
+@findex @code{sanitize_name()} function, @command{jrweave}
 @<Helper functions for @command{jrweave}@> =
 function sanitize_name(file_name)
 {
@@ -2803,6 +2847,9 @@ Since formatting anchors and references are similar,
 a helper function does the work, with the main functions
 delegating to it:
 
+@findex @code{format_anchor_or_ref()} function, @command{jrweave}
+@findex @code{format_anchor()} function, @command{jrweave}
+@findex @code{format_xref()} function, @command{jrweave}
 @<Helper functions for @command{jrweave}@> =
 function format_anchor_or_ref(type, name, defn,		clean_name, result)
 {
@@ -2829,6 +2876,7 @@ function format_anchor(name, defn)
 Finally, the formatting of tags (chunk names) varies based on whether
 it is file chunk or a code chunk.
 
+@findex @code{format_tag()} function, @command{jrweave}
 @<Helper functions for @command{jrweave}@> =
 function format_tag(name, count, type,		result, left, right, style)
 {
