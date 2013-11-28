@@ -1,7 +1,7 @@
 2013-11-28         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Further indexing improvements.
-	Move to regular @uref command.
+	Move to regular @uref command. Remove an unused chunk.
 
 2013-11-27         Arnold D. Robbins     <arnold@skeeve.com>
 

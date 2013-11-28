@@ -2343,7 +2343,6 @@ if (n > 1) {	# embedded chunk names
 		tagname = format_tag(name, Chunk_info[name]["chunk number"], "code chunk")
 		y = y tagname
 		y = y parts[i+1]
-		@<Add enclosing chunk name to list of uses of embedded code chunk @code{i}@>
 	}
 }
 @
@@ -2351,16 +2350,6 @@ if (n > 1) {	# embedded chunk names
 @<Finish off printing the chunk@> =
 printf("%s\n", y)
 print Example_end
-@
-
-@<Add enclosing chunk name to list of uses of embedded code chunk @code{i}@> =
-if (! (name in Chunk_info)) {	# sanity checking, remove eventually
-	fatal("name %s not in Chunk_info!\n", name)
-}
-if ("references" in Chunk_info[name])
-	Chunk_info[name]["references"] = Chunk_info[name]["references"] ", " anchor
-else
-	Chunk_info[name]["references"] = anchor
 @
 
 @node jrweave code chunks
