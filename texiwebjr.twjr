@@ -60,27 +60,9 @@
 @end macro
 @end ifnottex
 
-@c For printed output put the URLs into footnotes.
-@iftex
-@set PRINTEDOUTPUT
-@end iftex
-
-@ifset PRINTEDOUTPUT
-@macro UREF{link, text}
-\text\@footnote{@code{\link\}}
-@end macro
-@end ifset
-
-@ifclear PRINTEDOUTPUT
-@macro UREF{link, text}
-@uref{\link\, \text\}
-@end macro
-@end ifclear
-
-@c Letting this into the text makes it come out on the short title page.
-@c @FIXME{This may need more work.}
-
 @c merge the function and variable indexes into the concept index
+@c do so without the code font, and in the index entries do the
+@c font management ourselves.
 @ifnothtml
 @synindex fn cp
 @synindex vr cp
@@ -369,7 +351,7 @@ At least one index follows the bibliography.
 
 @cindex Texinfo document formatting language
 This @value{DOCUMENT} is written in an enhanced version of
-@UREF{http://www.gnu.org/software/texinfo/, Texinfo},
+@uref{http://www.gnu.org/software/texinfo/, Texinfo},
 the GNU documentation formatting language.
 A single Texinfo source file is used to produce both the printed and online
 versions of the documentation.
@@ -416,10 +398,14 @@ I would like to acknowledge the following people.
 
 @itemize @bullet
 @item
+@cindex Kernighan, Brian W.@:
+@cindex Aho, Alfred V.@:
+@cindex Weinberger, Peter J.@:
 Alfred V.@: Aho, Peter J.@: Weinberger, and Brian W.@: Kernighan,
 for inventing the @command{awk} language.
 
 @item
+@cindex Stallman, Richard M.@:
 Richard M.@: Stallman for inventing the Texinfo markup language.
 
 @item
@@ -432,6 +418,7 @@ Norman Ramsey for inventing @command{noweb}.
 Ben Pfaff for inventing the original TexiWeb.
 
 @item
+@cindex Berry, Karl
 Karl Berry for his infinite patience with my questions about
 and suggestions for Texinfo.
 
@@ -460,6 +447,7 @@ and implemented in @command{awk}.
 @node Litprog intro
 @section What Is Literate Programming?
 
+@cindex McPhee, Patrick TJ
 @quotation
 Without wanting to be elitist, the thing that will prevent literate
 programming from becoming a mainstream method is that it requires thought
@@ -470,17 +458,18 @@ of appeal. This doesn't take away from its usefulness as an approach.
 @author Patrick TJ McPhee
 @end quotation
 
+@cindex Knuth, Donald E.@:
 @dfn{Literate programming} is a programming style invented by
-@UREF{http://www-cs-faculty.stanford.edu/~knuth/, Professor Donald E.@: Knuth}
+@uref{http://www-cs-faculty.stanford.edu/~knuth/, Professor Donald E.@: Knuth}
 of Stanford University for implementing the
-@UREF{http://www.tug.org, @TeX{} document formatter}
+@uref{http://www.tug.org, @TeX{} document formatter}
 and @MF{} font-creation programs.
 
 A literate program is a mixture of program fragments that do some
 particular task, and explanatory prose describing what the code is
 doing. Preferably, the prose also describes @emph{why} the code is
 implemented in a particular fashion. More information and pedagogy
-may be found on @UREF{http://www.literateprogramming.com, the literate
+may be found on @uref{http://www.literateprogramming.com, the literate
 programming website}.
 
 Knuth's original @command{WEB} system was built on top of and for use
@@ -492,12 +481,15 @@ also ``pretty printed'' the code in the finished document.  (Today Knuth
 uses @command{CWEB}, which is similar to the original @command{WEB}
 but is intended for use with C.)
 
+@cindex Ramsey, Norman
+@cindex Pfaff, Ben
 Many literate programming tools have been developed since then.
 @value{TWJR} is inspired by two in particular:
-@UREF{http://www.cs.tufts.edu/~nr/noweb/, Norman Ramsey's @command{noweb}},
+@uref{http://www.cs.tufts.edu/~nr/noweb/, Norman Ramsey's @command{noweb}},
 and
-@UREF{http://searchcode.com/codesearch/view/14097352, Ben Pfaff's TexiWeb}.
+@uref{http://searchcode.com/codesearch/view/14097352, Ben Pfaff's TexiWeb}.
 
+@cindex @command{noweb} literate programmng tool
 @command{noweb} makes a conscious attempt to provide a minimal additional
 markup over and above the document formatting language. It also attempts
 to be portable to any markup language, not just @TeX{} or @LaTeX{},
@@ -507,7 +499,7 @@ making it easily extensible.  It is the ``minimal additional markup''
 aspect of @command{noweb} that I find particular appealing.
 
 TexiWeb was created by Ben Pfaff for writing his
-@UREF{http://adtinfo.org/, AVL library}.
+@uref{http://adtinfo.org/, AVL library}.
 It builds on the Texinfo markup language, which at first glance is
 exactly what I was looking for: Texinfo + Literate Programming.
 However, TexiWeb has two drawbacks: it is poorly documented,
@@ -602,7 +594,7 @@ may change as this evolves.
 Why write in @command{awk}? Good question. I glad you asked this one too.
 
 I got involved with the
-@UREF{http://www.gnu.org/software/gawk/, GNU Awk project}
+@uref{http://www.gnu.org/software/gawk/, GNU Awk project}
 late in 1987.  I have been the sole maintainer and the primary author
 of its documentation since 1994.  The language is small, elegant, and
 generally quite powerful.  @command{gawk}, in particular, adds many
@@ -638,7 +630,7 @@ statements, followed by code chunks and functions common to both
 @(jrtangle@) =
 @<Shebang header@>
 @<Common Chunks@>
-@<Common Functions@>
+@<Helper Functions@>
 @
 
 On my system, the latest version of @command{gawk} lives
@@ -1725,10 +1717,6 @@ Since @command{gawk} does not have a ``varargs'' facility,
 we simply supply 10 arguments; the extras are ignored if the
 format string does not reference them.
 
-@<Common Functions@>=
-@<Helper Functions@>
-@
-
 @findex @code{message()} function
 @findex @code{fatal()} function
 @findex @code{warning()} function
@@ -2718,8 +2706,8 @@ Pass == 2 { print }
 like to use tabs to handle indentation.  There are two ways to manage
 having real tabs: either set your editor to expand tabs to spaces upon
 input, or use real tabs, and expand them when creating the document with
-@command{jrweave}.  Since I happen to like using tabs@footnote{A habit of
-over 30 years that is just too hard to break.}, I have chosen the latter.
+@command{jrweave}.  Since I happen to like using tabs,@footnote{A habit of
+over 30 years that is just too hard to break.} I have chosen the latter.
 
 In addition, having literal tabs in a file can be critical: this is most
 applicable to @file{Makefile} files but perhaps matters for other kinds
@@ -2744,7 +2732,7 @@ BEGIN {
 
 I recommend using whatever appropriate magic in the @value{TWJR}
 document that will set the tab stop to whatever you prefer
-in your favorite editor.  For @UREF{http://www.vim.org, Vim},
+in your favorite editor.  For @uref{http://www.vim.org, Vim},
 I use this line, which also switches on syntax highlighting
 appropriate to Texinfo. It must be placed within the first four
 or so lines of the file.
@@ -3036,7 +3024,7 @@ dbpdf: docbook
 @section Downloading From The @command{git} Repository
 
 The code for @value{TWJR} is available from GitHub.
-To get it, you will need a @UREF{http://git-scm.org, @command{git}}
+To get it, you will need a @uref{http://git-scm.org, @command{git}}
 client of some kind.  The instructions here presume a command-line
 style client.
 
@@ -3060,6 +3048,7 @@ or later installed in @file{/usr/local/bin}. If not you will have to
 use something like @samp{gawk -f ./jrweave @r{@dots{}}} (assuming that
 @command{gawk} 4.0 or later is in your search path somewhere).
 
+@cindex @command{gawk} distribution
 And of course, if you don't have @command{gawk}, the canonical
 incantation is:
 
@@ -3074,6 +3063,7 @@ cd gawk-4.1.0
 @node Evaluation and Futures
 @chapter Evaluation and Future Work
 
+@cindex Kernighan, Brian W.@:
 At this point, we can stop and look at what we've accomplished. Together
 @command{jrtangle} and @command{jrweave} comprise around 1,150 lines of
 code.  That's a substantial amount of @command{awk}.@footnote{Especially
@@ -3386,6 +3376,7 @@ ISBN-10: 0937073806,
 ISBN-13: 978-0937073803.
 
 @item
+@cindex @command{gawk} documentation
 @uref{http://www.gnu.org/software/gawk/manual/,
 @cite{GAWK: Effective AWK Programming}},
 Arnold D. Robbins,
