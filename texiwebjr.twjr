@@ -62,10 +62,13 @@
 
 @c merge the function and variable indexes into the concept index
 @c do so without the code font, and in the index entries do the
-@c font management ourselves.
+@c font management ourselves.  Also merge in the chunk definition
+@c and reference entries, which jrweave creates for us.
 @ifnothtml
 @synindex fn cp
 @synindex vr cp
+@synindex cd cp
+@synindex cr cp
 @end ifnothtml
 
 @c If "finalout" is commented out, the printed output will show
@@ -1808,6 +1811,8 @@ since Texinfo won't know what to do with them.
 * jrweave ifweave iftangle::     Text inclusion/exclusion for
                                  @command{jrweave}.
 * jrweave language additions::   Extra stuff for authors.
+* jrweave chunk indexes::        Create indices for chunk definition and
+                                 references.
 * jrweave file chunks::          Collecting and formatting file chunks.
 * jrweave code chunks::          Collecting and formatting code chunks.
 * jrweave print setup recipe::   Printing the initial setup recipe.
@@ -2223,6 +2228,47 @@ And here is a second paragraph, to show that the first paragraph
 of a sidebar is not indented, whereas subsequent ones are.
 @end sidebar
 
+@node jrweave chunk indexes
+@section Creating Indices For Chunks
+
+Besides printing out the list of file definitions and code chunk
+definitions and references, @command{jrweave} creates index entries for
+each chunk's definition(s) and use(s).  This provides an easy way to
+find information based on alphabetic lookup of a chunk name.
+
+@FIXME{Add cross reference.}
+
+The index names are @samp{cd} for ``chunk definition'' and
+@samp{cr} for ``chunk reference.''
+It is up to the author of a document to either print the indices
+using a regular Texinfo @code{@@printindex} command or to merge
+them into one of the standard Texinfo indices.  I have taken
+the latter course. Towards the front I have
+
+@example
+@@synindex cd cp
+@@synindex cr cp
+@end example
+
+@(jrweave@) =
+@<Create Chunk Indices@>
+@
+
+According to the Texinfo manual, new indices should be created right
+after the Texinfo header.
+
+@<Create Chunk Indices@> =
+Pass == 2 && /^@c %\*\*end of header/ {
+	print	# print the line
+
+	print "\n@c Extra indices added by jrweave"
+	print "@defindex cd   @c chunk definition"
+	print "@defindex cr   @c chunk reference"
+
+	next
+}
+@
+
 @node jrweave file chunks
 @section Collecting and Formatting File Chunks for @command{jrweave}
 
@@ -2300,24 +2346,19 @@ formatting the names of the referenced chunks, and
 closing off the environment.
 
 @<Print the chunk body@> =
-@<Print the anchor and opening part@>
+@<Print the anchor@>
 @<Convert the lines for @TeX{}@>
 @<Format chunk names and reassemble output lines@>
-@<Finish off printing the chunk@>
+@<Print the complete chunk@>
 @
 
 Formatting the anchor is handled by a separate function which
 we'll see later. The output is the anchor, the formatted tag
 name and the opening @code{@@example} or @code{@@smallexample}.
 
-@<Print the anchor and opening part@> =
+@<Print the anchor@> =
 anchor = format_anchor(Current_chunk, Chunk_info[Current_chunk]["defn"])
 printf("%s\n", anchor)
-
-printf("@noindent\n%s %s@equiv{}\n",
-	format_tag(Current_chunk, Chunk_info[Current_chunk]["chunk number"], Chunk_type),
-	Chunk_info[Current_chunk]["defn"] == 1 ? "" : "+")
-print Example_start
 @
 
 Converting the lines means expanding the tabs, and then splitting the
@@ -2341,13 +2382,19 @@ if (n > 1) {	# embedded chunk names
 		name = strip_out_name(names[i])
 		@<Collect chunk reference information@>
 		tagname = format_tag(name, Chunk_info[name]["chunk number"], "code chunk")
+		printf("@crindex %s, use\n", tagname)
 		y = y tagname
 		y = y parts[i+1]
 	}
 }
 @
 
-@<Finish off printing the chunk@> =
+@<Print the complete chunk@> =
+the_tag = format_tag(Current_chunk, Chunk_info[Current_chunk]["chunk number"], Chunk_type)
+printf("@cdindex %s, definition\n", the_tag)
+printf("@noindent\n%s %s@equiv{}\n",
+	the_tag, Chunk_info[Current_chunk]["defn"] == 1 ? "" : "+")
+print Example_start
 printf("%s\n", y)
 print Example_end
 @
