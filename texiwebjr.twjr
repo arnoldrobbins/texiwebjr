@@ -12,11 +12,11 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH November, 2013
-@set EDITION 0.1
+@set UPDATE-MONTH December, 2013
+@set EDITION 0.5
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
-@set SHORTTITLE TexiWeb Jr.
+@set SHORTTITLE TexiWeb Jr.@:
 
 @iftex
 @set DOCUMENT book
@@ -133,12 +133,13 @@ URL: @url{http://www.skeeve.com/} @*
 
 @iftex
 @headings off
-@evenheading @thispage@ @ @value{DRAFT} @| @| @strong{@value{SHORTTITLE}}
-@oddheading  @strong{@thischapter} @| @| @value{DRAFT}@ @ @thispage
+@evenheading @thispage @| @| @strong{@value{SHORTTITLE}}
+@oddheading  @strong{@thischapter} @| @| @thispage
 @end iftex
 
 @ifnottex
 @ifnotxml
+@ifnotdocbook
 @node Top
 @top General Introduction
 @c Preface node should come right after the Top
@@ -150,6 +151,7 @@ on top of the Texinfo document formatting markup language.
 
 @insertcopying
 
+@end ifnotdocbook
 @end ifnotxml
 @end ifnottex
 
@@ -191,7 +193,7 @@ on top of the Texinfo document formatting markup language.
 * Expanding code chunks::          Expanding code chunks into straight code.
 * jrtangle before everything::     Doing something before extracting any
                                    files.
-* jrtangle avoiding update::       Leaving unchanged files alone.
+* jrtangle avoiding update::       Leaving unmodified files alone.
 * jrtangle after creation::        Doing something after creating a file.
 * Common Chunks::                  Common code chunks and functions.
 * jrweave two passes::             Two pass design.
@@ -244,8 +246,9 @@ thus leads to better programs.
 The Texinfo markup language is the official documentation markup
 language of the GNU Project. It makes writing program documentation
 pleasant. In addition, these documents can be converted to multiple
-formats for end use. The two most important formats (in my
-opinion) are HTML for viewing with a Web browser, and @TeX{} for printing.
+formats for end use. The most important formats (in my
+opinion) are HTML for viewing with a Web browser, @TeX{} for printing,
+and DocBook for publishing.
 
 This @value{DOCUMENT} describes @value{TWJR}, a system that provides
 literate programming on top of the Texinfo markup language.
@@ -270,9 +273,9 @@ literate programming, and in seeing how one programmer decided to
 create his own literate programming system for use in writing
 large programs.
 
-You may also find this @value{DOCUMENT} interesting if you
-like programming using scripting languages, as most of the
-code is written in @command{awk}, the author's favorite hammer.
+You may also find this @value{DOCUMENT} interesting if you like
+programming using scripting languages, as the code is written in
+@command{awk}, the author's favorite hammer.
 
 @c Scale figure to 4.5 inches which is good for both smallbook
 @c and regular.  TeX will scale height also automatically.
@@ -281,16 +284,14 @@ code is written in @command{awk}, the author's favorite hammer.
 @center @image{third_way, 5in, , Third Way}
 @end float
 
-Many people today are used to using WYSIWYG document creation
-programs.  Texinfo uses the older, batch-formatting
-model of document creation, where you @dfn{mark up} the
-text with formatting instructions, and the input does not
-physically resemble the output. (@xref{third-way}.)  Such systems may take longer
-to learn, but ultimately they provide more control over
-your document, and you spend your time thinking about your
-content instead of fighting the document program's ideas of
-how to do things.
-Thus, you should be familiar with the Texinfo markup language,
+Many people today are used to using WYSIWYG document creation programs.
+Texinfo uses the older, batch-formatting model of document creation, where
+you @dfn{mark up} the text with formatting instructions, and the input
+does not physically resemble the output. (@xref{third-way}.)  Such systems
+may take longer to learn, but ultimately they provide more control over
+your document, and you spend your time thinking about your content instead
+of fighting the document creation program's ideas of how to do things.
+Thus, you should be familiar with the Texinfo markup language.
 
 You should also be familiar with the @command{awk} programming language.
 In particular, @value{TWJR} makes use of additional features in
@@ -309,20 +310,21 @@ This @value{DOCUMENT} provides the full source and description
 of the @value{TWJR} literate programming system.
 The @value{CHAPTER}s and what they cover are as follows.
 
+@c No period when TWJR ends a sentence, since it has a period in it.
 @ref{Introduction}, briefly introduces literate programming
-and describes some of the motivation for @value{TWJR}.
+and describes some of the motivation for @value{TWJR}
 
 @ref{jrtangle code}, presents the code for @command{jrtangle}, the
-``tangling'' component of @value{TWJR}.
+``tangling'' component of @value{TWJR}
 
-@ref{jrweave code}, presents the code for @command{jrtangle}, the
-``weaving'' component of @value{TWJR}.
+@ref{jrweave code}, presents the code for @command{jrweave}, the
+``weaving'' component of @value{TWJR}
 
-@ref{Bootstrapping}, describes the issues involved in bringing
-up a literate programming system from scratch. It also presents
-the @file{Makefile} used for ongoing maintenance, and for lack of
-a better place, describes how to obtain the source for the system
-using @command{git}.
+@ref{Bootstrapping}, describes the issues involved in bringing up a
+literate programming system from scratch and shows the initial setup
+recipe. It also presents the @file{Makefile} used for ongoing maintenance,
+and for lack of a better place, describes how to obtain the source for
+the system using @command{git}.
 
 @ref{Evaluation and Futures}, provides some brief discussion
 of various design decisions, as well as looking at possible
@@ -357,7 +359,7 @@ This @value{DOCUMENT} is written in an enhanced version of
 @uref{http://www.gnu.org/software/texinfo/, Texinfo},
 the GNU documentation formatting language.
 A single Texinfo source file is used to produce both the printed and online
-versions of the documentation.
+versions of a program's documentation.
 @ifnotinfo
 Because of this, the typographical conventions
 are slightly different than in other books you may have read.
@@ -471,9 +473,14 @@ and @MF{} font-creation programs.
 A literate program is a mixture of program fragments that do some
 particular task, and explanatory prose describing what the code is
 doing. Preferably, the prose also describes @emph{why} the code is
-implemented in a particular fashion. More information and pedagogy
-may be found on @uref{http://www.literateprogramming.com, the literate
-programming website}.
+implemented in a particular fashion.
+
+The significant difference over simply using lots of comments is
+that code is presented in the order that makes the most sense for
+the human reading and understanding the program, as opposed to the
+order needed for the programming language's compiler or interpreter.
+More information and pedagogy may be found on
+@uref{http://www.literateprogramming.com, the literate programming website}.
 
 Knuth's original @command{WEB} system was built on top of and for use
 with Pascal.  When this was done in the early 1980s, Pascal was just about
@@ -481,7 +488,8 @@ the only language that was popular, generally portable, and basically
 usable for large programs (despite a number of constraints). @command{WEB}
 provided a number of facilities to make Pascal programming easier, and
 also ``pretty printed'' the code in the finished document.  (Today Knuth
-uses @command{CWEB}, which is similar to the original @command{WEB}
+uses @uref{http://www-cs-faculty.stanford.edu/~knuth/cweb.html,
+@command{CWEB}}, which is similar to the original @command{WEB}
 but is intended for use with C.)
 
 @cindex Ramsey, Norman
@@ -568,7 +576,7 @@ the traditional way, without being so verbose that my fingers end up
 hurting when I'm done working on a document after a few hours.
 
 While my first preference might have been to use @command{noweb}, since I
-familiar with it, it does not support Texinfo. Even though @LaTeX{} is a
+am familiar with it, it does not support Texinfo. Even though @LaTeX{} is a
 more powerful markup language, I didn't want to climb that learning curve
 just to use @command{noweb}.  Also, I felt that it might be easier---and
 certainly more @emph{fun}---to write my own small literate programming
@@ -622,6 +630,35 @@ a little psychology thrown in as well.}
 @node jrtangle code
 @chapter Tangling: The @command{jrtangle} Program
 
+The major additional syntactic features over Texinfo are @dfn{file chunks}
+and @dfn{code chunks}. Each starts with the name of the chunk in special
+bracketing sequences, and continues until a line with just a single
+@samp{@@} sign on it.
+
+@table @code
+@item @@(@var{filename}@@) =
+Start or add to the definition of @var{filename}'s contents.
+
+@item @@<@var{chunkname}@@> =
+Start or add to the definition of a code chunk named @var{chunkname}.
+@end table
+
+@menu
+* jrtangle header::             Getting Started.
+* jrtangle ifweave iftangle::   Text inclusion/exclusion for @command{jrtangle}.
+* jrtangle file chunks::        Processing file chunks for @command{jrtangle}.
+* jrtangle code chunks::        Processing code chunks for @command{jrtangle}.
+* jrtangle error checking::     Checking for errors in @command{jrtangle}.
+* Expanding code chunks::       Expanding code chunks into straight code.
+* jrtangle before everything::  Doing something before extracting any files.
+* jrtangle avoiding update::    Leaving unmodified files alone.
+* jrtangle after creation::     Doing something after creating a file.
+* Common Chunks::               Common code chunks and functions.
+@end menu
+
+@node jrtangle header
+@section Getting Started
+
 Let's get started.  Here is the code for @command{jrtangle}.
 
 The file starts with the obligatory @samp{#!} header and copyright
@@ -645,7 +682,7 @@ your system if it's not correct.
 @
 
 As a general note, @command{jrtangle} and @command{jrweave} need features
-introduced in @command{gawk} 4.0; previous versions will not work.
+introduced in @command{gawk} 4.0; earlier versions will not work.
 
 The common chunks and functions are described later in this @value{CHAPTER}.
 However, we define one of them now, so that the license comes
@@ -654,19 +691,6 @@ out at the top of the file. The actual license text is provided later.
 @<Common Chunks@>=
 @<GPL 3 Copyright statement@>
 @
-
-@menu
-* jrtangle ifweave iftangle::   Text inclusion/exclusion for
-                                @command{jrtangle}.
-* jrtangle file chunks::        Processing file chunks for @command{jrtangle}.
-* jrtangle code chunks::        Processing code chunks for @command{jrtangle}.
-* jrtangle error checking::     Checking for errors in @command{jrtangle}.
-* Expanding code chunks::       Expanding code chunks into straight code.
-* jrtangle before everything::  Doing something before extracting any files.
-* jrtangle avoiding update::    Leaving unchanged files alone.
-* jrtangle after creation::     Doing something after creating a file.
-* Common Chunks::               Common code chunks and functions.
-@end menu
 
 @node jrtangle ifweave iftangle
 @section Document Sections Exclusive to Tangling and Weaving
@@ -778,10 +802,11 @@ We will see the code chunk processing in @ref{jrtangle code chunks}.
 @<Process file chunks for @code{jrtangle}@>
 @
 
-File chunks start with @samp{@@(filename.c@@) =} in column 1. Unlike TexiWeb
-and like @command{noweb}, we don't require @samp{+=} to add more stuff to
-a definition. We just use @samp{=} and figure it out. File and code chunks end with
-a single @samp{@@} on a line by itself, with the @samp{@@} in column 1.
+As mentioned, file chunks start with @samp{@w{@@(filename.c@@) =}} in column
+1. Unlike TexiWeb and like @command{noweb}, we don't require @samp{+=}
+to add more stuff to a definition. We just use @samp{=} and figure it
+out. File and code chunks end with a single @samp{@@} on a line by itself,
+with the @samp{@@} in column 1.
 
 Instead of using a range pattern, we use a boolean flag; this lets us
 avoid special-casing the first and last lines.  The code checks that
@@ -828,7 +853,7 @@ flags (boolean values) indexed by strings indicating what we're doing.
 new_chunk = gensub(Pattern, "\\1", 1)
 if (Flags[Chunk_type]) {
 	fatal(_"%s start of %s found while still collecting %s\n",
-		Chunk_type, Current_chunk, new_chunk)
+		Chunk_type, new_chunk, Current_chunk)
 }
 check_unfinished()
 
@@ -1433,7 +1458,7 @@ if (length(Initial_setup) > 0) {
 @
 
 @node jrtangle avoiding update
-@section Leaving Unchanged Files Alone
+@section Leaving Unmodified Files Alone
 
 When working with @command{make}, especially in large programs,
 it is vital that source files be recompiled only if they have
@@ -1807,14 +1832,14 @@ since Texinfo won't know what to do with them.
 @menu
 * jrweave two passes::           Two pass design.
 * jrweave initial code::         Initial Stuff and Printing A Warning.
-* jrweave choosing code size::   Choosing the code size.
 * jrweave ifweave iftangle::     Text inclusion/exclusion for
                                  @command{jrweave}.
+* jrweave choosing code size::   Choosing the code size.
 * jrweave language additions::   Extra stuff for authors.
 * jrweave chunk indexes::        Create indices for chunk definition and
                                  references.
-* jrweave file chunks::          Collecting and formatting file chunks.
-* jrweave code chunks::          Collecting and formatting code chunks.
+* jrweave file chunks::          Processing file chunks.
+* jrweave code chunks::          Processing code chunks.
 * jrweave print setup recipe::   Printing the initial setup recipe.
 * jrweave file defs::            Printing file definitions.
 * jrweave code defs and refs::   Printing code definitions and references.
@@ -1954,54 +1979,6 @@ for (i = 1; i <= l + 4; i++)
 printf "\n"
 @
 
-@node jrweave choosing code size
-@section Choosing The Code Size
-
-Sometimes, code is just too wide for Texinfo's @code{@@example}
-sections and it is better to use @code{@@smallexample}.  The
-@code{@@use_smallexample} statement causes @command{jrweave}
-to use @code{@@smallexample} for all the file and code chunks.
-
-After some experimentation, it makes the most sense to make this
-be dynamic, allowing the author to switch things back
-and forth.  To that end there is also a @code{@@use_example}
-statement.
-
-@(jrweave@) =
-@<Switch example environment@>
-@
-
-A @code{BEGIN} block sets the default:
-
-@<Switch example environment@> =
-BEGIN {
-	Example_start = "@example"
-	Example_end = "@end example"
-}
-@
-
-And then we can switch sizes at will:
-
-@cindex @code{@@use_example} command, @command{jrweave}
-@cindex @code{@@use_smallexample} command, @command{jrweave}
-@<Switch example environment@> =
-Pass == 2 && /^@use_smallexample[[:space:]]*$/ {
-	Example_start = "@smallexample"
-	Example_end = "@end smallexample"
-	next
-}
-
-Pass == 2 && /^@use_example[[:space:]]*$/ {
-	Example_start = "@example"
-	Example_end = "@end example"
-	next
-}
-@
-
-@noindent
-@code{Example_start} and @code{Example_end} are then used throughout
-the rest of the program.
-
 @node jrweave ifweave iftangle
 @section Document Sections Exclusive to Weaving and Tangling
 
@@ -2067,6 +2044,54 @@ And without a lot of fanfare, here is the code:
 	# otherwise fall through into the rest of the code
 }
 @
+
+@node jrweave choosing code size
+@section Choosing The Code Size
+
+Sometimes, code is just too wide for Texinfo's @code{@@example}
+sections and it is better to use @code{@@smallexample}.  The
+@code{@@use_smallexample} statement causes @command{jrweave}
+to use @code{@@smallexample} for all the file and code chunks.
+
+After some experimentation, it makes the most sense to make this
+be dynamic, allowing the author to switch things back
+and forth.  To that end there is also a @code{@@use_example}
+statement.
+
+@(jrweave@) =
+@<Switch example environment@>
+@
+
+A @code{BEGIN} block sets the default:
+
+@<Switch example environment@> =
+BEGIN {
+	Example_start = "@example"
+	Example_end = "@end example"
+}
+@
+
+And then we can switch sizes at will:
+
+@cindex @code{@@use_example} command, @command{jrweave}
+@cindex @code{@@use_smallexample} command, @command{jrweave}
+@<Switch example environment@> =
+Pass == 2 && /^@use_smallexample[[:space:]]*$/ {
+	Example_start = "@smallexample"
+	Example_end = "@end smallexample"
+	next
+}
+
+Pass == 2 && /^@use_example[[:space:]]*$/ {
+	Example_start = "@example"
+	Example_end = "@end example"
+	next
+}
+@
+
+@noindent
+@code{Example_start} and @code{Example_end} are then used throughout
+the rest of the program.
 
 @node jrweave language additions
 @section Additions For Writing Documents
@@ -2270,7 +2295,7 @@ Pass == 2 && /^@c %\*\*end of header/ {
 @
 
 @node jrweave file chunks
-@section Collecting and Formatting File Chunks for @command{jrweave}
+@section Processing File Chunks for @command{jrweave}
 
 Now comes the hard part. We use the same process for file chunks
 and for code chunks, although each will be tracked separately.
@@ -2400,7 +2425,7 @@ print Example_end
 @
 
 @node jrweave code chunks
-@section Collecting and Formatting Code Chunks
+@section Processing Code Chunks for @command{jrweave}
 
 Code chunk collection and formatting can now benefit from all
 the work done previously.
@@ -2490,7 +2515,7 @@ named ``Initial setup.''
 @
 
 @node jrweave file defs
-@section Printing Out File Definitions 
+@section Printing File Definitions 
 
 Now that we have collected and printed all the code definitions
 and references, we can print out the lists of everywhere
@@ -3338,22 +3363,22 @@ and the code chunk references.
 
 @menu
 * File Definitions::            Source files by definition.
-* Code Segment Definitions::    Code segments by definition.
-* Code Segment References::     Code segments by reference.
+* Code Chunk Definitions::    Code chunks by definition.
+* Code Chunk References::     Code chunks by reference.
 @end menu
 
 @node File Definitions
-@appendixsec Source Files Definitions
+@appendixsec Source File Definitions
 
 @print_file_defs
 
-@node Code Segment Definitions
-@appendixsec Code Segment Definitions
+@node Code Chunk Definitions
+@appendixsec Code Chunk Definitions
 
 @print_code_defs
 
-@node Code Segment References
-@appendixsec Code Segment References
+@node Code Chunk References
+@appendixsec Code Chunk References
 
 @print_code_refs
 
