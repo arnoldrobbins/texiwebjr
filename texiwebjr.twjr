@@ -81,9 +81,27 @@
 @end iftex
 
 @copying
+@docbook
+<para>Published by:</para>
+
+<literallayout class="normal">Arnold David Robbins
+P.O. Box 354
+Nof Ayalon
+D.N. Shimshon 9978500
+ISRAEL
+Email: <email>arnold@@skeeve.com</email>
+URL: <ulink url="http://www.skeeve.com/">http://www.skeeve.com/</ulink></literallayout>
+
+<literallayout class="normal">Copyright &copy; 2013
+Arnold David Robbins
+All Rights Reserved.</literallayout>
+@end docbook
+
+@ifnotdocbook
 Copyright @copyright{} 2013 @*
 Arnold David Robbins @*
 All Rights Reserved.
+@end ifnotdocbook
 @sp 1
 The @command{jrtangle} and @command{jrweave} programs are copyright
 @copyright{} 2013 by Arnold David Robbins. They are published under
@@ -111,6 +129,7 @@ This is Edition @value{EDITION} of @cite{@value{TITLE}}.
 @subtitle @value{UPDATE-MONTH}
 @author Arnold D. Robbins
 
+@ifnotdocbook
 @c Include the Distribution inside the titlepage environment so
 @c that headings are turned off.  Headings on and off do not work.
 
@@ -127,6 +146,7 @@ Email: @EMAIL{arnold@@skeeve.com,arnold AT skeeve.com} @*
 URL: @url{http://www.skeeve.com/} @*
 
 @insertcopying
+@end ifnotdocbook
 @end titlepage
 
 @set DRAFT @i{DRAFT}
@@ -137,9 +157,7 @@ URL: @url{http://www.skeeve.com/} @*
 @oddheading  @strong{@thischapter} @| @| @thispage
 @end iftex
 
-@ifnottex
-@ifnotxml
-@ifnotdocbook
+@ifinfo
 @node Top
 @top General Introduction
 @c Preface node should come right after the Top
@@ -150,10 +168,7 @@ This file documents @value{TWJR}, a program suite for Literate Programming
 on top of the Texinfo document formatting markup language.
 
 @insertcopying
-
-@end ifnotdocbook
-@end ifnotxml
-@end ifnottex
+@end ifinfo
 
 @menu
 * Preface::                        Preface.
