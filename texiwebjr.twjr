@@ -945,10 +945,6 @@ Flags["file chunk"] || Flags["code chunk"] {
 }
 @
 
-When we're done, we save the collected lines
-in array indexed by chunk names. For @command{jrtangle},
-there are separate arrays for files and chunks.
-
 @node jrtangle finish file chunk
 @subsection Completing File Collection for @command{jrtangle}
 
@@ -1027,7 +1023,7 @@ For @command{jrtangle} we store the lines for later use.
 
 @findex @code{end_code_gathering()} function, @command{jrtangle}
 @<Process code chunks for @code{jrtangle}@>=
-# end_code_gathering --- complete process of collecting lines of code chunk
+# end_code_gathering --- complete the collecting lines of code chunk
 
 function end_code_gathering()
 {
@@ -1038,7 +1034,7 @@ function end_code_gathering()
 		Code_contents[Current_chunk] = Chunk_lines
 
 	if (Debug ~ /code/)
-		printf("finished collecting code %s\n", Current_chunk) > "/dev/stderr"
+		printf("finished collecting %s\n", Current_chunk) > "/dev/stderr"
 }
 @
 
@@ -1056,7 +1052,8 @@ Here is the error checking code. First add it to both files:
 # Use brackets to avoid triggering the warning on ourselves!
 /(^<[@])|(>[@]([[:space:]]*=[[:space:]]*)?$)/	{
 	# Ditto, with concatenation
-	warning(_"<" "@ or >" "@ used instead of @" "< or @" ">\n\t%s\n", $0)
+	warning("<" "@ or >" "@ used instead of @" "< or @" ">\n\t%s\n",
+			$0)
 }
 
 END {
@@ -1175,12 +1172,16 @@ function dump_files(	i, s, update_recipe)
 }
 @
 
+@noindent
+(The @code{Shell_debug} variable is discussed in
+@ref{jrtangle avoiding update}.)
+
 In turn, @code{expand_code_chunks()} initializes for recursion checking
 and then passes the buck to @code{do_expand_code_chunks()}.
 
 @findex @code{expand_code_chunks()} function, @command{jrtangle}
 @<Expand code chunks@>=
-# expand_code_chunks --- expand embedded code chunks. this is the hard part
+# expand_code_chunks --- expand embedded code chunks.
 
 function expand_code_chunks(contents)
 {
@@ -1191,7 +1192,7 @@ function expand_code_chunks(contents)
 @
 
 By the time we get here, it isn't actually so hard.
-@code{do_expand_code_chunks()} splits the file contents into individual
+@code{do_expand_code_chunks()} splits the contents into individual
 lines. It then loops over the results.  If a line does not contain any
 chunk names, then the result can be kept verbatim, and it is copied into
 the @code{results} array.
@@ -1203,7 +1204,8 @@ down in @code{expand_one_line()}.
 @<Expand code chunks@>=
 # do_expand_code_chunks --- do the actual work to expand code chunks
 
-function do_expand_code_chunks(contents,	nlines, lines, results, i, j)
+function do_expand_code_chunks(contents,
+								nlines, lines, results, i, j) # locals
 {
 	nlines = split(contents, lines, "\n")
 
