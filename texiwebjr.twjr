@@ -2617,8 +2617,11 @@ print "@end table"
 @<Format and print chunk definition list@> =
 tag = format_chunk_name(name, Chunk_info[name]["chunk number"], Chunk_info[name]["type"])
 printf("@item %s\n", tag)
-printf("One or more definitions occur in\n")
 n = Chunk_info[name]["defn"]
+if (n == 1)
+	printf("This chunk is defined in\n")
+else
+	printf("Multiple definitions occur in\n")
 for (j = 1; j <= n; j++) {
 	printf("%s", format_xref(name, j))
 	if (j == n-1)
@@ -3114,6 +3117,7 @@ suffices.
 @<GPL 3 Copyright statement@>
 
 # FIXME: Maybe make the Makefile depend on the .twjr file.
+# FIXME: Run xmllint on the xml file.
 
 SOURCE = texiwebjr.twjr
 TEXISOURCE = texiwebjr.texi
