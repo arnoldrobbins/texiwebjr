@@ -185,6 +185,7 @@ on top of the Texinfo document formatting markup language.
 * Concept Index::                  The concept index.
 
 @detailmenu
+* Lit prog and me::                Literate programming and me.
 * Audience::                       Who should read this @value{DOCUMENT}.
 * Overview::                       An overview of the @value{DOCUMENT}.
 * Conventions::                    Typographical conventions.
@@ -269,11 +270,41 @@ This @value{DOCUMENT} describes @value{TWJR}, a system that provides
 literate programming on top of the Texinfo markup language.
 
 @menu
+* Lit prog and me::             Literate programming and me.
 * Audience::                    Who should read this @value{DOCUMENT}.
 * Overview::                    An overview of the @value{DOCUMENT}.
 * Conventions::                 Typographical conventions.
 * Acknowledgements::            Acknowledgements.
 @end menu
+
+@node Lit prog and me
+@unnumberedsec Literate Programming and Me
+
+I am not sure when I first learned about literate programming.
+
+I do know that I was dabbling with it as early as sometime in the first
+half of 1998, since that is when I found and fixed a race condition in
+@command{noweb}'s @command{troff} backend.
+
+From October of 1999 through September of 2001, I did some consulting
+work for Mike Brennan, the author of @command{mawk} and a good friend.
+We used Mike's @command{mweb} system@footnote{As I recall it, sometime
+earlier I had pointed him at literate programming.  While I was dabbling
+with @command{noweb}, Mike went off and wrote his own system!} for
+the work, which naturally used weave and tangle processors written in
+@command{mawk}, and a custom set of @TeX{} macros.  This was certainly
+the largest body of literate code I have written to date.
+(At this point, I don't recall the details of @command{mweb}, but
+undoubtedly it was an influence for @value{TWJR}) @c no period!
+
+In April of 2003, I used @command{noweb} to rewrite the input record
+handling of @command{gawk}, considerably simplifying it in the process. To
+this day, there have been very few bugs in it, and it certainly qualifies
+as ``golden code.''
+
+Alas, though. I've done very little literate programming since, until now.
+I hope that this will be the start of a new phase for me, where I can write
+code that will be appealing to read and enjoyable to write.
 
 @node Audience
 @unnumberedsec Intended Audience

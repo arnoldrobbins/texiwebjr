@@ -1,3 +1,9 @@
+2013-12-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Add a section on literate programming and me,
+	including a description of Mike Brennan's mweb. Thanks to Mike
+	for pointing this out.
+
 2013-12-04         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Improve code definition list prose. Add another
