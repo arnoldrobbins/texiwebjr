@@ -2439,6 +2439,7 @@ formatting the names of the referenced chunks, and
 closing off the environment.
 
 @<Print the chunk body@> =
+# print "@need 750"	# try to get at least first two lines together
 @<Print the anchor@>
 @<Convert the lines for @TeX{}@>
 @<Format chunk names and reassemble output lines@>

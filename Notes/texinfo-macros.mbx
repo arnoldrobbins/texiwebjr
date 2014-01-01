@@ -1,0 +1,161 @@
+From karl@freefriends.org  Thu Nov 28 21:27:47 2013
+Return-Path: <karl@freefriends.org>
+Received: from skeeve.com (skeeve.com [127.0.0.1])
+	by skeeve.com (8.14.4/8.14.4/Debian-2ubuntu2.1) with ESMTP id rASJR40A010794
+	for <arnold@localhost>; Thu, 28 Nov 2013 21:27:47 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	frenzy.freefriends.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00
+	autolearn=ham version=3.3.1
+X-Envelope-From: karl@freefriends.org
+X-Envelope-To: <arnold@skeeve.com>
+Received: from frenzy.freefriends.org [66.54.153.139]
+	by skeeve.com with IMAP (fetchmail-6.3.21)
+	for <arnold@localhost> (single-drop); Thu, 28 Nov 2013 21:27:47 +0200 (IST)
+Received: from freefriends.org (localhost [127.0.0.1])
+	by freefriends.org (8.14.6/8.14.6) with ESMTP id rAQIXPHe028752
+	for <arnold@skeeve.com>; Tue, 26 Nov 2013 11:33:26 -0700
+Received: (from nobody@localhost)
+	by freefriends.org (8.14.6/8.14.6/submit) id rAQIXP5C028751;
+	Tue, 26 Nov 2013 18:33:25 GMT
+Date: Tue, 26 Nov 2013 18:33:25 GMT
+Message-Id: <201311261833.rAQIXP5C028751@freefriends.org>
+X-Authentication-Warning: frenzy.freefriends.org: nobody set sender to karl@freefriends.org using -f
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="Oc7O1UE6Me"
+Content-Transfer-Encoding: 7bit
+From: karl@freefriends.org (Karl Berry)
+To: arnold@skeeve.com
+Subject: url style, colors
+Status: RO
+
+
+--Oc7O1UE6Me
+Content-Type: text/plain; charset=us-ascii
+Content-Description: message body text
+Content-Transfer-Encoding: 7bit
+
+Hi Arnold,
+
+I committed a new texinfo.tex (also attached) which always uses the
+"DVI" style for @uref and always prints in black.  If one actually wants
+color, e.g.,
+@tex
+\gdef\urlcolor{1 0 0}% red
+\gdef\linkcolor{0 0 1}% blue
+@end tex
+
+I'll test and document that in a bit, but just thought you might want to
+try the code before I push it out.
+
+Thanks,
+k
+
+
+--Oc7O1UE6Me
+Content-Type: application/octet-stream
+Content-Disposition: attachment;
+	filename="texinfo.tex.gz"
+Content-Transfer-Encoding: base64
+
+
+--Oc7O1UE6Me--
+
+From karl@freefriends.org  Fri Nov 29 13:00:50 2013
+Return-Path: <karl@freefriends.org>
+Received: from skeeve.com (skeeve.com [127.0.0.1])
+	by skeeve.com (8.14.4/8.14.4/Debian-2ubuntu2.1) with ESMTP id rATB0YSD002477
+	for <arnold@localhost>; Fri, 29 Nov 2013 13:00:50 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	frenzy.freefriends.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00
+	autolearn=ham version=3.3.1
+X-Envelope-From: karl@freefriends.org
+X-Envelope-To: <arnold@skeeve.com>
+Received: from frenzy.freefriends.org [66.54.153.139]
+	by skeeve.com with IMAP (fetchmail-6.3.21)
+	for <arnold@localhost> (single-drop); Fri, 29 Nov 2013 13:00:50 +0200 (IST)
+Received: from freefriends.org (localhost [127.0.0.1])
+	by freefriends.org (8.14.6/8.14.6) with ESMTP id rASN1XGl007315
+	for <arnold@skeeve.com>; Thu, 28 Nov 2013 16:01:33 -0700
+Received: (from nobody@localhost)
+	by freefriends.org (8.14.6/8.14.6/submit) id rASN1XVf007314;
+	Thu, 28 Nov 2013 23:01:33 GMT
+Date: Thu, 28 Nov 2013 23:01:33 GMT
+Message-Id: <201311282301.rASN1XVf007314@freefriends.org>
+X-Authentication-Warning: frenzy.freefriends.org: nobody set sender to karl@freefriends.org using -f
+From: karl@freefriends.org (Karl Berry)
+To: arnold@skeeve.com
+Subject: Re: url style, colors
+In-Reply-To: <201311280815.rAS8F1uL002576@freefriends.org>
+Status: RO
+
+    So there's no way to get the embedded link style anymore?
+
+There's another "secret" option for that.
+@tex
+\global\urefurlonlylinktrue
+@end tex
+
+    Happy Thanksgiving,
+
+You too :).
+
+k
+
+From karl@freefriends.org  Thu Dec 19 23:02:55 2013
+Return-Path: <karl@freefriends.org>
+Received: from skeeve.com (skeeve.com [127.0.0.1])
+	by skeeve.com (8.14.4/8.14.4/Debian-2ubuntu2.1) with ESMTP id rBJL2naH002762
+	for <arnold@localhost>; Thu, 19 Dec 2013 23:02:54 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	frenzy.freefriends.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00
+	autolearn=ham version=3.3.1
+X-Envelope-From: karl@freefriends.org
+X-Envelope-To: <arnold@skeeve.com>
+Received: from frenzy.freefriends.org [66.54.153.139]
+	by skeeve.com with IMAP (fetchmail-6.3.21)
+	for <arnold@localhost> (single-drop); Thu, 19 Dec 2013 23:02:54 +0200 (IST)
+Received: from freefriends.org (localhost [127.0.0.1])
+	by freefriends.org (8.14.6/8.14.6) with ESMTP id rBIL8HQi023109
+	for <arnold@skeeve.com>; Wed, 18 Dec 2013 14:08:17 -0700
+Received: (from nobody@localhost)
+	by freefriends.org (8.14.6/8.14.6/submit) id rBIL8Hpp023108;
+	Wed, 18 Dec 2013 21:08:17 GMT
+Date: Wed, 18 Dec 2013 21:08:17 GMT
+Message-Id: <201312182108.rBIL8Hpp023108@freefriends.org>
+X-Authentication-Warning: frenzy.freefriends.org: nobody set sender to karl@freefriends.org using -f
+From: karl@freefriends.org (Karl Berry)
+To: arnold@skeeve.com
+Subject: Re: how to use @need?
+In-Reply-To: <201312182020.rBIKKIbm012579@skeeve.com>
+Status: R
+
+    Is there an easy way to translate "mils" into "lines"? 
+
+Nothing's easy, exactly, but you could do @showthe@baselineskip to see
+the line spacing and then do the multiplication.
+E.g., if the line spacing is 12pt, that's 1/6 in, so
+2 lines = 1/3 inch = 333 mil?  
+(Depends on if you're using @smallbook, @fontsize, etc.)
+
+    "I need at least the following N lines to
+    be kept together and not broken across a page".
+    
+@group?
+
+    Mils (1/1000 of an inch?) seems a funny unit to have to work in.
+
+It's completely bogus IMHO.  Chassell invented it back in the early
+days, for no good reason that I know of.
+
+However, since @need (and @group) are relatively rarely used, and even
+less actually needed, I'm not so inclined to worry about improving the
+units.
+
+k
+

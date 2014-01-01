@@ -1,0 +1,67 @@
+From bwk@cs.princeton.edu  Thu Nov 28 21:28:14 2013
+Return-Path: <bwk@cs.princeton.edu>
+Received: from skeeve.com (skeeve.com [127.0.0.1])
+	by skeeve.com (8.14.4/8.14.4/Debian-2ubuntu2.1) with ESMTP id rASJR40U010794
+	for <arnold@localhost>; Thu, 28 Nov 2013 21:28:13 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	frenzy.freefriends.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RP_MATCHES_RCVD autolearn=ham version=3.3.1
+X-Envelope-From: bwk@cs.princeton.edu
+X-Envelope-To: <arnold@skeeve.com>
+Received: from frenzy.freefriends.org [66.54.153.139]
+	by skeeve.com with IMAP (fetchmail-6.3.21)
+	for <arnold@localhost> (single-drop); Thu, 28 Nov 2013 21:28:13 +0200 (IST)
+Received: from redflag.CS.Princeton.EDU (redflag.CS.Princeton.EDU [128.112.136.72])
+	by freefriends.org (8.14.6/8.14.6) with ESMTP id rARGLX16032198
+	for <arnold@skeeve.com>; Wed, 27 Nov 2013 09:21:36 -0700
+Received: from tux.CS.Princeton.EDU (tux.CS.Princeton.EDU [128.112.155.166])
+	(authenticated bits=0)
+	by redflag.CS.Princeton.EDU (8.13.8/8.13.8) with ESMTP id rARGLWoP023709
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT)
+	for <arnold@skeeve.com>; Wed, 27 Nov 2013 11:21:32 -0500
+Date: Wed, 27 Nov 2013 11:21:32 -0500 (EST)
+From: Brian Kernighan <bwk@cs.princeton.edu>
+To: arnold@skeeve.com
+Subject: Re: a simple style question
+In-Reply-To: <201311271242.rARCgUgK019666@freefriends.org>
+Message-ID: <alpine.LRH.2.02.1311271118120.10325@tux.cs.princeton.edu>
+References: <201311271242.rARCgUgK019666@freefriends.org>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Status: RO
+
+It's pretty unwise to take my answer as authoritative.  I can't
+find anything specific in either the Chicago Manual of Style nor
+Words Into Type (my two reference sources for such matters), but
+examples in the latter suggest that the second form (comma before
+superscript) is the right one.  I also looked at some legal documents,
+and they too put the reference after the punctuation.  In the absence
+of actual knowledge, that's what I would go with.
+
+Brian
+
+On Wed, 27 Nov 2013, arnold@skeeve.com wrote:
+
+> Writing style, not coding style.
+>
+> Should footnote numbers be inside or outside punctuation, such as
+> periods or commas?
+>
+> 	This is great[1],
+> or
+> 	Ths is great,[1]
+>
+>
+> where [1] represents the small elevated footnote number in typeset
+> material.
+>
+> I have some documents where I need to make this consistent...
+>
+> Much thanks,
+>
+> Arnold
+>
+
