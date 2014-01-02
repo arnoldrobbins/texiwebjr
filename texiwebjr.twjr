@@ -12,7 +12,7 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH December, 2013
+@set UPDATE-MONTH January, 2014
 @set EDITION 0.5
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
@@ -92,19 +92,19 @@ ISRAEL
 Email: <email>arnold@@skeeve.com</email>
 URL: <ulink url="http://www.skeeve.com/">http://www.skeeve.com/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2013
+<literallayout class="normal">Copyright &copy; 2013, 2014
 Arnold David Robbins
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2013 @*
+Copyright @copyright{} 2013, 2014 @*
 Arnold David Robbins @*
 All Rights Reserved.
 @end ifnotdocbook
 @sp 1
 The @command{jrtangle} and @command{jrweave} programs are copyright
-@copyright{} 2013 by Arnold David Robbins. They are published under
+@copyright{} 2013, 2014 by Arnold David Robbins. They are published under
 the conditions of the GNU General Public License, version 3.
 @sp 1
 The explanatory text provided in this document may be reproduced verbatim
@@ -157,7 +157,9 @@ URL: @url{http://www.skeeve.com/} @*
 @oddheading  @strong{@thischapter} @| @| @thispage
 @end iftex
 
-@ifinfo
+@ifnottex
+@ifnotdocbook
+@ifnotxml
 @node Top
 @top General Introduction
 @c Preface node should come right after the Top
@@ -168,7 +170,9 @@ This file documents @value{TWJR}, a program suite for Literate Programming
 on top of the Texinfo document formatting markup language.
 
 @insertcopying
-@end ifinfo
+@end ifnotxml
+@end ifnotdocbook
+@end ifnottex
 
 @menu
 * Preface::                        Preface.
@@ -280,22 +284,24 @@ literate programming on top of the Texinfo markup language.
 @node Lit prog and me
 @unnumberedsec Literate Programming and Me
 
-I am not sure when I first learned about literate programming.
+I probably first encountered literate programming in Jon Bentley's
+@cite{Programming Pearls} columns in CACM in the mid-1980s. Sometime
+later I found and read Knuth's book on the subject (@pxref{Bibliography}).
 
 I do know that I was dabbling with it as early as sometime in the first
 half of 1998, since that is when I found and fixed a race condition in
 @command{noweb}'s @command{troff} backend.
 
-From October of 1999 through September of 2001, I did some consulting
-work for Mike Brennan, the author of @command{mawk} and a good friend.
-We used Mike's @command{mweb} system@footnote{As I recall it, sometime
-earlier I had pointed him at literate programming.  While I was dabbling
-with @command{noweb}, Mike went off and wrote his own system!} for
-the work, which naturally used weave and tangle processors written in
-@command{mawk}, and a custom set of @TeX{} macros.  This was certainly
-the largest body of literate code I have written to date.
-(At this point, I don't recall the details of @command{mweb}, but
-undoubtedly it was an influence for @value{TWJR}) @c no period!
+From October of 1999 through September of 2001, I did some consulting work
+for Mike Brennan, the author of @command{mawk} and a good friend.  We used
+Mike's @command{mweb} system@footnote{As I recall it, sometime earlier I
+had pointed him at literate programming. He created his @command{mweb} in
+1994.} for the work. @command{mweb} used @command{notangle} for tangling,
+along with @command{markup} from @command{noweb} with a backend written
+(of course) in @command{mawk}, and a custom set of @TeX{} macros.
+This was certainly the largest body of literate code I have written
+to date.  (At this point, I don't recall the details of @command{mweb},
+but undoubtedly it was an influence for @value{TWJR}) @c no period!
 
 In April of 2003, I used @command{noweb} to rewrite the input record
 handling of @command{gawk}, considerably simplifying it in the process. To
@@ -555,6 +561,7 @@ several stages in a pipeline and a documented intermediate format,
 making it easily extensible.  It is the ``minimal additional markup''
 aspect of @command{noweb} that I find particular appealing.
 
+@cindex TexiWeb literate programmng tool
 TexiWeb was created by Ben Pfaff for writing his
 @uref{http://adtinfo.org/, AVL library}.
 It builds on the Texinfo markup language, which at first glance is
@@ -593,8 +600,8 @@ Knuth's @command{WEB} provided @command{TANGLE}, which created a straight
 Pascal program.  The @command{noweb} suite has @command{notangle}.
 
 The @value{TWJR} tangling program is called @command{jrtangle}.  It reads
-a @value{TWJR} document and produces the source files for running or
-compiling.
+a @value{TWJR} document and produces the source files defined therein for
+running or compiling.
 @end table
 
 By convention, @value{TWJR} files have a @file{.twjr} extension.
@@ -736,7 +743,7 @@ your system if it's not correct.
 @
 
 As a general note, @command{jrtangle} and @command{jrweave} need features
-introduced in @command{gawk} 4.0; earlier versions will not work.
+introduced in @command{gawk} 4.0; @emph{earlier versions will not work}.
 
 The common chunks and functions are described later in this @value{CHAPTER}.
 However, we define one of them now, so that the license comes
@@ -764,8 +771,8 @@ each one ignores what the other one passes through.
 The following code is straightforward. We see here the first instance
 of any global variables: @code{Line_numbers}. Instead of having lots
 of different global variables, they are grouped by function into
-associative arrays.  Here we see @code{Line_numbers["@@ifweave"]}
-and @code{Line_numbers["@@iftangle"]} to help in error checking. If an
+associative arrays.  Here we see @code{Line_numbers["ifweave"]}
+and @code{Line_numbers["iftangle"]} to help in error checking. If an
 @code{@@ifweave} block is encountered while @command{jrtangle} thinks
 it's processing an @code{@@iftangle} block, then something got messed
 up somewhere.  Note also the convention that global variables start with
@@ -862,20 +869,14 @@ to add more stuff to a definition. We just use @samp{=} and figure it
 out. File and code chunks end with a single @samp{@@} on a line by itself,
 with the @samp{@@} in column 1.
 
-Instead of using a range pattern, we use a boolean flag; this lets us
-avoid special-casing the first and last lines.  The code checks that
-we're not already gathering a chunk; if we are someone left off a trailing
-@samp{@@} somewhere. The @code{check_unfinished()} function checks other
-possible things that may have gone wrong.
+@code{File_chunk_pattern} describes the regexp for matching the first
+line of a file chunk. It is a variable since it needs to be used for
+matching and with @code{gensub()}. This is better than repeating the
+regexp in the code.
 
-@vindex @code{Debug} variable
-@vindex variable, @code{Debug}
-@cindex debugging, @code{Debug} variable
-The check against @code{Debug} uses a nice trick. By using
-@command{gawk}'s @option{-v} option, we can set @code{Debug} to any value,
-such as @code{"filename code"} and debug as many different aspects of
-the program simultaneously as we might want.  Use of the @command{gawk}
-built-in debugger also helps considerably.
+@<Definition of @code{File_chunk_pattern}@> =
+File_chunk_pattern = "^@\\(([^)]+)@\\)[[:space:]]*=[[:space:]]*$"
+@
 
 It turns out that file chunk processing has some common bits
 for both @command{jrtangle} and @command{jrweave}.
@@ -898,10 +899,26 @@ Debug_pat = "filename"
 @<Common chunk initial processing@>
 @
 
+Instead of using a range pattern, we use a boolean flag; this lets us
+avoid special-casing the first and last lines.
+
 @vindex @code{Flags} variable
 @vindex variable, @code{Flags}
+The code checks that
+we're not already gathering a chunk; if we are, someone left off a trailing
+@samp{@@} somewhere. The @code{check_unfinished()} function also checks other
+possible things that may have gone wrong.
 Similar to @code{Line_numbers}, @code{Flags} is a global array of
 flags (boolean values) indexed by strings indicating what we're doing.
+
+@vindex @code{Debug} variable
+@vindex variable, @code{Debug}
+@cindex debugging, @code{Debug} variable
+The check against @code{Debug} uses a nice trick. By using
+@command{gawk}'s @option{-v} option, we can set @code{Debug} to any value,
+such as @code{"filename code"} and debug as many different aspects of
+the program simultaneously as we might want.  Use of the @command{gawk}
+built-in debugger also helps considerably.
 
 @<Common chunk initial processing@> =
 new_chunk = gensub(Pattern, "\\1", 1)
@@ -920,9 +937,7 @@ if (Debug ~ Debug_pat)
 	printf("saw new %s %s\n", Debug_pat, Current_chunk) > "/dev/stderr"
 @
 
-The @code{BEGIN} block sets up some constants. @code{File_chunk_pattern}
-is a variable since it needs to be used for matching and with
-@code{gensub()}. This is better than repeating the regexp in the code.
+The @code{BEGIN} block sets up some constants.
 
 @<Common Chunks@>=
 BEGIN {
@@ -935,7 +950,7 @@ And here is the first set of constants:
 @<Constants used by @command{jrtangle} and @command{jrweave}@> =
 TRUE = 1
 FALSE = 0
-File_chunk_pattern = "^@\\(([^)]+)@\\)[[:space:]]*=[[:space:]]*$"
+@<Definition of @code{File_chunk_pattern}@>
 @
 
 @node jrtangle finish chunk collection
@@ -971,6 +986,8 @@ across @command{jrtangle} and @samp{jrweave}.
 	next
 }
 @
+
+@c ============== Start here - needs reorg
 
 @node jrtangle collecting chunk lines
 @subsection Collecting Chunk Lines
@@ -1124,7 +1141,7 @@ needed just for @command{jrtangle}.
 
 Checking for unfinished chunks is the same for both @command{jrtangle}
 and @command{jrweave}. This is the first of the shared helper functions,
-@code{check_unfinished()}.
+@code{check_unfinished()}.  We will see more functions later.
 
 @findex @code{check_unfinished()} function
 @<Helper Functions@> =
@@ -3238,7 +3255,7 @@ What you see is the final product; it evolved during development.
 Unfortunately, there is no good way to present, in a static document
 like this one, the dynamics of the software development, and to show
 how the program changed as it grew.@footnote{The morbidly curious can
-grow grovelling through the history in the @command{git} repository.
+go grovelling through the history in the @command{git} repository.
 However, I'm not sure that's a good use of anyone's time.} The best I
 can do is make some appropriate notes in the prose in the right places;
 e.g., that chunks are stored without the final newline.
@@ -3341,10 +3358,10 @@ differences (that is, typos) in chunk names. Neither program is
 very robust about this right now.
 @end itemize
 
-One thing I noted during development: Copy--paste development causes problems.
-The original operations for file chunks and code chunks were similar but not identical.
-This made it hard to get the code right and eventually led to a large refactoring
-of the whole business (file + code)
+One thing I noted during development: Copy--paste development causes
+problems.  The original operations for file chunks and code chunks were
+similar but not identical.  This made it hard to get the code right and
+eventually led to a large refactoring of the whole business (file + code)
 @iftex
 @math{\times}
 @end iftex

@@ -1,3 +1,9 @@
+2014-01-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: A fair amount of general edits, including making
+	it work with current makeinfo for HTML.
+	* template.twjr: New file.
+
 2014-01-01         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Add a placeholder for dealing with @need.
