@@ -1,8 +1,10 @@
 2014-01-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: A fair amount of general edits, including making
-	it work with current makeinfo for HTML.
+	it work with current makeinfo for HTML. Update copyright years
+	everywhere.
 	* template.twjr: New file.
+	* LICENSE: Update copyright years.
 
 2014-01-01         Arnold D. Robbins     <arnold@skeeve.com>
 

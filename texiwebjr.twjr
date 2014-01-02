@@ -1780,7 +1780,7 @@ and @command{jrweave}.
 @use_smallexample
 @<GPL 3 Copyright statement@>=
 #
-# Copyright (C) 2013 Arnold David Robbins
+# Copyright (C) 2013, 2014 Arnold David Robbins
 # 
 # This file is part of TexiWeb Jr., a literate programming system.
 # 
