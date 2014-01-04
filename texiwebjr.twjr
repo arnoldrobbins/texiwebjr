@@ -296,8 +296,9 @@ From October of 1999 through September of 2001, I did some consulting work
 for Mike Brennan, the author of @command{mawk} and a good friend.  We used
 Mike's @command{mweb} system@footnote{As I recall it, sometime earlier I
 had pointed him at literate programming. He created his @command{mweb} in
-1994.} for the work. @command{mweb} used @command{notangle} for tangling,
-along with @command{markup} from @command{noweb} with a backend written
+1996.} for the work. @command{mweb} used @command{notangle} for tangling.
+For weaving, it used
+@command{markup} from @command{noweb} with a backend written
 (of course) in @command{mawk}, and a custom set of @TeX{} macros.
 This was certainly the largest body of literate code I have written
 to date.  (At this point, I don't recall the details of @command{mweb},
