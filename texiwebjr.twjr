@@ -987,8 +987,6 @@ across @command{jrtangle} and @samp{jrweave}.
 }
 @
 
-@c ============== Start here - needs reorg
-
 @node jrtangle collecting chunk lines
 @subsection Collecting Chunk Lines
 
@@ -2456,11 +2454,26 @@ formatting the names of the referenced chunks, and
 closing off the environment.
 
 @<Print the chunk body@> =
-# print "@need 750"	# try to get at least first two lines together
+@<Try to keep at least the first two lines of the chunk together@>
 @<Print the anchor@>
 @<Convert the lines for @TeX{}@>
 @<Format chunk names and reassemble output lines@>
 @<Print the complete chunk@>
+@
+
+For aesthetic purposes, it would be good to keep at least the first
+two lines of the chunk together.  The Texinfo command to do this
+is @code{@@need}, which takes an argument in ``mils''---thousandths of
+an inch.
+
+So, how many thousandths of an inch do two lines take? Karl Berry advised
+to try using @samp{@@showthe@@baselineskip}.  The result is 13.2 points.
+There are 72 points in an inch, so one line is 13.2 divided by 72 = 0.183
+inches.  Multiply that by two, and we get 0.367 inches.  We round that
+up to a slightly larger number in the hopes that this will actually work:
+
+@<Try to keep at least the first two lines of the chunk together@> =
+print "@need 400"
 @
 
 Formatting the anchor is handled by a separate function which

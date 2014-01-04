@@ -1,3 +1,8 @@
+2014-01-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Add code to compute and do an @need
+	before each chunk.
+
 2014-01-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: A fair amount of general edits, including making
