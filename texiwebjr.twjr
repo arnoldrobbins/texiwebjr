@@ -293,7 +293,9 @@ half of 1998, since that is when I found and fixed a race condition in
 @command{noweb}'s @command{troff} backend.
 
 From October of 1999 through September of 2001, I did some consulting work
-for Mike Brennan, the author of @command{mawk} and a good friend.  We used
+for Mike Brennan, the author of
+@uref{http://www.invisible-island.net/mawk, @command{mawk}}
+and a good friend.  We used
 Mike's @command{mweb} system@footnote{As I recall it, sometime earlier I
 had pointed him at literate programming. He created his @command{mweb} in
 1996.} for the work. @command{mweb} used @command{notangle} for tangling.
@@ -3574,6 +3576,13 @@ Of course, it would be nice if I were to follow through by setting
 @item Multidimensional Arrays
 Here too, the standard syntax could be made to work, by contorting
 the code slightly. However, the multidimensional arrays are cleaner.
+
+@item @code{length(@var{array})}
+In at least one place, we use the minor extension that
+@code{length(@var{array})} returns the number of elements in the
+array.  Both Brian Kernighan's @command{awk} and current versions of
+@command{mawk} support this feature. I don't think it has yet made its
+way into POSIX, though.
 @end table
 
 @node Bibliography
