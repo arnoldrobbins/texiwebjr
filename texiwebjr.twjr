@@ -691,13 +691,6 @@ and @dfn{code chunks}. Each starts with the name of the chunk in special
 bracketing sequences, and continues until a line with just a single
 @samp{@@} sign on it.
 
-@quotation NOTE
-Due to the implementation of @command{jrweave}, file chunks and code
-chunks share the same ``name space,'' meaning that you will
-cause severe confusion if you attempt to use the same name
-as a source file name and as a code chunk name.
-@end quotation
-
 @table @code
 @item @@(@var{filename}@@) =
 Start or add to the definition of @var{filename}'s contents.
@@ -705,6 +698,13 @@ Start or add to the definition of @var{filename}'s contents.
 @item @@<@var{chunkname}@@> =
 Start or add to the definition of a code chunk named @var{chunkname}.
 @end table
+
+@quotation NOTE
+Due to the implementation of @command{jrweave}, file chunks and code
+chunks share the same ``name space,'' meaning that you will
+cause severe confusion if you attempt to use the same name
+as a source file name and as a code chunk name.
+@end quotation
 
 @menu
 * jrtangle header::             Getting Started.
@@ -766,6 +766,7 @@ should be used only for one operation or the other.  Note that these
 have to be done differently for @command{jrtangle} and @command{jrweave};
 each one ignores what the other one passes through.
 
+@page
 @(jrtangle@) =
 @<Handle @code{ifweave} and @code{iftangle} for @code{jrtangle}@>
 @
@@ -965,6 +966,7 @@ code chunks.  Since we are manually simulating a range pattern, this
 code chunks. Otherwise the collection never stops!@footnote{Guess
 how I discovered that one@enddots{} Duh.}
 
+@page
 @<Process file chunks for @code{jrtangle}@>=
 @<Handle terminating at-sign for file and code chunks@>
 @
@@ -2323,7 +2325,7 @@ Pass == 2 && /^@end[[:space:]]+sidebar[[:space:]]*$/ {
 	next
 }
 
-Pass == 2 && Collecting_sidebar == 1 {
+Pass == 2 && Collecting_sidebar {
 	Sidebar_body = Sidebar_body "\n" $0
 	next
 }
@@ -2483,6 +2485,7 @@ Formatting the anchor is handled by a separate function which
 we'll see later. The output is the anchor, the formatted chunk
 name and the opening @code{@@example} or @code{@@smallexample}.
 
+@page
 @<Print the anchor@> =
 anchor = format_anchor(Current_chunk, Chunk_info[Current_chunk]["defn"])
 printf("%s\n", anchor)
@@ -2764,7 +2767,7 @@ print "@end table"
 @node jrweave print code refs
 @subsection  Printing Code References
 
-Printing code references is the flip side of printing code references.
+Printing code references is the flip side of printing code definitions.
 
 @(jrweave@) =
 @<Handle @code{@@print_code_refs}@>
@@ -2808,6 +2811,8 @@ for (i = 1; i in Sorted_code_names; i++) {
 }
 print "@end table"
 @
+
+Here is how we collect the information.
 
 @<Collect chunk reference information@> =
 xref = format_xref(Current_chunk, Chunk_info[Current_chunk]["defn"])
@@ -3225,8 +3230,7 @@ style client.
 git clone https://github.com/arnoldrobbins/texiwebjr
 cd texiwebjr
 ./bootstrapping/jrtangle0 texiwebjr.twjr
-./jrweave texiwebjr.twjr > texiwebjr.texi
-./bootstrapping/makepdf0
+make
 @end example
 
 When you're done, you will have @command{jrweave}, @command{jrtangle} and
