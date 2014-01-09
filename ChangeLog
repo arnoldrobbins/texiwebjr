@@ -1,3 +1,9 @@
+2014-01-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr: New commands: @dquotexrefs, @pdflinkcolor,
+	@urllinkcolor, @hideurls.
+	* texinfo.tex: Updated.
+
 2014-01-05         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Add mark URL. Add an additional gawk extension.

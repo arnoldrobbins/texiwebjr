@@ -6,6 +6,14 @@
 @settitle TexiWeb Jr.---A Super Simple Literate Programming System
 @c %**end of header (This is for running Texinfo on a region.)
 
+@c Change how xref titles are quoted.
+@dquotexrefs
+@ifclear FORPRINT
+@pdflinkcolor
+@urllinkcolor
+@hideurls
+@end ifclear
+
 @xrefautomaticsectiontitle on
 
 @c The following information should be updated here only!
@@ -13,7 +21,7 @@
 
 @c These apply across the board.
 @set UPDATE-MONTH January, 2014
-@set EDITION 0.5
+@set EDITION 0.6
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -224,6 +232,7 @@ on top of the Texinfo document formatting markup language.
 * jrweave language additions::     Extra stuff for authors.
 * jrweave additional macros::      Macros for writing documents.
 * jrweave sidebars::               Providing sidebars.
+* jrweave @TeX{} control::         Addiional features for @TeX{}.
 * jrweave file chunks::            Collecting and formatting file chunks.
 * jrweave code chunks::            Collecting and formatting code chunks.
 * jrweave print setup recipe::     Printing the initial setup recipe.
@@ -2188,6 +2197,7 @@ work.
 @menu
 * jrweave additional macros::   Macros for writing documents.
 * jrweave sidebars::            Providing sidebars.
+* jrweave @TeX{} control::      Addiional features for @TeX{}.
 @end menu
 
 @node jrweave additional macros
@@ -2338,6 +2348,145 @@ and to make sure that the @command{jrweave} code works.
 And here is a second paragraph, to show that (in Texninfo) the first
 paragraph of a sidebar is not indented, whereas subsequent ones are.
 @end sidebar
+
+@node jrweave @TeX{} control
+@subsection Addiional Features for @TeX{}
+
+There are some additional changes that make the output from @TeX{}
+a little bit nicer.  We'll explain them as we go along.
+
+@quotation CAUTION
+All of the features in the @value{SUBSECTION} depend upon the
+macros in @file{texinfo.tex}.  If they change in an imcompatible way,
+these features may break or become impossible to continue to maintain.
+Use them with care!
+@end quotation
+
+@<Texinfo authoring additions@>=
+@<Change cross-reference quoting@>
+@<Change PDF internal link color@>
+@<Set URL formatting@>
+@
+
+I happen to dislike the way chapter and section titles are quoted in
+cross-references in @TeX{} output.  You can change to use double-quoted
+titles with the @samp{@@dquotexrefs} command:
+
+@<Change cross-reference quoting@> =
+Pass == 2 && /^@dquotexrefs[[:space:]]*$/ {
+	print "@tex"
+#	print "%\\gdef\\xrefprintnodename#1{{\\it #1}}"
+	print "\\gdef\\xrefprintnodename#1{``#1''}"
+	print "@end tex"
+
+	next
+}
+@
+
+@noindent
+The commented-out @code{print} statement shows an alternative that I
+experimented with, to italicize titles, but then the formatting doesn't
+look quite as good.
+
+Texinfo is slightly schizophrenic in relation to output from @TeX{}.
+In particular, PDF provides the ability to have @dfn{links}, both within the
+document and to external URLs.  In a PDF viewer, clicking on an internal
+link takes you to the target, whereas clicking on a URL starts a web browser.
+Previously, when a Texinfo file was processed with pdf@TeX{},
+both cross-references and URLs were formatted as PDF links, in
+a different color.
+
+On the other hand, regular DVI output is aimed more for printing.
+Thus, when run with regular @TeX{}, Texinfo documents showed URLs
+inline in the text, and cross references were printed in black.
+
+It is important to note that PDF files can also be used as the master for printing.
+In such a case, you @emph{don't} cross-references in a different color
+and you do want URLs to appear in the text.
+
+Because of this,
+in November 2013, @file{texinfo.tex} was changed to use the DVI
+style of printing for both cross-references and URLs. However, facilities
+were documented for enabling the previous behavior should you wish
+to do so.
+
+The following set of new commands makes it easy to enable these
+features if you wish.  Use:
+
+@example
+@@pdflinkcolor @r{[} @var{red green blue} @r{]}
+@end example
+
+This sets the color for internal links.  Here, @var{red}, @var{green}
+and @var{blue} are values between zero and one (inclusive) to indicate
+how much of each color to use in creating the final color.
+The default is the previous value used by @file{texinfo.tex},
+called ``dark red'': 0.50 red, 0.09 green, and 0.12 blue.
+
+@(jrweave@) =
+BEGIN {
+	Dark_red = "0.5 0.09 0.12"
+}
+@
+
+@<Change PDF internal link color@> =
+Pass == 2 && /^@pdflinkcolor[[:space:]]*.*$/ {
+	if (NF != 1 && NF != 4)
+		fatal(_"@pdflinkcolor: either no arguments or three arguments required")
+
+	if (NF == 1)
+		Link_color = Dark_red
+	else {
+		$1 = ""
+		$0 = $0
+		Link_color = $0
+	}
+
+	print "@tex"
+	print "\\gdef\\linkcolor{" Link_color "}"
+	print "@end tex"
+	
+	next
+}
+@
+
+Similar to internal links, you can set the color of URL links.
+They are independant of each other. The command here is @samp{@@urllinkcolor}:
+
+@<Set URL formatting@> =
+Pass == 2 && /^@urllinkcolor[[:space:]]*.*$/ {
+	if (NF != 1 && NF != 4)
+		fatal(_"@urllinkcolor: either no arguments or three arguments required")
+
+	if (NF == 1)
+		URL_color = Dark_red
+	else {
+		$1 = ""
+		$0 = $0
+		URL_color = $0
+	}
+
+	print "@tex"
+	print "\\gdef\\urlcolor{" URL_color "}"
+	print "@end tex"
+	
+	next
+}
+@
+
+Besides setting the color for URLs, you can control whether the text of
+a URL should appear in the document text, or not. By default, it does
+appear.  To make it disappear, use @samp{@@hideurls}:
+
+@<Set URL formatting@> =
+Pass == 2 && /^@hideurls[[:space:]]*$/ {
+	print "@tex"
+	print "\\global\\urefurlonlylinktrue"	# NOTE: *not* \gdef
+	print "@end tex"
+	
+	next
+}
+@
 
 @node jrweave chunk indexes
 @section Creating Indices For Chunks
@@ -3264,7 +3413,7 @@ cd gawk-4.1.0
 
 @cindex Kernighan, Brian W.@:
 At this point, we can stop and look at what we've accomplished. Together
-@command{jrtangle} and @command{jrweave} comprise around 1,150 lines of
+@command{jrtangle} and @command{jrweave} comprise around 1,200 lines of
 code.  That's a substantial amount of @command{awk}.@footnote{Especially
 as Brian Kernighan keeps insisting that two lines is the optimal size
 for an @command{awk} program!} Nonetheless, I think that the literate
@@ -3411,6 +3560,11 @@ Start or add to the definition of @var{filename}'s contents.
 Start or add to the definition of a code chunk named @var{chunkname}.
 @xref{jrtangle code chunks}, and @ref{jrweave code chunks}.
 
+@item @@dquotexrefs
+In @TeX{} output, change cross references to enclose chapter
+and section titles in double quotes instead of in square
+brackets.
+
 @item @@EMAIL@{@var{real}, @var{spelled}@}
 Use @var{spelled} as the email address for HTML output.
 Use @var{real} as the email address for anything else.
@@ -3430,6 +3584,11 @@ This should be system level (``shell'') code.
 @item @@FIXME@{@var{text}@}
 Add a ``FIXME'' note to the text for use during writing.
 @xref{jrweave additional macros}.
+
+@item @@hideurls
+In @TeX{} output, URLs from @code{@@url} and @code{@@uref}
+are formatted as links, instead of being placed into
+the body of the text.
 
 @item @@iftangle @r{@dots{}} @@end iftangle
 Pass the enclosed lines through when tangling and delete
@@ -3451,6 +3610,12 @@ creates any files. @xref{jrtangle before everything}.
 Set @var{number} in @TeX{}'s @code{\oldstyle} font. This
 is for use by @command{jrweave}, and not directly
 by the author of a document.
+
+@item @@pdflinkcolor @r{[} @var{red green blue} @r{]}
+In @TeX{} output, links within the document (such as
+cross references) show up in the color defined by
+@var{red}, @var{green}, and @var{blue}.
+If not provided, ``dark red'' is used.
 
 @item @@post_create @var{filename} @var{command to run}
 Arrange to run @var{command to run} after @var{filename}
@@ -3480,6 +3645,12 @@ Create a sidebar named @var{title}.
 For DocBook output, create a real @code{<sidebar>} element.
 For anything else, fake it using Texinfo's @code{@@cartouche}
 environment.  @xref{jrweave sidebars}.
+
+@item @@urllinkcolor @r{[} @var{red green blue} @r{]}
+In @TeX{} output, URLs from @code{@@url} and @code{@@uref}
+formatted as links show up in the color defined by
+@var{red}, @var{green}, and @var{blue}.
+If not provided, ``dark red'' is used.
 
 @item @@use_example
 After occurrences of this command, code is formatted
