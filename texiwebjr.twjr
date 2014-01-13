@@ -1957,11 +1957,23 @@ referenced before it is defined; in fact this is usually the case.
 This raises a difficulty; @command{jrweave} cannot print a chunk
 with its associated number if it hasn't yet seen its definition.
 
-The solution to this problem is to use a two-pass design. In the
+It is also traditional, for each chunk, to print a list of other
+places where the chunk is defined, and where the chunk is used.
+Mike Brennan suggests that furthermore, it is worthwhile to print
+a list of sites where the chunks referenced by the current chunk
+are defined.
+
+The way to accomplish all this is to use a two-pass design. In the
 first pass @command{jrweave} collects information about each
 unique file and each unique code chunk, assigning numbers as it
 goes.  In the second pass it prints the file, formatting file
-and code chunk names appropriately.
+and code chunk names appropriately, and writing out the various
+cross references.
+
+Things are complicated somewhat by the fact
+that Texinfo only gives us anchors and cross references, without
+access to just the pages numbers where something occurs.
+So, we'll do our best.
 
 We start with the @samp{#!} header and the copyright statement,
 and then proceed to arrange to perform two passes over the input.
@@ -1974,16 +1986,21 @@ and then proceed to arrange to perform two passes over the input.
 @<Pass 2 debugging@>
 @
 
+In order to allow very large documents split into multiple
+files, we copy the full list over.
+
 @<Set up two passes@> =
 BEGIN {
-	if (ARGC != 2)
-		fatal(_"usage: jrweave file.twjr\n")
+	if (ARGC < 2)
+		fatal(_"usage: jrweave file.twjr [...]\n")
 
-	@<Disallow standard input for @command{jrweave}@>
 	Pass = 1
-	ARGV[2] = "Pass=2"
-	ARGV[3] = ARGV[1]
-	ARGC = 4
+	n = ARGC
+	ARGV[ARGC++] = "Pass=2"
+	for (i = 1; i < n; i++) {
+		@<Disallow standard input for @command{jrweave}@>
+		ARGV[ARGC++] = ARGV[i]
+	}
 }
 @
 
@@ -1991,7 +2008,7 @@ Because of the two-pass nature of the code, we can't
 accept standard input:
 
 @<Disallow standard input for @command{jrweave}@> =
-if (ARGV[1] == "-" || ARGV[1] == "/dev/stdin")
+if (ARGV[i] == "-" || ARGV[i] == "/dev/stdin")
 	fatal(_"jrweave: standard input not allowed\n")
 @
 
@@ -2184,8 +2201,8 @@ Pass == 2 && /^@use_example[[:space:]]*$/ {
 @
 
 @noindent
-@code{Example_start} and @code{Example_end} are then used throughout
-the rest of the program.
+We then use @code{Example_start} and @code{Example_end} throughout the
+rest of the program.
 
 @node jrweave language additions
 @section Additions For Writing Documents
@@ -2233,7 +2250,7 @@ Pass == 2 && /^@titlepage/ {
 For HTML output, we want to be able to provide an email address
 as something like ``arnold AT skeeve.com'' in order to avoid
 address harvesters and receiving even more spam. To that end
-the document can use @samp{@@EMAIL@{arnold@@skeeve.com, arnold AT skeeve.com@}}
+the document can use @samp{@@EMAIL@{arnold@@@@skeeve.com, arnold AT skeeve.com@}}
 and things will happen the way we want them to.
 
 @cindex @code{@@EMAIL} macro, @command{jrweave}
@@ -2345,7 +2362,7 @@ Pass == 2 && Collecting_sidebar {
 This is a test sidebar, just to show what one looks like,
 and to make sure that the @command{jrweave} code works.
 
-And here is a second paragraph, to show that (in Texninfo) the first
+And here is a second paragraph, to show that (in Texinfo) the first
 paragraph of a sidebar is not indented, whereas subsequent ones are.
 @end sidebar
 
@@ -2389,26 +2406,25 @@ experimented with, to italicize titles, but then the formatting doesn't
 look quite as good.
 
 Texinfo is slightly schizophrenic in relation to output from @TeX{}.
-In particular, PDF provides the ability to have @dfn{links}, both within the
-document and to external URLs.  In a PDF viewer, clicking on an internal
-link takes you to the target, whereas clicking on a URL starts a web browser.
-Previously, when a Texinfo file was processed with pdf@TeX{},
-both cross-references and URLs were formatted as PDF links, in
-a different color.
+In particular, PDF provides the ability to have @dfn{links}, both
+within the document and to external URLs.  In a PDF viewer, clicking
+on an internal link takes you to the target, whereas clicking on a URL
+starts a web browser.  Previously, when a Texinfo file was processed with
+pdf@TeX{}, both cross-references and URLs were formatted as PDF links,
+in a different color.
 
-On the other hand, regular DVI output is aimed more for printing.
-Thus, when run with regular @TeX{}, Texinfo documents showed URLs
-inline in the text, and cross references were printed in black.
+On the other hand, regular DVI output is aimed more for printing.  Thus,
+when run with regular @TeX{}, Texinfo documents showed URLs inline in
+the text, and cross references were printed in black.
 
-It is important to note that PDF files can also be used as the master for printing.
-In such a case, you @emph{don't} cross-references in a different color
-and you do want URLs to appear in the text.
+It is important to note that PDF files can also be used as the master
+for printing.  In such a case, you @emph{don't} want cross-references
+in a different color and you do want URLs to appear in the text.
 
-Because of this,
-in November 2013, @file{texinfo.tex} was changed to use the DVI
-style of printing for both cross-references and URLs. However, facilities
-were documented for enabling the previous behavior should you wish
-to do so.
+Because of this, in November 2013, @file{texinfo.tex} was changed to use
+the DVI printing style for both cross-references and URLs. However,
+facilities were documented for enabling the previous behavior should
+you wish to do so.
 
 The following set of new commands makes it easy to enable these
 features if you wish.  Use:
@@ -2445,7 +2461,7 @@ Pass == 2 && /^@pdflinkcolor[[:space:]]*.*$/ {
 	print "@tex"
 	print "\\gdef\\linkcolor{" Link_color "}"
 	print "@end tex"
-	
+
 	next
 }
 @
@@ -2469,7 +2485,7 @@ Pass == 2 && /^@urllinkcolor[[:space:]]*.*$/ {
 	print "@tex"
 	print "\\gdef\\urlcolor{" URL_color "}"
 	print "@end tex"
-	
+
 	next
 }
 @
@@ -2483,10 +2499,12 @@ Pass == 2 && /^@hideurls[[:space:]]*$/ {
 	print "@tex"
 	print "\\global\\urefurlonlylinktrue"	# NOTE: *not* \gdef
 	print "@end tex"
-	
+
 	next
 }
 @
+
+@c ============== start here to rework def/use tracking and printing.
 
 @node jrweave chunk indexes
 @section Creating Indices For Chunks
@@ -3453,17 +3471,6 @@ standard output. Perhaps instead the output file should be derived from
 the name of the input file with the same kind of ``did it change?'' checking
 being done by @command{jrweave}, instead of this having to be done in the
 @file{Makefile} (if at all).
-
-@item
-For very large programs, some kind of @code{@@include} preprocessing
-step may be needed.  If so, the code from @command{igawk} in the
-@command{gawk} distribution would be a good place to start.
-
-Alternatively, @code{jrtangle} as it stands now would work by simply
-listing multiple files in the right order on the command line;
-@command{jrweave} could be easily modified to adjust @code{ARGC} and
-@code{ARGV} to do a second pass over multiple files.  That is likely
-the simpler option.
 
 @item
 The generated list of file definitions, and of chunk definitions and references 
