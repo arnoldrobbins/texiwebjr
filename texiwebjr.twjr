@@ -232,7 +232,7 @@ on top of the Texinfo document formatting markup language.
 * jrweave language additions::     Extra stuff for authors.
 * jrweave additional macros::      Macros for writing documents.
 * jrweave sidebars::               Providing sidebars.
-* jrweave @TeX{} control::         Addiional features for @TeX{}.
+* jrweave @TeX{} control::         Additional features for @TeX{}.
 * jrweave file chunks::            Collecting and formatting file chunks.
 * jrweave code chunks::            Collecting and formatting code chunks.
 * jrweave print setup recipe::     Printing the initial setup recipe.
@@ -2197,7 +2197,7 @@ work.
 @menu
 * jrweave additional macros::   Macros for writing documents.
 * jrweave sidebars::            Providing sidebars.
-* jrweave @TeX{} control::      Addiional features for @TeX{}.
+* jrweave @TeX{} control::      Additional features for @TeX{}.
 @end menu
 
 @node jrweave additional macros
@@ -2350,7 +2350,7 @@ paragraph of a sidebar is not indented, whereas subsequent ones are.
 @end sidebar
 
 @node jrweave @TeX{} control
-@subsection Addiional Features for @TeX{}
+@subsection Additional Features for @TeX{}
 
 There are some additional changes that make the output from @TeX{}
 a little bit nicer.  We'll explain them as we go along.
@@ -2502,7 +2502,7 @@ The index names are @samp{cd} for ``chunk definition'' and
 It is up to the author of a document to either print the indices
 using a regular Texinfo @code{@@printindex} command or to merge
 them into one of the standard Texinfo indices.  I have taken
-the latter course. Towards the front I have
+the latter course. Towards the front of this @value{DOCUMENT} I have
 
 @example
 @@synindex cd cp
