@@ -2506,6 +2506,25 @@ Pass == 2 && /^@hideurls[[:space:]]*$/ {
 
 @c ============== start here to rework def/use tracking and printing.
 
+@node jrweave def/use tracking
+@section Tracking Definitions and Uses
+
+@quotation
+Stuff from Mike Brennan here
+@author Michael Brennan
+@end quotation
+
+As mentioned at the beginning of this @value{CHAPTER}, at the place
+where a chunk is defined (or added on to) we want to
+be able to present to the reader a list of where the chunk is used,
+where else it is defined, and the definition points for any other chunks
+it references.
+
+We start by collecting this information and tracking it.
+We collect the information during the first pass.
+
+@c ============== end here to rework def/use tracking and printing.
+
 @node jrweave chunk indexes
 @section Creating Indices For Chunks
 
