@@ -2516,12 +2516,19 @@ Stuff from Mike Brennan here
 
 As mentioned at the beginning of this @value{CHAPTER}, at the place
 where a chunk is defined (or added on to) we want to
-be able to present to the reader a list of where the chunk is used,
+be able to present to the reader a list of places where the chunk is used,
 where else it is defined, and the definition points for any other chunks
 it references.
 
 We start by collecting this information and tracking it.
 We collect the information during the first pass.
+
+Stuff we track:
+Chunk_info[Current_chunk]["type"] = Chunk_type
+Chunk_info[Current_chunk]["defn"]++
+Chunk_info[Current_chunk]["chunk number"] = \
+n = Chunk_info[name]["numrefs"]
+	printf("%s", Chunk_info[name]["refs"][j])	# will be an anchor
 
 @c ============== end here to rework def/use tracking and printing.
 
@@ -2601,8 +2608,6 @@ are so similar, they will share data structures, so that
 the expansion code needs to be written only once.
 
 @<Collect chunk information@>=
-# Create array for this chunk
-Chunk_info[Current_chunk][0]++
 if (Pass == 1) {
 	@<Store info for chunk@>
 } else
