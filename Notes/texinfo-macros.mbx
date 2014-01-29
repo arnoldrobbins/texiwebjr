@@ -133,7 +133,7 @@ From: karl@freefriends.org (Karl Berry)
 To: arnold@skeeve.com
 Subject: Re: how to use @need?
 In-Reply-To: <201312182020.rBIKKIbm012579@skeeve.com>
-Status: R
+Status: RO
 
     Is there an easy way to translate "mils" into "lines"? 
 
@@ -158,4 +158,210 @@ less actually needed, I'm not so inclined to worry about improving the
 units.
 
 k
+
+From karl@freefriends.org  Thu Jan  9 05:49:49 2014
+Return-Path: <karl@freefriends.org>
+Received: from skeeve.com (skeeve.com [127.0.0.1])
+	by skeeve.com (8.14.4/8.14.4/Debian-2ubuntu2.1) with ESMTP id s093niF0006561
+	for <arnold@localhost>; Thu, 9 Jan 2014 05:49:49 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	frenzy.freefriends.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00
+	autolearn=ham version=3.3.1
+X-Envelope-From: karl@freefriends.org
+X-Envelope-To: <arnold@skeeve.com>
+Received: from frenzy.freefriends.org [66.54.153.139]
+	by skeeve.com with IMAP (fetchmail-6.3.21)
+	for <arnold@localhost> (single-drop); Thu, 09 Jan 2014 05:49:49 +0200 (IST)
+Received: from freefriends.org (localhost [127.0.0.1])
+	by freefriends.org (8.14.6/8.14.6) with ESMTP id s08MGDgc016117
+	for <arnold@skeeve.com>; Wed, 8 Jan 2014 15:16:13 -0700
+Received: (from nobody@localhost)
+	by freefriends.org (8.14.6/8.14.6/submit) id s08MGDeA016116;
+	Wed, 8 Jan 2014 22:16:13 GMT
+Date: Wed, 8 Jan 2014 22:16:13 GMT
+Message-Id: <201401082216.s08MGDeA016116@freefriends.org>
+X-Authentication-Warning: frenzy.freefriends.org: nobody set sender to karl@freefriends.org using -f
+From: karl@freefriends.org (Karl Berry)
+To: arnold@skeeve.com
+Subject: Re: texinfo thought....
+In-Reply-To: <201401081222.s08CMhwQ016505@freefriends.org>
+Status: RO
+
+    Is there a way to get control of the total text of an internal link?
+
+No.  Sorry.
+
+I suppose it could be done.  If you want to try, the macro for cross ref
+output is \xrefX.  It would be similar to the way I put
+\ifurefurlonlylink into \urefbreakfinish for @url.  I just can't deal
+with it any time soon.
+
+k
+
+From aharon.robbins@intel.com  Sun Jan 12 19:45:34 2014
+Return-Path: <aharon.robbins@intel.com>
+Received: from skeeve.com (skeeve.com [127.0.0.1])
+	by skeeve.com (8.14.4/8.14.4/Debian-2ubuntu2.1) with ESMTP id s0CHjDDg004511
+	for <arnold@localhost>; Sun, 12 Jan 2014 19:45:33 +0200
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	frenzy.freefriends.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,HTML_MESSAGE,
+	RCVD_IN_DNSWL_HI,RP_MATCHES_RCVD autolearn=ham version=3.3.1
+X-Envelope-From: aharon.robbins@intel.com
+X-Envelope-To: <arnold@skeeve.com>
+Received: from frenzy.freefriends.org [66.54.153.139]
+	by skeeve.com with IMAP (fetchmail-6.3.21)
+	for <arnold@localhost> (single-drop); Sun, 12 Jan 2014 19:45:33 +0200 (IST)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+	by freefriends.org (8.14.6/8.14.6) with ESMTP id s0CDvgVS023086
+	for <arnold@skeeve.com>; Sun, 12 Jan 2014 06:57:45 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP; 12 Jan 2014 05:57:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="4.95,647,1384329600"; 
+   d="scan'208,217";a="463906915"
+Received: from fmsmsx105.amr.corp.intel.com ([10.19.9.36])
+  by fmsmga002.fm.intel.com with ESMTP; 12 Jan 2014 05:57:41 -0800
+Received: from FMSMSX110.amr.corp.intel.com (10.18.116.10) by
+ FMSMSX105.amr.corp.intel.com (10.19.9.36) with Microsoft SMTP Server (TLS) id
+ 14.3.123.3; Sun, 12 Jan 2014 05:57:40 -0800
+Received: from hasmsx152.ger.corp.intel.com (10.184.195.15) by
+ fmsmsx110.amr.corp.intel.com (10.18.116.10) with Microsoft SMTP Server (TLS)
+ id 14.3.123.3; Sun, 12 Jan 2014 05:57:41 -0800
+Received: from hasmsx105.ger.corp.intel.com ([169.254.1.235]) by
+ HASMSX152.ger.corp.intel.com ([169.254.3.66]) with mapi id 14.03.0123.003;
+ Sun, 12 Jan 2014 15:57:39 +0200
+From: "Robbins, Aharon" <aharon.robbins@intel.com>
+To: "Aharon Robbins (arnold@skeeve.com)" <arnold@skeeve.com>
+Subject: smaller fonts
+Thread-Topic: smaller fonts
+Thread-Index: Ac8Pnj4YrECOJtgSTK2Vbc0yJD+hvQ==
+Date: Sun, 12 Jan 2014 13:57:38 +0000
+Message-ID: <E29EA7F8F823E941A1E6EFBF1425792A3882883C@HASMSX105.ger.corp.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.184.70.12]
+Content-Type: multipart/alternative;
+	boundary="_000_E29EA7F8F823E941A1E6EFBF1425792A3882883CHASMSX105gercor_"
+MIME-Version: 1.0
+Status: RO
+
+--_000_E29EA7F8F823E941A1E6EFBF1425792A3882883CHASMSX105gercor_
+Content-Type: text/plain; charset="windows-1255"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+
+U29tZSB0ZXh0LgpAc21hbGxmb250cyBAcm0KU29tZSBzbWFsbGVyIHRleHQuCkB0ZXh0Zm9udHMg
+QHJtClNvbWUgYmlnZ2VyIHRleHQuCgpBaGFyb24gKEFybm9sZCkgUm9iYmlucwpJU0RDIC8gVlBH
+LCBKZXJ1c2FsZW0sIElzcmFlbApFbWFpbDogUGljayBvbmU6ICBBaGFyb24uUm9iYmluc0BpbnRl
+bC5jb208bWFpbHRvOkFoYXJvbi5Sb2JiaW5zQGludGVsLmNvbT4gICBvciBBcm5vbGQuUm9iYmlu
+c0BpbnRlbC5jb208bWFpbHRvOkFybm9sZC5Sb2JiaW5zQGludGVsLmNvbT4KTGlua3M6ICBNeSBJ
+bnRlbCBCbG9nPGh0dHA6Ly9zb2Z0d2FyZS5pbnRlbC5jb20vZW4tdXMvYmxvZ3MvYXV0aG9yL2Fo
+YXJvbi1yb2JiaW5zPiAgIE15IFBlcnNvbmFsIEhvbWUgUGFnZTxodHRwOi8vd3d3LnNrZWV2ZS5j
+b20vPiAgVW5peCAvIExpbnV4IEJvb2tzIEkndmUgV3JpdHRlbiAodmlhIEFtYXpvbi5jb20pPGh0
+dHA6Ly93d3cuYW1hem9uLmNvbS9Bcm5vbGQtUm9iYmlucy9lL0IwMDFJR0xWVjIvcmVmPWVwX3Nw
+cmtsX2F0X0IwMDFJR0xWVjI/cGZfcmRfcD00NzgyNjk2OTEmcGZfcmRfcz1hdXRvLXNwYXJrbGUm
+cGZfcmRfdD0zMDEmcGZfcmRfaT1Bcm5vbGQlMjBSb2JiaW5zJnBmX3JkX209QVRWUERLSUtYMERF
+UiZwZl9yZF9yPTFCSEdIR1FUQkc0UkIzSlNOQVBaPiAgTXkgTGlua2VkIEluIFByb2ZpbGU8aHR0
+cDovL3d3dy5saW5rZWRpbi5jb20vaW4vYXJub2xkcm9iYmlucz4KQ3VycmVudCBGYXZvcml0ZSBR
+dW90ZTogWyBJbiBMaW51eCBlc3Mgdm9sdCBuaXNodCBnZXNjaGVpbiBdICjh7Onw5ffxIObkIOzg
+IOTp5CD35fjkKSAg4OnvIOzp8OX38SDy8SDl5eDs6CDw6fnoIOLy+enp7woKLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+CkludGVsIElzcmFlbCAoNzQpIExpbWl0ZWQKClRoaXMgZS1tYWlsIGFuZCBhbnkgYXR0YWNobWVu
+dHMgbWF5IGNvbnRhaW4gY29uZmlkZW50aWFsIG1hdGVyaWFsIGZvcgp0aGUgc29sZSB1c2Ugb2Yg
+dGhlIGludGVuZGVkIHJlY2lwaWVudChzKS4gQW55IHJldmlldyBvciBkaXN0cmlidXRpb24KYnkg
+b3RoZXJzIGlzIHN0cmljdGx5IHByb2hpYml0ZWQuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRl
+ZApyZWNpcGllbnQsIHBsZWFzZSBjb250YWN0IHRoZSBzZW5kZXIgYW5kIGRlbGV0ZSBhbGwgY29w
+aWVzLgo=
+
+--_000_E29EA7F8F823E941A1E6EFBF1425792A3882883CHASMSX105gercor_
+Content-Type: text/html; charset="windows-1255"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+
+PGh0bWwgeG1sbnM6dj0idXJuOnNjaGVtYXMtbWljcm9zb2Z0LWNvbTp2bWwiIHhtbG5zOm89InVy
+bjpzY2hlbWFzLW1pY3Jvc29mdC1jb206b2ZmaWNlOm9mZmljZSIgeG1sbnM6dz0idXJuOnNjaGVt
+YXMtbWljcm9zb2Z0LWNvbTpvZmZpY2U6d29yZCIgeG1sbnM6bT0iaHR0cDovL3NjaGVtYXMubWlj
+cm9zb2Z0LmNvbS9vZmZpY2UvMjAwNC8xMi9vbW1sIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv
+VFIvUkVDLWh0bWw0MCI+CjxoZWFkPgo8bWV0YSBodHRwLWVxdWl2PSJDb250ZW50LVR5cGUiIGNv
+bnRlbnQ9InRleHQvaHRtbDsgY2hhcnNldD13aW5kb3dzLTEyNTUiPgo8bWV0YSBuYW1lPSJHZW5l
+cmF0b3IiIGNvbnRlbnQ9Ik1pY3Jvc29mdCBXb3JkIDE0IChmaWx0ZXJlZCBtZWRpdW0pIj4KPHN0
+eWxlPjwhLS0KLyogRm9udCBEZWZpbml0aW9ucyAqLwpAZm9udC1mYWNlCgl7Zm9udC1mYW1pbHk6
+Q2FsaWJyaTsKCXBhbm9zZS0xOjIgMTUgNSAyIDIgMiA0IDMgMiA0O30KLyogU3R5bGUgRGVmaW5p
+dGlvbnMgKi8KcC5Nc29Ob3JtYWwsIGxpLk1zb05vcm1hbCwgZGl2Lk1zb05vcm1hbAoJe21hcmdp
+bjowaW47CgltYXJnaW4tYm90dG9tOi4wMDAxcHQ7Cglmb250LXNpemU6MTEuMHB0OwoJZm9udC1m
+YW1pbHk6IkNhbGlicmkiLCJzYW5zLXNlcmlmIjt9CmE6bGluaywgc3Bhbi5Nc29IeXBlcmxpbmsK
+CXttc28tc3R5bGUtcHJpb3JpdHk6OTk7Cgljb2xvcjpibHVlOwoJdGV4dC1kZWNvcmF0aW9uOnVu
+ZGVybGluZTt9CmE6dmlzaXRlZCwgc3Bhbi5Nc29IeXBlcmxpbmtGb2xsb3dlZAoJe21zby1zdHls
+ZS1wcmlvcml0eTo5OTsKCWNvbG9yOnB1cnBsZTsKCXRleHQtZGVjb3JhdGlvbjp1bmRlcmxpbmU7
+fQpzcGFuLkVtYWlsU3R5bGUxNwoJe21zby1zdHlsZS10eXBlOnBlcnNvbmFsLWNvbXBvc2U7Cglm
+b250LWZhbWlseToiQ2FsaWJyaSIsInNhbnMtc2VyaWYiOwoJY29sb3I6d2luZG93dGV4dDt9Ci5N
+c29DaHBEZWZhdWx0Cgl7bXNvLXN0eWxlLXR5cGU6ZXhwb3J0LW9ubHk7Cglmb250LWZhbWlseToi
+Q2FsaWJyaSIsInNhbnMtc2VyaWYiO30KQHBhZ2UgV29yZFNlY3Rpb24xCgl7c2l6ZTo4LjVpbiAx
+MS4waW47CgltYXJnaW46MS4waW4gMS4yNWluIDEuMGluIDEuMjVpbjt9CmRpdi5Xb3JkU2VjdGlv
+bjEKCXtwYWdlOldvcmRTZWN0aW9uMTt9Ci0tPjwvc3R5bGU+PCEtLVtpZiBndGUgbXNvIDldPjx4
+bWw+CjxvOnNoYXBlZGVmYXVsdHMgdjpleHQ9ImVkaXQiIHNwaWRtYXg9IjEwMjYiIC8+CjwveG1s
+PjwhW2VuZGlmXS0tPjwhLS1baWYgZ3RlIG1zbyA5XT48eG1sPgo8bzpzaGFwZWxheW91dCB2OmV4
+dD0iZWRpdCI+CjxvOmlkbWFwIHY6ZXh0PSJlZGl0IiBkYXRhPSIxIiAvPgo8L286c2hhcGVsYXlv
+dXQ+PC94bWw+PCFbZW5kaWZdLS0+CjwvaGVhZD4KPGJvZHkgbGFuZz0iRU4tVVMiIGxpbms9ImJs
+dWUiIHZsaW5rPSJwdXJwbGUiPgo8ZGl2IGNsYXNzPSJXb3JkU2VjdGlvbjEiPgo8cCBjbGFzcz0i
+TXNvTm9ybWFsIj5Tb21lIHRleHQuPG86cD48L286cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwi
+PkBzbWFsbGZvbnRzIEBybTxvOnA+PC9vOnA+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj5Tb21l
+IHNtYWxsZXIgdGV4dC48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+QHRleHRm
+b250cyBAcm08bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+U29tZSBiaWdnZXIg
+dGV4dC48bzpwPjwvbzpwPjwvcD4KPHAgY2xhc3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286
+cD48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5B
+aGFyb24gKEFybm9sZCkgUm9iYmluczxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xhc3M9Ik1z
+b05vcm1hbCI+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPklTREMgLyBWUEcsIEplcnVzYWxl
+bSwgSXNyYWVsPG86cD48L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3Bh
+biBzdHlsZT0iY29sb3I6IzFGNDk3RCI+RW1haWw6IFBpY2sgb25lOiZuYnNwOyA8YSBocmVmPSJt
+YWlsdG86QWhhcm9uLlJvYmJpbnNAaW50ZWwuY29tIj4KPHNwYW4gc3R5bGU9ImNvbG9yOmJsdWUi
+PkFoYXJvbi5Sb2JiaW5zQGludGVsLmNvbTwvc3Bhbj48L2E+Jm5ic3A7Jm5ic3A7IG9yIDxhIGhy
+ZWY9Im1haWx0bzpBcm5vbGQuUm9iYmluc0BpbnRlbC5jb20iPgo8c3BhbiBzdHlsZT0iY29sb3I6
+Ymx1ZSI+QXJub2xkLlJvYmJpbnNAaW50ZWwuY29tPC9zcGFuPjwvYT48bzpwPjwvbzpwPjwvc3Bh
+bj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjojMUY0OTdEIj5M
+aW5rczombmJzcDsgPGEgaHJlZj0iaHR0cDovL3NvZnR3YXJlLmludGVsLmNvbS9lbi11cy9ibG9n
+cy9hdXRob3IvYWhhcm9uLXJvYmJpbnMiPgo8c3BhbiBzdHlsZT0iY29sb3I6Ymx1ZSI+TXkgSW50
+ZWwgQmxvZzwvc3Bhbj48L2E+Jm5ic3A7Jm5ic3A7IDxhIGhyZWY9Imh0dHA6Ly93d3cuc2tlZXZl
+LmNvbS8iPgo8c3BhbiBzdHlsZT0iY29sb3I6Ymx1ZSI+TXkgUGVyc29uYWwgSG9tZSBQYWdlPC9z
+cGFuPjwvYT4mbmJzcDsgPGEgaHJlZj0iaHR0cDovL3d3dy5hbWF6b24uY29tL0Fybm9sZC1Sb2Ji
+aW5zL2UvQjAwMUlHTFZWMi9yZWY9ZXBfc3Bya2xfYXRfQjAwMUlHTFZWMj9wZl9yZF9wPTQ3ODI2
+OTY5MSZhbXA7cGZfcmRfcz1hdXRvLXNwYXJrbGUmYW1wO3BmX3JkX3Q9MzAxJmFtcDtwZl9yZF9p
+PUFybm9sZCUyMFJvYmJpbnMmYW1wO3BmX3JkX209QVRWUERLSUtYMERFUiZhbXA7cGZfcmRfcj0x
+QkhHSEdRVEJHNFJCM0pTTkFQWiI+CjxzcGFuIHN0eWxlPSJjb2xvcjpibHVlIj5Vbml4IC8gTGlu
+dXggQm9va3MgSSd2ZSBXcml0dGVuICh2aWEgQW1hem9uLmNvbSk8L3NwYW4+PC9hPiZuYnNwOwo8
+YSBocmVmPSJodHRwOi8vd3d3LmxpbmtlZGluLmNvbS9pbi9hcm5vbGRyb2JiaW5zIj48c3BhbiBz
+dHlsZT0iY29sb3I6Ymx1ZSI+TXkgTGlua2VkIEluIFByb2ZpbGU8L3NwYW4+PC9hPgo8bzpwPjwv
+bzpwPjwvc3Bhbj48L3A+CjxwIGNsYXNzPSJNc29Ob3JtYWwiPjxzcGFuIHN0eWxlPSJjb2xvcjoj
+MUY0OTdEIj5DdXJyZW50IEZhdm9yaXRlIFF1b3RlOiBbIEluIExpbnV4IGVzcyB2b2x0IG5pc2h0
+IGdlc2NoZWluIF0KPC9zcGFuPjxzcGFuIGRpcj0iUlRMIj48L3NwYW4+PHNwYW4gZGlyPSJSVEwi
+Pjwvc3Bhbj48c3BhbiBsYW5nPSJIRSIgZGlyPSJSVEwiIHN0eWxlPSJmb250LWZhbWlseTomcXVv
+dDtUaW1lcyBOZXcgUm9tYW4mcXVvdDssJnF1b3Q7c2VyaWYmcXVvdDs7Y29sb3I6IzFGNDk3RCI+
+PHNwYW4gZGlyPSJSVEwiPjwvc3Bhbj48c3BhbiBkaXI9IlJUTCI+PC9zcGFuPijh7Onw5ffxIObk
+IOzgIOTp5CD35fjkKQo8L3NwYW4+PHNwYW4gZGlyPSJMVFIiPjwvc3Bhbj48c3BhbiBkaXI9IkxU
+UiI+PC9zcGFuPjxzcGFuIGxhbmc9IkhFIiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+PHNwYW4gZGly
+PSJMVFIiPjwvc3Bhbj48c3BhbiBkaXI9IkxUUiI+PC9zcGFuPiZuYnNwOzwvc3Bhbj48c3BhbiBs
+YW5nPSJIRSIgZGlyPSJSVEwiIHN0eWxlPSJmb250LWZhbWlseTomcXVvdDtUaW1lcyBOZXcgUm9t
+YW4mcXVvdDssJnF1b3Q7c2VyaWYmcXVvdDs7Y29sb3I6IzFGNDk3RCI+4OnvIOzp8OX38SDy8SDl
+5eDs6CDw6fnoIOLy+enp7zwvc3Bhbj48c3BhbiBzdHlsZT0iY29sb3I6IzFGNDk3RCI+PG86cD48
+L286cD48L3NwYW4+PC9wPgo8cCBjbGFzcz0iTXNvTm9ybWFsIj48c3BhbiBkaXI9IlJUTCI+PC9z
+cGFuPjxzcGFuIGRpcj0iUlRMIj48L3NwYW4+PHNwYW4gZGlyPSJSVEwiIHN0eWxlPSJmb250LWZh
+bWlseTomcXVvdDtBcmlhbCZxdW90OywmcXVvdDtzYW5zLXNlcmlmJnF1b3Q7O2NvbG9yOiMxRjQ5
+N0QiPjxzcGFuIGRpcj0iUlRMIj48L3NwYW4+PHNwYW4gZGlyPSJSVEwiPjwvc3Bhbj48L3NwYW4+
+PHNwYW4gc3R5bGU9ImNvbG9yOiMxRjQ5N0QiPjxvOnA+PC9vOnA+PC9zcGFuPjwvcD4KPHAgY2xh
+c3M9Ik1zb05vcm1hbCI+PG86cD4mbmJzcDs8L286cD48L3A+CjwvZGl2Pgo8cD4tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS08YnI+CkludGVsIElzcmFlbCAoNzQpIExpbWl0ZWQ8L3A+Cgo8cD5UaGlzIGUtbWFpbCBhbmQg
+YW55IGF0dGFjaG1lbnRzIG1heSBjb250YWluIGNvbmZpZGVudGlhbCBtYXRlcmlhbCBmb3I8YnI+
+CnRoZSBzb2xlIHVzZSBvZiB0aGUgaW50ZW5kZWQgcmVjaXBpZW50KHMpLiBBbnkgcmV2aWV3IG9y
+IGRpc3RyaWJ1dGlvbjxicj4KYnkgb3RoZXJzIGlzIHN0cmljdGx5IHByb2hpYml0ZWQuIElmIHlv
+dSBhcmUgbm90IHRoZSBpbnRlbmRlZDxicj4KcmVjaXBpZW50LCBwbGVhc2UgY29udGFjdCB0aGUg
+c2VuZGVyIGFuZCBkZWxldGUgYWxsIGNvcGllcy48L3A+PC9ib2R5Pgo8L2h0bWw+Cg==
+
+--_000_E29EA7F8F823E941A1E6EFBF1425792A3882883CHASMSX105gercor_--
 
