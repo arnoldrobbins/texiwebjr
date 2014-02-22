@@ -107,8 +107,8 @@ Full name here @*
 All Rights Reserved.
 @end ifnotdocbook
 @sp 1
-The @command{jrtangle} and @command{jrweave} programs are copyright
-@copyright{} YYYY, YYYY by Full name here. They are published under
+The FOO program is copyright
+@copyright{} YYYY, YYYY by Full name here. It is published under
 the conditions of the GNU General Public License, version 3.
 @sp 1
 The explanatory text provided in this document may be reproduced verbatim
