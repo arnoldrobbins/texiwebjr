@@ -14,6 +14,11 @@
 @hideurls
 @end ifclear
 
+@c FIXME: Add a command to turn this on.
+@tex
+\global\usebracesinindexestrue
+@end tex
+
 @xrefautomaticsectiontitle on
 
 @c The following information should be updated here only!
@@ -2290,18 +2295,20 @@ numbering the code chunks.  We have to do this in two steps:
 first define a macro for @TeX{} itself, and then define a macro
 for use in the other formats, which will be just the number itself.
 
+Following advice from Karl Berry, we define the macro unconditionally
+and then redefine it just for @TeX{}.  This lets @file{texinfo.tex} be
+smarter about how it puts chunk names into the indexing.
+
 @cindex @code{@@oldnum} macro, @command{jrweave}
 @cindex macro, @command{jweave}, @code{@@oldnum}
 @<Macro for ``old style'' numbers@>=
-print "@tex"
-print "\\gdef\\oldnum#1{\\begingroup\\oldstyle #1\\endgroup}%"
-print "@end tex"
-print ""
-print "@ifnottex"
 print "@macro oldnum{value}"
 print "\\value\\"
 print "@end macro"
-print "@end ifnottex"
+print ""
+print "@tex"
+print "\\gdef\\oldnum#1{\\begingroup\\oldstyle #1\\endgroup}%"
+print "@end tex"
 @
 
 @node jrweave sidebars

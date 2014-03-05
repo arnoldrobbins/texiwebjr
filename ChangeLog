@@ -1,3 +1,10 @@
+2014-03-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Revise `oldnum' macro per advice from Karl
+	Berry. Switch on indexing that understands braces; requires
+	new texindex program written in awk by yours truly. This latter
+	needs to move into a TexiWebJR command.
+
 2014-02-22         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texindex.tex: Sync with current Texinfo SVN.
