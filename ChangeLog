@@ -1,3 +1,8 @@
+2014-03-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* template.twjr: Add printing of chunk definitions and references
+	at end.
+
 2014-03-05         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Revise `oldnum' macro per advice from Karl
