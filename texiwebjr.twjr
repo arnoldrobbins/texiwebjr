@@ -8,16 +8,13 @@
 
 @c Change how xref titles are quoted.
 @dquotexrefs
+@c And let braces in index entries work.
+@allowindexbraces
 @ifclear FORPRINT
 @pdflinkcolor
 @urllinkcolor
 @hideurls
 @end ifclear
-
-@c FIXME: Add a command to turn this on.
-@tex
-\global\usebracesinindexestrue
-@end tex
 
 @xrefautomaticsectiontitle on
 
@@ -2436,6 +2433,7 @@ Use them with care!
 @<Change cross-reference quoting@>
 @<Change PDF internal link color@>
 @<Set URL formatting@>
+@<Enable braces in index entries@>
 @
 
 I happen to dislike the way chapter and section titles are quoted in
@@ -2557,6 +2555,27 @@ Pass == 2 && /^@hideurls[[:space:]]*$/ {
 }
 @
 
+Until Texinfo 5.2, if open or close braces were the first real character
+in an index entry, they were indexed under @samp{|}, which comes between
+the brace characters in ASCII order.  This was largely due to how the
+@command{texindex} program worked; it required balanced braces in the
+input created for it by @file{texinfo.tex}.
+
+Early in 2014 I fixed this by rewriting @command{texindex} in
+@command{awk} (using @value{TWJR} to do so!)  and current versions of
+@file{texinfo.tex} allow enabling index entries where braces may be used.
+The @value{TWJR} command @code{@@allowindexbraces} enables this feature.
+
+@<Enable braces in index entries@> =
+Pass == 2 && /^@allowindexbraces[[:space:]]*$/ {
+	print "@tex"
+	print "\\global\\usebracesinindexestrue"	# NOTE: *not* \gdef
+	print "@end tex"
+
+	next
+}
+@
+
 @node jrweave chunk indexes
 @section Creating Indices For Chunks
 
@@ -2607,15 +2626,11 @@ Pass == 2 && /^@c %\*\*end of header/ {
 }
 @
 
-@FIXME{Consider grouping all the def / use stuff into a section and making
-the following few sections into subsections.}
-
-@c ####################################
-@c ## Insert rewritten material here ##
-@c ####################################
-
 @node jrweave def/use collecting
 @section Tracking Definitions and Uses
+
+@FIXME{Consider grouping all the def / use stuff into a section and making
+the following few sections into subsections.}
 
 @quotation
 A literate document defines a directed acyclic graph of code chunks.
@@ -2662,15 +2677,12 @@ We need to track the following:
 @table @asis
 @item Chunk type (@code{Chunk_info[Current_chunk]["type"]})
 File chunk or code chunk.
-@ignore
-@c FIXME: Put this back in.
 We assume (for now) that the list of file chunk
 definitions provide by
 @code{@@print_file_defs}
 (@pxref{jrweave file defs})
 is adequate, and that Mike's graph of chunks relates mainly to code chunks.
-@end ignore
-The value is either @code{"file"} or @code{"code"}.
+The value is either @code{"file chunk"} or @code{"code chunk"}.
 
 @item Chunk number (@code{Chunk_info[Current_chunk]["chunk number"]})
 This is mainly for aesthetics and tradition; in @value{TWJR} the chunk numbers
@@ -3633,6 +3645,13 @@ html: texiwebjr.html
 
 texiwebjr.html: $(TEXISOURCE)
 	makeinfo --no-split --html $(TEXISOURCE)
+
+clean:
+	rm -f texiwebjr.html texiwebjr.info texiwebjr.xml texiwebjr.texi texiwebjr.pdf
+	rm -fr texiwebjr.t2p
+
+distclean: clean
+	rm jrweave jrtangle Makefile
 @
 
 @node Downloading from git
@@ -3816,6 +3835,11 @@ Start or add to the definition of @var{filename}'s contents.
 @item @@<@var{chunkname}@@> =
 Start or add to the definition of a code chunk named @var{chunkname}.
 @xref{jrtangle code chunks}, and @ref{jrweave code chunks}.
+
+@item @@allowindexbraces
+Cause index entries that start with a brace to be correctly
+indexed under @samp{@{}.
+@xref{jrweave additional macros}.
 
 @item @@dquotexrefs
 In @TeX{} output, change cross references to enclose chapter

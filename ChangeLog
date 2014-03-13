@@ -9,6 +9,9 @@
 	Restored commands to build lists of file definitions, code
 	definitions and code references.
 
+	Add @allowindexbraces command. Add clean and distclean targets
+	to the Makefile.
+
 
 2014-03-10         Arnold D. Robbins     <arnold@skeeve.com>
 
