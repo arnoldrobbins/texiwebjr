@@ -25,8 +25,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH January, 2014
-@set EDITION 0.6
+@set UPDATE-MONTH March, 2014
+@set EDITION 0.7
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -780,7 +780,6 @@ should be used only for one operation or the other.  Note that these
 have to be done differently for @command{jrtangle} and @command{jrweave};
 each one ignores what the other one passes through.
 
-@page
 @(jrtangle@) =
 @<Handle @code{ifweave} and @code{iftangle} for @code{jrtangle}@>
 @
@@ -861,7 +860,8 @@ references to code chunks.
 @node jrtangle start chunk collection
 @subsection Starting File and Code Chunk Collection
 
-It turns out that because code chunks also include straight code mixed
+File chunks include straight code mixed with references to code chunks.
+It turns out that because code chunks @emph{also} include straight code mixed
 with references to code chunks, their processing is quite similar to
 that of file chunks.  After fully implementing @command{jrtangle} and
 almost fully implementing @command{jrweave}, it became clear that I was
@@ -906,7 +906,7 @@ $0 ~ File_chunk_pattern {
 }
 @
 
-In turn, the file processing shares code with the chunk processing by
+In turn, the file processing shares code with the code chunk processing by
 putting the appropriate values into variables used while collecting both
 kinds of chunks.
 
@@ -980,7 +980,6 @@ code chunks.  Since we are manually simulating a range pattern, this
 code chunks. Otherwise the collection never stops!@footnote{Guess
 how I discovered that one@enddots{} Duh.}
 
-@page
 @<Process file chunks for @code{jrtangle}@>=
 @<Handle terminating at-sign for file and code chunks@>
 @
@@ -1857,6 +1856,9 @@ function message(msg, format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
 {
 	printf("%s:%d: %s: " format, FILENAME, FNR, msg,
 		a1, a2, a3, a4, a5, a6, a7, a8, a9, a10) > "/dev/stderr"
+
+	if (substr(format, length(format), 1) != "\n")
+		printf("\n") > "/dev/stderr"
 }
 
 # fatal --- print a fatal error message and exit.
@@ -1923,7 +1925,7 @@ function dump_chunks(	i, format)
 @chapter Weaving: The @command{jrweave} Program
 
 Weaving a @value{TWJR} document is in fact the more challenging task.
-We want the output to look good, and we also want to keep track of
+We want the output to look good, and we want to keep track of
 where chunks are defined and referenced. In addition, we
 have to remove any lines that are just for @command{jrtangle},
 since Texinfo won't know what to do with them.
@@ -1933,16 +1935,15 @@ since Texinfo won't know what to do with them.
 * jrweave initial code::         Initial Stuff and Printing A Warning.
 * jrweave ifweave iftangle::     Text inclusion/exclusion for
                                  @command{jrweave}.
+* jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
 * jrweave choosing code size::   Choosing the code size.
 * jrweave language additions::   Extra stuff for authors.
+* jrweave print setup recipe::   Printing the initial setup recipe.
 * jrweave chunk indexes::        Create indices for chunk definition and
                                  references.
+* jrweave def/use collecting::   Collecting definition and use information.
 * jrweave file chunks::          Processing file chunks.
 * jrweave code chunks::          Processing code chunks.
-* jrweave print setup recipe::   Printing the initial setup recipe.
-* jrweave file defs::            Printing file definitions.
-* jrweave code defs and refs::   Printing code definitions and references.
-* jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
 * jrweave last bit::             Passing everything else through.
 * jrweave expanding tabs::       Expanding tabs.
 * jrweave helper functions::     Helper functions for @command{jrweave}.
@@ -1955,7 +1956,9 @@ The general tradition in literate programming documentation is that each
 unique chunk is numbered sequentially from 1, in the order that they are
 defined.  Even as chunks are added on to, they are referred to by the
 same number.  The numbering is managed by the weaving process; the author
-of a literate program does not have to manage this.
+of a literate program does not have to do it.
+@FIXME{We may removed this since it has no real added value
+for @value{TWJR}.}
 
 An important part of the literate style is that a code chunk may be
 referenced before it is defined; in fact this is usually the case.
@@ -1970,7 +1973,7 @@ are defined.
 
 The way to accomplish all this is to use a two-pass design. In the
 first pass @command{jrweave} collects information about each
-unique file and each unique code chunk, assigning numbers as it
+unique file chunk and each unique code chunk, assigning numbers as it
 goes.  In the second pass it prints the file, formatting file
 and code chunk names appropriately, and writing out the various
 cross references.
@@ -1991,6 +1994,10 @@ and then proceed to arrange to perform two passes over the input.
 @<Pass 2 debugging@>
 @
 
+We use the standard two-pass mechanism for an @command{awk}
+program, which is to insert a variable assignment into
+@code{ARGV} and to duplicate the list of input files in
+additional elements in @code{ARGV}.
 In order to allow very large documents split into multiple
 files, we copy the full list over.
 
@@ -2019,7 +2026,7 @@ if (ARGV[i] == "-" || ARGV[i] == "/dev/stdin")
 
 This rule serves as a place to set a breakpoint in the
 @command{gawk} debugger for when we start the second pass
-through the @value{TWJR} source file:
+through each @value{TWJR} source file:
 
 @<Pass 2 debugging@>=
 Pass == 2 && FNR == 1 && Debug ~ /pass2/ {
@@ -2031,7 +2038,7 @@ Pass == 2 && FNR == 1 && Debug ~ /pass2/ {
 @section Initial Stuff and Printing A Warning
 
 We print an initial header to remind the user @emph{not} to edit the
-generated Texinfo file, and then continue with the helper functions.
+generated Texinfo file.
 
 @(jrweave@) =
 @<Create ``do not edit'' warning@>
@@ -2045,6 +2052,9 @@ fancy, just for the fun of it.
 
 Printing the header is independent of the two-pass nature of the program
 and thus can be done from a @code{BEGIN} block.
+We have to fudge this a bit, since we are not
+listing all the input files, just the first one.
+@FIXME{Fix this one day.}
 
 @findex @code{print_do_not_edit()} function, @command{jrweave}
 @<Create ``do not edit'' warning@>=
@@ -2076,7 +2086,8 @@ on the left.
 
 @<Set warning text @code{s} and @code{t}, compute left and right padding @code{pl} and @code{pr}@> =
 t = _"DO NOT EDIT THIS FILE!!!!"
-s = sprintf(_"It was created by jrweave from `%s'.", ARGV[1])
+s = sprintf(_"It was created by jrweave from `%s' (or maybe others).",
+			ARGV[1])
 
 l = length(s)
 pl = (l - length(t)) / 2	# padding on left side
@@ -2161,6 +2172,38 @@ And without a lot of fanfare, here is the code:
 }
 @
 
+@node jrweave delete jrtangle code
+@section Removing Stuff For @command{jrtangle}
+
+As with any literate programming system, some commands are only for
+tangling, and others are only for weaving.  Although the tangle component
+only has to pull out source files and expand code, the weaving
+component has to also recognize commands for the tangling component,
+in order to keep them out of the document formatter's way.
+
+@(jrweave@) =
+@<Remove @code{jrtangle} commands for weaving@>
+@
+
+There are only three such commands, and all we have to
+do is skip over them with @code{next}.
+
+@cindex @code{@@file_update_recipe} command, @command{jrweave}
+@cindex @code{@@file_update} command, @command{jrweave}
+@cindex @code{@@post_create} command, @command{jrweave}
+@<Remove @code{jrtangle} commands for weaving@> =
+/^@file_update_recipe[[:space:]]*$/,
+		/^@end file_update_recipe[[:space:]]*$/ {
+	next
+}
+/^@file_update[[:space:]]/ {
+	next
+}
+/^@post_create[[:space:]]+/ {
+	next
+}
+@
+
 @node jrweave choosing code size
 @section Choosing The Code Size
 
@@ -2170,7 +2213,7 @@ sections and it is better to use @code{@@smallexample}.  The
 to use @code{@@smallexample} for all the file and code chunks.
 
 After some experimentation, it makes the most sense to make this
-be dynamic, allowing the author to switch things back
+be dynamic, allowing a documment author to switch things back
 and forth.  To that end there is also a @code{@@use_example}
 statement.
 
@@ -2291,13 +2334,12 @@ print "@end macro"
 @
 
 Finally, we want to use @TeX{}'s ``old style'' numbers for
-numbering the code chunks.  We have to do this in two steps:
-first define a macro for @TeX{} itself, and then define a macro
-for use in the other formats, which will be just the number itself.
-
+numbering the code chunks.
 Following advice from Karl Berry, we define the macro unconditionally
 and then redefine it just for @TeX{}.  This lets @file{texinfo.tex} be
 smarter about how it puts chunk names into the indexing.
+The unconditional macro will take effect
+in the other formats; the result will be just the number itself.
 
 @cindex @code{@@oldnum} macro, @command{jrweave}
 @cindex macro, @command{jweave}, @code{@@oldnum}
@@ -2381,7 +2423,7 @@ a little bit nicer.  We'll explain them as we go along.
 
 @quotation CAUTION
 All of the features in the @value{SUBSECTION} depend upon the
-macros in @file{texinfo.tex}.  If they change in an imcompatible way,
+macros in @file{texinfo.tex}.  If they change in an incompatible way,
 these features may break or become impossible to continue to maintain.
 Use them with care!
 @end quotation
@@ -2394,7 +2436,7 @@ Use them with care!
 
 I happen to dislike the way chapter and section titles are quoted in
 cross-references in @TeX{} output.  You can change to use double-quoted
-titles with the @samp{@@dquotexrefs} command:
+titles with the @code{@@dquotexrefs} command:
 
 @<Change cross-reference quoting@> =
 Pass == 2 && /^@dquotexrefs[[:space:]]*$/ {
@@ -2434,7 +2476,7 @@ facilities were documented for enabling the previous behavior should
 you wish to do so.
 
 The following set of new commands makes it easy to enable these
-features if you wish.  Use:
+features if you wish. The first one is:
 
 @example
 @@pdflinkcolor @r{[} @var{red green blue} @r{]}
@@ -2455,7 +2497,7 @@ BEGIN {
 @<Change PDF internal link color@> =
 Pass == 2 && /^@pdflinkcolor[[:space:]]*.*$/ {
 	if (NF != 1 && NF != 4)
-		fatal(_"@pdflinkcolor: either no arguments or three arguments required")
+		fatal(_"@pdflinkcolor: wrong number of arguments\n")
 
 	if (NF == 1)
 		Link_color = Dark_red
@@ -2474,12 +2516,12 @@ Pass == 2 && /^@pdflinkcolor[[:space:]]*.*$/ {
 @
 
 Similar to internal links, you can set the color of URL links.
-They are independant of each other. The command here is @samp{@@urllinkcolor}:
+They are independant of each other. The command here is @code{@@urllinkcolor}:
 
 @<Set URL formatting@> =
 Pass == 2 && /^@urllinkcolor[[:space:]]*.*$/ {
 	if (NF != 1 && NF != 4)
-		fatal(_"@urllinkcolor: either no arguments or three arguments required")
+		fatal(_"@urllinkcolor: wrong number of arguments\n")
 
 	if (NF == 1)
 		URL_color = Dark_red
@@ -2499,7 +2541,7 @@ Pass == 2 && /^@urllinkcolor[[:space:]]*.*$/ {
 
 Besides setting the color for URLs, you can control whether the text of
 a URL should appear in the document text, or not. By default, it does
-appear.  To make it disappear, use @samp{@@hideurls}:
+appear.  To make it disappear, use @code{@@hideurls}:
 
 @<Set URL formatting@> =
 Pass == 2 && /^@hideurls[[:space:]]*$/ {
@@ -2508,260 +2550,6 @@ Pass == 2 && /^@hideurls[[:space:]]*$/ {
 	print "@end tex"
 
 	next
-}
-@
-
-@c ============== start here to rework def/use tracking and printing.
-
-@node jrweave def/use tracking
-@section Tracking Definitions and Uses
-
-@quotation
-Stuff from Mike Brennan here
-@author Michael Brennan
-@end quotation
-
-As mentioned at the beginning of this @value{CHAPTER}, at the place
-where a chunk is defined (or added on to) we want to
-be able to present to the reader a list of places where the chunk is used,
-where else it is defined, and the definition points for any other chunks
-it references.
-
-We start by collecting this information and tracking it.
-We collect the information during the first pass.
-
-Stuff we track:
-Chunk_info[Current_chunk]["type"] = Chunk_type
-Chunk_info[Current_chunk]["defn"]++
-Chunk_info[Current_chunk]["chunk number"] = \
-n = Chunk_info[name]["numrefs"]
-	printf("%s", Chunk_info[name]["refs"][j])	# will be an anchor
-
-@c ============== end here to rework def/use tracking and printing.
-
-@node jrweave chunk indexes
-@section Creating Indices For Chunks
-
-Besides printing out the list of file definitions and code chunk
-definitions and references (@pxref{jrweave file defs}, and
-@pxref{jrweave code defs and refs}), @command{jrweave} creates index entries for
-each chunk's definition(s) and use(s).  This provides an easy way to
-find information based on alphabetic lookup of a chunk name.
-
-The index names are @samp{cd} for ``chunk definition'' and
-@samp{cr} for ``chunk reference.''
-It is up to the author of a document to either print the indices
-using a regular Texinfo @code{@@printindex} command or to merge
-them into one of the standard Texinfo indices.  I have taken
-the latter course. Towards the front of this @value{DOCUMENT} I have
-
-@example
-@@synindex cd cp
-@@synindex cr cp
-@end example
-
-@(jrweave@) =
-@<Create Chunk Indices@>
-@
-
-According to the Texinfo manual, new indices should be created right
-after the Texinfo header.
-
-@<Create Chunk Indices@> =
-Pass == 2 && /^@c %\*\*end of header/ {
-	print	# print the line
-
-	print "\n@c Extra indices added by jrweave"
-	print "@defindex cd   @c chunk definition"
-	print "@defindex cr   @c chunk reference"
-
-	next
-}
-@
-
-@node jrweave file chunks
-@section Processing File Chunks for @command{jrweave}
-
-Now comes the hard part. We use the same process for file chunks
-and for code chunks, although each will be tracked separately.
-
-@(jrweave@) =
-@<Process file chunks for @code{jrweave}@>
-@<Process code chunk for @command{jrweave}@>
-@
-
-The initial code is similar to that of @command{jrtangle}.
-
-@<Process file chunks for @code{jrweave}@>=
-$0 ~ File_chunk_pattern {
-	@<Common file chunk initial processing@>
-	@<Collect chunk information@>
-	next
-}
-@
-
-We need the following information: The file's name, and a running
-count of how many times this file has been seen.  This running count
-is used to create an @code{@@anchor@{@}} for this definition.
-We also have a global running count of files.
-In addition, we need to save the file's name and
-the current anchor value for when we build the list of where
-each code chunk is referenced; this list can then be printed
-later with the @code{@@print_code_refs} command
-(@pxref{jrweave print code refs}).
-
-Because file chunk and code chunk collection and expansion
-are so similar, they will share data structures, so that
-the expansion code needs to be written only once.
-
-@<Collect chunk information@>=
-if (Pass == 1) {
-	@<Store info for chunk@>
-} else
-	Chunk_info[Current_chunk]["defn"]++
-@
-
-@<Store info for chunk@>=
-if (! ("chunk number" in Chunk_info[Current_chunk])) {
-	Chunk_info[Current_chunk]["chunk number"] = \
-							++Chunk_numbers[Chunk_type]
-}
-@
-
-@<Process file chunks for @code{jrweave}@>=
-@<Handle terminating at-sign for file and code chunks@>
-@<Collect chunk lines@>
-@
-
-Here is where we format the file chunks.
-
-@findex @code{end_file_gathering()} function, @command{jrweave}
-@<Process file chunks for @code{jrweave}@>=
-function end_file_gathering(	x, y, n, i, parts, names,
-								name, anchor, chunk_being_used)
-{
-	if (Pass == 1) {
-		Chunk_lines = ""
-		Flags["file chunk"] = FALSE
-		return
-	}
-
-	# On the second pass, format the chunk
-	@<Print the chunk body@>
-}
-@
-
-Printing the chunk encompasses printing the leading stuff,
-formatting the code lines for @TeX{}, such as expanding tabs,
-formatting the names of the referenced chunks, and
-closing off the environment.
-
-@<Print the chunk body@> =
-@<Try to keep at least the first two lines of the chunk together@>
-@<Print the anchor@>
-@<Convert the lines for @TeX{}@>
-@<Format chunk names and reassemble output lines@>
-@<Print the complete chunk@>
-@
-
-For aesthetic purposes, it would be good to keep at least the first
-two lines of the chunk together.  The Texinfo command to do this
-is @code{@@need}, which takes an argument in ``mils''---thousandths of
-an inch.
-
-So, how many thousandths of an inch do two lines take? Karl Berry advised
-to try using @samp{@@showthe@@baselineskip}.  The result is 13.2 points.
-There are 72 points in an inch, so one line is 13.2 divided by 72 = 0.183
-inches.  Multiply that by two, and we get 0.367 inches.  We round that
-up to a slightly larger number in the hopes that this will actually work:
-
-@<Try to keep at least the first two lines of the chunk together@> =
-print "@need 400"
-@
-
-Formatting the anchor is handled by a separate function which
-we'll see later. The output is the anchor, the formatted chunk
-name and the opening @code{@@example} or @code{@@smallexample}.
-
-@page
-@<Print the anchor@> =
-anchor = format_anchor(Current_chunk, Chunk_info[Current_chunk]["defn"])
-printf("%s\n", anchor)
-@
-
-Converting the lines means expanding the tabs, and then splitting the
-total set of lines apart at each chunk name.  The regular text goes
-into the array @code{parts}, and the chunk names into the array @code{names}.
-
-@<Convert the lines for @TeX{}@> =
-x = expand_tabs(Chunk_lines, Tabstop)
-# extract code chunks
-n = split(x, parts, Chunk_name_pattern, names)
-
-# escape special chars in parts of code that aren't chunk names
-for (i = 1; i in parts; i++)
-	gsub(/[@{}]/, "@&", parts[i])
-@
-
-@<Format chunk names and reassemble output lines@> =
-y = parts[1]
-if (n > 1) {	# embedded chunk names
-	for (i = 1; i in names; i++) {
-		name = strip_out_name(names[i])
-		@<Collect chunk reference information@>
-		chunk_being_used = \
-			format_chunk_name(name, Chunk_info[name]["chunk number"], "code chunk")
-		printf("@crindex %s, use\n", chunk_being_used)
-		y = y chunk_being_used
-		y = y parts[i+1]
-	}
-}
-@
-
-@<Print the complete chunk@> =
-chunk_being_defined = \
-	format_chunk_name(Current_chunk, Chunk_info[Current_chunk]["chunk number"],
-						Chunk_type)
-printf("@cdindex %s, definition\n", chunk_being_defined)
-printf("@noindent\n%s %s@equiv{}\n",
-	chunk_being_defined, Chunk_info[Current_chunk]["defn"] == 1 ? "" : "+")
-print Example_start
-printf("%s\n", y)
-print Example_end
-@
-
-@node jrweave code chunks
-@section Processing Code Chunks for @command{jrweave}
-
-Code chunk collection and formatting can now benefit from all
-the work done previously.
-
-@<Process code chunk for @command{jrweave}@> =
-$0 ~ Code_chunk_pattern {
-	@<Common code chunk initial processing@>
-	@<Collect chunk information@>
-	next
-}
-@
-
-For weaving, we collect the code lines and then when
-done, print out the chunk nicely formatted.
-
-@findex @code{end_code_gathering()} function, @command{jrweave}
-@<Process code chunk for @command{jrweave}@> =
-function end_code_gathering(	i, j, n, x, parts, names, name, anchor)
-{
-	if (Pass == 1) {
-		Chunk_lines = ""
-		Flags["code chunk"] = FALSE
-		return
-	}
-
-	# In second pass, print the code
-	@<Print the chunk body@>
-
-	if (Debug ~ /code/)
-		printf("finished formatting code %s\n", Code_chunk) > "/dev/stderr"
 }
 @
 
@@ -2802,7 +2590,7 @@ named ``Initial setup.''
 	Chunk_info[Initial_setup_name]["type"] = "code chunk"
 	Chunk_info[Initial_setup_name]["defn"] = 1
 	if (/^@initial_setup[[:space:]]*$/) {
-		printf("%s\n", format_anchor(Initial_setup_name, 1))
+		printf("%s\n", format_anchor(Initial_setup_name, 0))
 		printf("@noindent\n%s @equiv{}\n",
 			format_chunk_name(Initial_setup_name, 0, "code chunk"))
 		print Example_start
@@ -2818,260 +2606,492 @@ named ``Initial setup.''
 }
 @
 
-@node jrweave file defs
-@section Printing File Definitions 
+@node jrweave chunk indexes
+@section Creating Indices For Chunks
 
-At this point we have collected and printed all the file and code
-defintion chunks. Along the way we have gathered information about where
-each chunk is defined and where each chunk is referenced (used inside
-a chunk body).
+@ignore
+Besides printing out the list of file definitions and code chunk
+definitions and references (@pxref{jrweave file defs}, and
+@pxref{jrweave code defs and refs}),
+@end ignore
+@command{jrweave} creates index entries for
+each chunk's definition(s) and use(s).  This provides
+@ignore
+another
+@end ignore
+an easy way
+way to
+find information, based on alphabetic lookup of a chunk name.
 
-We are now able to print the lists of everywhere that file chunks are
-defined.
+The index names are @samp{cd} for ``chunk definition'' and
+@samp{cr} for ``chunk reference.''
+(This follows Texinfo convention of using two-letter index names.)
+It is up to the author of a document to either print the indices
+using a regular Texinfo @code{@@printindex} command or to merge
+them into one of the standard Texinfo indices, such as the
+concept index, @samp{cp}. For @value{TWJR},  I have taken
+the latter course. Towards the front of this @value{DOCUMENT} I have:
 
-@quotation NOTE
-This @emph{must} be done after all file and code chunks have
-been printed, since the necessary information is collected during
-the second pass.  With some work, this could be fixed by collecting
-the information during the first pass, but the general intent is that
-these lists be placed in an appendix at the end of the document.
+@example
+@@synindex cd cp
+@@synindex cr cp
+@end example
+
+@(jrweave@) =
+@<Create Chunk Indices@>
+@
+
+According to the Texinfo manual, new indices should be created right
+after the Texinfo header.
+
+@<Create Chunk Indices@> =
+Pass == 2 && /^@c %\*\*end of header/ {
+	print	# print the line
+
+	print "\n@c Extra indices added by jrweave"
+	print "@defindex cd   @c chunk definition"
+	print "@defindex cr   @c chunk reference"
+
+	next
+}
+@
+
+@FIXME{Consider grouping all the def / use stuff into a section and making
+the following few sections into subsections.}
+
+@c ####################################
+@c ## Insert rewritten material here ##
+@c ####################################
+
+@node jrweave def/use collecting
+@section Tracking Definitions and Uses
+
+@quotation
+A literate document defines a directed acyclic graph of code chunks.
+Mostly it is a tree.
+
+A chunk's parents are where it is used.  If all chunks were only used
+in one place, it would be a tree.
+
+It's children are chunks it uses.
+Chunks added onto it are siblings.
+
+For the document to be useful for understanding, using and maintaining
+the code, the reader needs to be able to easily traverse this graph.
+@author Michael Brennan
 @end quotation
 
-The command to print the file definitions is @code{@@print_file_defs}.
-With some luck and some careful programming, we can reuse the code
-we'll write here for the code definitions as well.
+As mentioned at the beginning of this @value{CHAPTER}, at the place
+where a chunk is defined (or added on to) we want to
+be able to present to the reader the following:
+
+@itemize @bullet
+@item
+A list of the other places where it is defined.
+
+@item
+A list of places where the chunk is used (the chunks that call this one).
+
+@item
+The definition points for any chunks it references.
+@end itemize
+
+Let's define this more formally.
+Everything will live in an array named @code{Chunk_info}, whose top
+level index is the chunk name.
+The name of the current chunk will be @code{Current_chunk}.
+
+@quotation NOTE
+In all cases, we store and use the name of a chunk without the leading
+and trailing delimiters.
+@end quotation
+
+We need to track the following:
+
+@table @asis
+@item Chunk type (@code{Chunk_info[Current_chunk]["type"]})
+File chunk or code chunk.
+@ignore
+@c FIXME: Put this back in.
+We assume (for now) that the list of file chunk
+definitions provide by
+@code{@@print_file_defs}
+(@pxref{jrweave file defs})
+is adequate, and that Mike's graph of chunks relates mainly to code chunks.
+@end ignore
+The value is either @code{"file"} or @code{"code"}.
+
+@item Chunk number (@code{Chunk_info[Current_chunk]["chunk number"]})
+This is mainly for aesthetics and tradition; in @value{TWJR} the chunk numbers
+don't have any real added value.@footnote{Mike's @command{mweb} numbers chunks with
+page number and occurrence on the page. E.g., chunk ``3b'' is the second chunk
+on page 3.  I can't do that without @emph{a lot} of grubbing around with
+raw @TeX{}, which I don't know how, nor want, to do.  And even if I were to bother,
+that would not solve the problem for other formats such as DocBook or HTML.}
+@FIXME{Consider removing the chunk numbers. It would simplify the code a little
+and the minor aesthetic loss may not matter.}
+
+@item Definition points (@code{Chunk_info[Current_chunk]["defn"]})
+Each point where a chunk is defined (created or added onto) is a definition point.
+These are the siblings in Mike's graph.
+It is enough to track how many definitions there are by incrementing
+this array element. The definition number is used to generate anchors
+which are used in cross references.
+All references to other chunks, and to sibling definitions of the current
+chunk, will use cross references to anchors.
+
+@item Second pass definition points (@code{Chunk_info[Current_chunk]["redefn"]})
+This is similar to the @code{"defn"} element; it is needed on the second
+pass to know where we are in the list of chunk definitions.
+
+@item Referers, or callers (@code{Chunk_info[Current_chunk]["callers"][@dots{}]})
+We need a list of other chunks that refer to this one in their bodies.
+This will be indexed by chunk name, and we will print the list
+sorted by chunk name.
+@end table
+
+The list of chunks that the current chunk calls
+must be collected during both passes.  During the first pass (code gathering), we update each
+called chunk's ``callers'' list with the name of the current chunk, if it's not
+already there.
+During the second pass (code formatting), the list of called chunks
+needs to be collected for printing cross reference information
+at the end of the current chunk's definition.
+
+All of the rest of the above information must be collected on the first pass through
+the source document file(s).
+
+@node jrweave file chunks
+@section Processing File Chunks for @command{jrweave}
+
+Now comes the hard part. We use the same process for file chunks
+and for code chunks, although each will be tracked separately.
 
 @(jrweave@) =
-@<Handle @code{@@print_file_defs}@>
+@<Process file chunks for @code{jrweave}@>
+@<Process code chunk for @command{jrweave}@>
 @
 
-This is done in the second pass:
+The initial code is similar to that of @command{jrtangle}.
 
-@cindex @code{@@print_file_defs} command, @command{jrweave}
-@<Handle @code{@@print_file_defs}@> =
-Pass == 2 && /^@print_file_defs[[:space:]]*$/ {
-	@<Print file chunk definition list@>
+@<Process file chunks for @code{jrweave}@>=
+$0 ~ File_chunk_pattern {
+	@<Common file chunk initial processing@>
 	next
 }
 @
 
-We first build a sorted array of file names,
-and then print out the definitions in order.
-
-@<Print file chunk definition list@> =
-delete Sorted_file_names
-j = 1
-for (i in Chunk_info) {
-	if (Chunk_info[i]["type"] == "file chunk")
-		Sorted_file_names[j++] = i
-}
-asort(Sorted_file_names)	# Sorted by value
-@
-
-Next, we have to loop through the names and print out
-the relevant info. We do it in a Texinfo @code{@@table}.
-
-@<Print file chunk definition list@> =
-print "@table @asis"
-for (i = 1; i in Sorted_file_names; i++) {
-	name = Sorted_file_names[i]
-	@<Format and print chunk definition list@>
-}
-print "@end table"
-@
-
-@<Format and print chunk definition list@> =
-tag = format_chunk_name(name, Chunk_info[name]["chunk number"], Chunk_info[name]["type"])
-printf("@item %s\n", tag)
-n = Chunk_info[name]["defn"]
-if (n == 1)
-	printf("This chunk is defined in\n")
-else
-	printf("Multiple definitions occur in\n")
-for (j = 1; j <= n; j++) {
-	printf("%s", format_xref(name, j))
-	if (j == n-1)
-		printf(",\nand\n")
-	else if (j < n-1)
-		printf(",\n")
-}
-print ".\n"
-@
-
-@node jrweave code defs and refs
-@section Printing Code Definitions and References
-
-Unlike files, for code we want to print both
-definitions and references.
-
-@menu
-* jrweave print code defs::     Printing code definitions.
-* jrweave print code refs::     Printing code references.
-@end menu
-
-@node jrweave print code defs
-@subsection  Printing Code Definitions
-
-Printing code definitions is almost identical to printing
-file definitions.
+Checking for the terminating @samp{@@} sign must
+come right after the two patterns that start collecting
+lines.
 
 @(jrweave@) =
-@<Handle @code{@@print_code_defs}@>
+@<Handle terminating at-sign for file and code chunks@>
+@<Collect chunk lines@>
 @
 
-This too is done in the second pass:
-
-@cindex @code{@@print_code_defs} command, @command{jrweave}
-@<Handle @code{@@print_code_defs}@> =
-Pass == 2 && /^@print_code_defs[[:space:]]*$/ {
-	@<Print code chunk definition list@>
-	next
-}
-@
-
-We first build a sorted array of code chunk names,
-and then print out the definitions in order.
-
-@<Print code chunk definition list@> =
-@<Create @code{Sorted_code_names}@>
-@
-
-Creating the array of sorted code chunk names is also
-done when printing code chunk references, so it lives in
-its own chunk.
-
-@<Create @code{Sorted_code_names}@> =
-delete Sorted_code_names
-j = 1
-for (i in Chunk_info) {
-	if (Chunk_info[i]["type"] == "code chunk")
-		Sorted_code_names[j++] = i
-}
-asort(Sorted_code_names)	# Sorted by value
-@
-
-Next, we have to loop through the names and print out
-the relevant info. We do it in a Texinfo @code{@@table}.
-
-@<Print code chunk definition list@> =
-print "@table @asis"
-for (i = 1; i in Sorted_code_names; i++) {
-	name = Sorted_code_names[i]
-	@<Format and print chunk definition list@>
-}
-print "@end table"
-@
-
-@node jrweave print code refs
-@subsection  Printing Code References
-
-Printing code references is the flip side of printing code definitions.
+The @code{end_file_gathering()} function is where
+we will do all the work.  It simply delegates
+to two different functions based on whether we
+are collecting data (pass 1) or printing it (pass 2).
+In fact, the actions are the same for file chunks
+and code chunk, so the work can be delegated
+to a common function.
 
 @(jrweave@) =
-@<Handle @code{@@print_code_refs}@>
-@
+function end_chunk_gathering()
+{
+	if (Pass == 1) {
+		collect_chunk_info()
+		Chunk_lines = ""
+		Flags[Chunk_type] = FALSE
+	} else
+		print_out_chunk()
+}
 
-First, recognize the @code{@@print_code_refs} command:
-
-@cindex @code{@@print_code_refs} command, @command{jrweave}
-@<Handle @code{@@print_code_refs}@> =
-Pass == 2 && /^@print_code_refs[[:space:]]*$/ {
-	@<Create @code{Sorted_code_names}@>
-	@<Print code chunk references list@>
-	next
+function end_file_gathering()
+{
+	end_chunk_gathering()
 }
 @
 
-We start by pretending that we have the information we need,
-and printing it out.
+If we do this right, everything we do here can be
+reused for code chunks. First, let's collect all the
+information we're going to need.
 
-@<Print code chunk references list@> =
-print "@table @asis"
-for (i = 1; i in Sorted_code_names; i++) {
-	name = Sorted_code_names[i]
-
-	n = Chunk_info[name]["numrefs"]
-	if (n == 0)		# warning printed elsewhere
-		continue
-
-	tag = format_chunk_name(name, Chunk_info[name]["chunk number"],
-							Chunk_info[name]["type"])
-	printf("@item %s\n", tag)
-	print "This chunk is referenced in"
-	for (j = 1; j <= n; j++) {
-		printf("%s", Chunk_info[name]["refs"][j])	# will be an anchor
-		if (j + 1 == n)
-			printf(",\nand\n")
-		else if (j < n)
-			printf(",\n")
+@(jrweave@)=
+function collect_chunk_info(	i, n, x, called, junk)
+{
+	# Current_chunk, Chunk_type already set by initial code
+	# Chunk number
+	if (! ("chunk number" in Chunk_info[Current_chunk])) {
+		Chunk_info[Current_chunk]["chunk number"] = \
+								++Chunk_numbers[Chunk_type]
 	}
-	printf(".\n\n")
-}
-print "@end table"
-@
 
-Here is how we collect the information.
+	# Definition instance
+	Chunk_info[Current_chunk]["defn"]++
 
-@<Collect chunk reference information@> =
-xref = format_xref(Current_chunk, Chunk_info[Current_chunk]["defn"])
-if (! ("numrefs" in Chunk_info[name])) {
-	nrefs = Chunk_info[name]["numrefs"] = 1
-	Chunk_info[name]["refs"][nrefs] = xref
-} else {
-	nrefs = Chunk_info[name]["numrefs"]
-	if (Chunk_info[name]["refs"][nrefs] != xref) {
-		Chunk_info[name]["refs"][++nrefs] = xref
-		Chunk_info[name]["numrefs"] = nrefs
+	# Get names of called chunks into called
+	n = split(Chunk_lines, junk, Chunk_name_pattern, called)
+
+	# Add ourselves to the callers
+	for (i in called) {
+		x = strip_out_name(called[i])
+		Chunk_info[x]["callers"][Current_chunk]++
 	}
 }
 @
 
-@node jrweave delete jrtangle code
-@section Removing Stuff For @command{jrtangle}
+@(jrweave@)=
+function print_out_chunk(	x, y, n, i, parts, names,
+							name, anchor, chunk_being_used)
+{
+	# Redefinition instance
+	Chunk_info[Current_chunk]["redefn"]++
 
-As with any literate programming system, some commands are only for
-tangling, and others are only for weaving.  Although the tangle component
-only has to pull out source files and expand code, the weaving
-component has to also recognize commands for the tangling component,
-in order to keep them out of the document formatter's way.
+	@<Print the chunk body@>
+}
+@
+
+Printing the chunk encompasses printing the leading stuff,
+formatting the code lines for @TeX{}, such as expanding tabs,
+formatting the names of the referenced chunks, and
+closing off the environment.
+Then we have to print all the cross reference information.
+
+@<Print the chunk body@> =
+@<Try to keep at least the first two lines of the chunk together@>
+@<Print the anchor@>
+@<Convert the lines for @TeX{}@>
+@<Format chunk names and reassemble output lines@>
+@<Print the complete chunk@>
+@<Print chunk cross reference information@>
+@
+
+For aesthetic purposes, it would be good to keep at least the first
+two lines of the chunk together.  The Texinfo command to do this
+is @code{@@need}, which takes an argument in ``mils''---thousandths of
+an inch.
+
+So, how many thousandths of an inch do two lines take? Karl Berry advised
+to try using @samp{@@showthe@@baselineskip}.  The result is 13.2 points.
+There are 72 points in an inch, so one line is 13.2 divided by 72 = 0.183
+inches.  Multiply that by two, and we get 0.367 inches.  We round that
+up to a slightly larger number in the hopes that this will actually work:
+
+@<Try to keep at least the first two lines of the chunk together@> =
+print "@need 400"
+@
+
+Formatting the anchor is handled by a separate function which
+we'll see later. The output is the anchor.
+We have to pass it the @code{"redefn"} value since we're in
+the second pass.
+
+@<Print the anchor@> =
+anchor = format_anchor(Current_chunk,
+			Chunk_info[Current_chunk]["redefn"],
+			Chunk_info[Current_chunk]["defn"])
+printf("%s\n", anchor)
+@
+
+Converting the lines means expanding the tabs, and then splitting the
+total set of lines apart at each chunk name.  The regular text goes
+into the array @code{parts}, and the chunk names into the array @code{names}.
+
+@<Convert the lines for @TeX{}@> =
+x = expand_tabs(Chunk_lines, Tabstop)
+# extract code chunks
+n = split(x, parts, Chunk_name_pattern, names)
+
+# escape special chars in parts of code that aren't chunk names
+for (i = 1; i in parts; i++)
+	gsub(/[@{}]/, "@&", parts[i])
+@
+
+@<Format chunk names and reassemble output lines@> =
+y = parts[1]
+if (n > 1) {	# embedded chunk names
+	for (i = 1; i in names; i++) {
+		name = strip_out_name(names[i])
+		chunk_being_used = \
+			format_chunk_name(name, Chunk_info[name]["chunk number"], "code chunk")
+		printf("@crindex %s, use\n", chunk_being_used)
+		y = y chunk_being_used
+		y = y parts[i+1]
+	}
+}
+@
+
+@<Print the complete chunk@> =
+chunk_being_defined = \
+	format_chunk_name(Current_chunk, Chunk_info[Current_chunk]["chunk number"],
+						Chunk_type)
+printf("@cdindex %s, definition\n", chunk_being_defined)
+printf("@noindent\n%s %s@equiv{}\n",
+	chunk_being_defined, Chunk_info[Current_chunk]["redefn"] == 1 ? "" : "+")
+print Example_start
+printf("%s\n", y)
+print Example_end
+@
+
+@<Print chunk cross reference information@>=
+for (i in names)
+	names[i] = strip_out_name(names[i])	# remove delimiters
+
+# FIXME: Start of small font
+@<print list of other places where this chunk is defined@>
+if (Chunk_type == "code chunk") {
+	@<print list of chunks that call this one@>
+}
+@<remove duplicates from @code{names}@>
+@<print list of called chunks@>
+# FIXME: End of small font
+@
+
+
+@<print list of other places where this chunk is defined@> =
+print ""
+if ((total_defns = Chunk_info[Current_chunk]["defn"]) > 1) {
+	current_defn = Chunk_info[Current_chunk]["redefn"]
+
+	print "@noindent\nThis chunk is also defined in"
+
+	# Anchors for 1 .. current_defn - 1
+	for (i = 1; i <= current_defn - 1; i++) {
+		printf("%s", format_xref(Current_chunk, i))
+		if (i + 1 < current_defn || current_defn < total_defns)
+			print ","
+	}
+
+	# Anchors for redefn + 1 .. total_defns
+	for (i = current_defn + 1; i <= total_defns; i++) {
+		printf("%s", format_xref(Current_chunk, i))
+		if (i < total_defns)
+			print ","
+	}
+	print "."
+}
+@
+
+@<print list of chunks that call this one@>=
+if ("callers" in Chunk_info[Current_chunk]) {
+	print ""
+	asorti(Chunk_info[Current_chunk]["callers"], my_callers)
+	if (length(my_callers) > 1) {
+		print "@noindent\nThis chunk is called by the following chunks:\n"
+		print_ref_table(my_callers)
+	} else {
+		n = Chunk_info[my_callers[1]]["defn"]
+
+		printf("@noindent\nThis chunk is called by %s; see its first defintion at %s.\n",
+			format_chunk_name(my_callers[1],
+						Chunk_info[my_callers[1]]["chunk number"], "code chunk"),
+			format_xref(my_callers[1], n > 1 ? 1 : 0))
+	}
+} else
+	warning(_"chunk %s has no callers\n", Current_chunk)
+@
+
+The @code{print_ref_table()} function prints out a table
+of chunk names and references to the first definition points.
+The list of names has already had delimiters removed.
 
 @(jrweave@) =
-@<Remove @code{jrtangle} commands for weaving@>
+function print_ref_table(chunklist,		i, x, n)
+{
+	print "@multitable @columnfractions .35 .65"
+	print "@headitem Chunk name @tab First definition point"
+
+	for (i = 1; i in chunklist; i++) {
+		x = chunklist[i]
+		n = (Chunk_info[x]["defn"] > 1) ? 1 : 0
+		printf("@item %s @tab See %s.\n",
+			format_chunk_name(x,
+				Chunk_info[x]["chunk number"],
+				Chunk_info[x]["type"]),
+			format_xref(x, n))
+	}
+
+	print "@end multitable"
+}
 @
 
-There are only three such commands, and all we have to
-do is skip over them with @code{next}.
+@<print list of called chunks@> =
+switch (length(names)) {
+case 0:
+	break;
+case 1:
+	printf("\n@noindent\nThe called chunk %s is first defined at\n%s.\n",
+			format_chunk_name(names[1],
+							Chunk_info[names[1]]["chunk number"], "code chunk"),
+			format_xref(names[1],
+				(Chunk_info[names[1]]["defn"] > 1) ? 1 : 0))
+	break;
+default:
+	printf("\n@noindent\nThe following table lists called chunk definition points.\n\n")
+	print_ref_table(names)
+	break;
+}
+@
 
-@cindex @code{@@file_update_recipe} command, @command{jrweave}
-@cindex @code{@@file_update} command, @command{jrweave}
-@cindex @code{@@post_create} command, @command{jrweave}
-@<Remove @code{jrtangle} commands for weaving@> =
-/^@file_update_recipe[[:space:]]*$/, \
-		/^@end file_update_recipe[[:space:]]*$/ {
-	next
+@<remove duplicates from @code{names}@>=
+sort_and_remove_duplicates(names)
+@
+
+@(jrweave@) =
+function sort_and_remove_duplicates(names,	i, dups)
+{
+	for (i in names)
+		dups[names[i]] = 1
+
+	asorti(dups)
+	delete names
+	for (i in dups)
+		names[i] = dups[i]
 }
-/^@file_update[[:space:]]/ {
-	next
-}
-/^@post_create[[:space:]]+/ {
+@
+
+@node jrweave code chunks
+@section Processing Code Chunks for @command{jrweave}
+
+Code chunk collection and formatting can now benefit from all
+the work done previously.
+
+@<Process code chunk for @command{jrweave}@> =
+$0 ~ Code_chunk_pattern {
+	@<Common code chunk initial processing@>
 	next
 }
 @
+
+@(jrweave@) =
+function end_code_gathering()
+{
+	end_chunk_gathering()
+
+	if (Debug ~ /code/)
+		printf("finished formatting code %s\n", Code_chunk) > "/dev/stderr"
+}
+@
+
+@c TO BE CONTINUED
 
 @node jrweave last bit
 @section Passing Everything Else Through
 
 Any line in the input document that doesn't match
-one of the commands described in the previous section
+one of the commands described in the previous @value{SECTION}s
 should be left alone.
+Thus, the final thing to do is to pass all other lines on through
+to the output.
 
 @(jrweave@) =
 @<Default @code{print} statement for @command{jrweave}@>
 @
 
-Thus, the final thing to do is to pass all other lines on through
-to the output.  This statement @emph{must} be the last
-active rule in @command{jrweave}.
+This statement @emph{must} be the last active rule in @command{jrweave}.
 
 @<Default @code{print} statement for @command{jrweave}@> =
 Pass == 2 { print }
@@ -3087,10 +3107,9 @@ input, or use real tabs, and expand them when creating the document with
 @command{jrweave}.  Since I happen to like using tabs,@footnote{A habit of
 over 30 years that is just too hard to break.} I have chosen the latter.
 
-In addition, having literal tabs in a file can be critical: this is most
+In addition, preserving literal tabs in a file can be critical: this is most
 applicable to @file{Makefile} files but perhaps matters for other kinds
 of files as well.
-
 
 @(jrweave@) =
 @<Expand tabs for @command{jrweave}@>
@@ -3109,7 +3128,7 @@ BEGIN {
 @
 
 I recommend using whatever appropriate magic in the @value{TWJR}
-document that will set the tab stop to whatever you prefer
+input document that will set the tab stop to whatever you prefer
 in your favorite editor.  For @uref{http://www.vim.org, Vim},
 I use this line, which also switches on syntax highlighting
 appropriate to Texinfo. It must be placed within the first four
@@ -3214,7 +3233,6 @@ a helper function does the work, with the main functions
 delegating to it:
 
 @findex @code{format_anchor_or_ref()} function, @command{jrweave}
-@findex @code{format_anchor()} function, @command{jrweave}
 @findex @code{format_xref()} function, @command{jrweave}
 @<Helper functions for @command{jrweave}@> =
 function format_anchor_or_ref(type, name, defn,		clean_name, result)
@@ -3232,9 +3250,20 @@ function format_xref(name, defn)
 {
 	return format_anchor_or_ref("ref", name, defn)
 }
+@
 
-function format_anchor(name, defn)
+Formatting anchors is not so simple. If there is only one
+definition, a value of zero should be passed to
+@code{format_anchor_or_ref()}.
+
+@findex @code{format_anchor()} function, @command{jrweave}
+@<Helper functions for @command{jrweave}@> =
+function format_anchor(name, cur_defn, total_defns,		defn)
 {
+	if (total_defns == 1)
+		defn = 0
+	else if (cur_defn <= total_defns)
+		defn = cur_defn
 	return format_anchor_or_ref("anchor", name, defn)
 }
 @
@@ -3266,6 +3295,7 @@ function format_chunk_name(name, count, type,	result, left, right, style)
 	return result
 }
 @
+@c +++++++++++++++++++ end of new +++++++++++++++++++++++++
 
 @node Bootstrapping
 @chapter Bootstrapping The System
@@ -3738,17 +3768,17 @@ and the code chunk references.
 @node File Definitions
 @appendixsec Source File Definitions
 
-@print_file_defs
+@code{@@print_file_defs}
 
 @node Code Chunk Definitions
 @appendixsec Code Chunk Definitions
 
-@print_code_defs
+@code{@@print_code_defs}
 
 @node Code Chunk References
 @appendixsec Code Chunk References
 
-@print_code_refs
+@code{@@print_code_refs}
 
 @node Use of @command{gawk} features
 @appendix Features Specific to @command{gawk}
