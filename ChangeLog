@@ -12,6 +12,8 @@
 	Add @allowindexbraces command. Add clean and distclean targets
 	to the Makefile.
 
+	Add @numberlesschunks command. Bug fix in chunk name formatting
+	in a few places.
 
 2014-03-10         Arnold D. Robbins     <arnold@skeeve.com>
 

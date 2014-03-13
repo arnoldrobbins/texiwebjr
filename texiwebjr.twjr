@@ -10,6 +10,8 @@
 @dquotexrefs
 @c And let braces in index entries work.
 @allowindexbraces
+@c No chunk numbers
+@numberlesschunks
 @ifclear FORPRINT
 @pdflinkcolor
 @urllinkcolor
@@ -1958,8 +1960,6 @@ unique chunk is numbered sequentially from 1, in the order that they are
 defined.  Even as chunks are added on to, they are referred to by the
 same number.  The numbering is managed by the weaving process; the author
 of a literate program does not have to do it.
-@FIXME{We may removed this since it has no real added value
-for @value{TWJR}.}
 
 An important part of the literate style is that a code chunk may be
 referenced before it is defined; in fact this is usually the case.
@@ -2354,6 +2354,26 @@ print "\\gdef\\oldnum#1{\\begingroup\\oldstyle #1\\endgroup}%"
 print "@end tex"
 @
 
+As a matter of taste, it may be that an author decides not
+to have numbers in the printed chunk names.  This can
+be done using the @code{@@numberlesschunks} command.
+This can be placed anywhere in the document; by checking for
+it during the first pass we guarantee it will be in effect
+when the document is output.
+The variable @code{Numberless_chunks} is checked during
+chunk name formatting.
+The check for the first pass is inside the body of the rule
+since the command must be removed from the output
+during the second pass.
+
+@<Texinfo authoring additions@>=
+/^@numberlesschunks[[:space:]]*$/ {
+	if (Pass == 1)
+		Numberless_chunks = TRUE
+	next
+}
+@
+
 @node jrweave sidebars
 @subsection Providing Sidebars
 
@@ -2691,8 +2711,8 @@ page number and occurrence on the page. E.g., chunk ``3b'' is the second chunk
 on page 3.  I can't do that without @emph{a lot} of grubbing around with
 raw @TeX{}, which I don't know how, nor want, to do.  And even if I were to bother,
 that would not solve the problem for other formats such as DocBook or HTML.}
-@FIXME{Consider removing the chunk numbers. It would simplify the code a little
-and the minor aesthetic loss may not matter.}
+For this reason they may be disabled with the @code{@@numberlesschunks} command
+(@pxref{jrweave additional macros}).
 
 @item Definition points (@code{Chunk_info[Current_chunk]["defn"]})
 Each point where a chunk is defined (created or added onto) is a definition point.
@@ -2879,7 +2899,8 @@ if (n > 1) {	# embedded chunk names
 	for (i = 1; i in names; i++) {
 		name = strip_out_name(names[i])
 		chunk_being_used = \
-			format_chunk_name(name, Chunk_info[name]["chunk number"], "code chunk")
+			format_chunk_name(name, Chunk_info[name]["chunk number"],
+				Chunk_info[name]["type"])
 		printf("@crindex %s, use\n", chunk_being_used)
 		y = y chunk_being_used
 		y = y parts[i+1]
@@ -2950,7 +2971,8 @@ if ("callers" in Chunk_info[Current_chunk]) {
 
 		printf("@noindent\nThis chunk is called by %s; see its first defintion at %s.\n",
 			format_chunk_name(my_callers[1],
-						Chunk_info[my_callers[1]]["chunk number"], "code chunk"),
+						Chunk_info[my_callers[1]]["chunk number"],
+						Chunk_info[my_callers[1]]["type"]),
 			format_xref(my_callers[1], n > 1 ? 1 : 0))
 	}
 } else
@@ -2988,7 +3010,8 @@ case 0:
 case 1:
 	printf("\n@noindent\nThe called chunk %s is first defined at\n%s.\n",
 			format_chunk_name(names[1],
-							Chunk_info[names[1]]["chunk number"], "code chunk"),
+							Chunk_info[names[1]]["chunk number"],
+							Chunk_info[names[1]]["type"]),
 			format_xref(names[1],
 				(Chunk_info[names[1]]["defn"] > 1) ? 1 : 0))
 	break;
@@ -3487,7 +3510,7 @@ function format_chunk_name(name, count, type,	result, left, right, style)
 	} else
 		fatal(_"format_chunk_name: Unknown chunk type `%s'\n", type)
 
-	if (count > 0)
+	if (count > 0 && ! Numberless_chunks)
 		result = sprintf("@r{%s@%s{%s} @oldnum{%d}%s}",
 						left, style, name, count, right)
 	else
@@ -3886,6 +3909,10 @@ them when tangling.
 @item @@initial_setup @r{@dots{}} @@end initial_setup
 Define the actions to be done before @command{jrtangle}
 creates any files. @xref{jrtangle before everything}.
+
+@item @@numberlesschunks
+Don't use numbered chunks in the printed document.
+@xref{jrweave additional macros}.
 
 @item @@oldnum@{@var{number}@}
 Set @var{number} in @TeX{}'s @code{\oldstyle} font. This
