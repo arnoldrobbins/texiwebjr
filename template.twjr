@@ -8,6 +8,18 @@
 @settitle Put Your Title Here
 @c %**end of header (This is for running Texinfo on a region.)
 
+@c Change how xref titles are quoted.
+@dquotexrefs
+@c And let braces in index entries work.
+@allowindexbraces
+@c No chunk numbers
+@numberlesschunks
+@ifclear FORPRINT
+@pdflinkcolor
+@urllinkcolor
+@hideurls
+@end ifclear
+
 @xrefautomaticsectiontitle on
 
 @c The following information should be updated here only!
