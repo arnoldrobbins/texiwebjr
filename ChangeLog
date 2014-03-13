@@ -1,10 +1,14 @@
-2014-03-14         Arnold D. Robbins     <arnold@skeeve.com>
+2014-03-13         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Considerably reworked chunk collection and
 	printing to dump cross reference info after each chunk. The
 	former commands for dumping at the end are temporarily disabled
 	and there are still FIXMEs, but this is finally good enough to
 	do a checkpoint check-in.
+
+	Restored commands to build lists of file definitions, code
+	definitions and code references.
+
 
 2014-03-10         Arnold D. Robbins     <arnold@skeeve.com>
 

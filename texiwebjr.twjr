@@ -1938,12 +1938,16 @@ since Texinfo won't know what to do with them.
 * jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
 * jrweave choosing code size::   Choosing the code size.
 * jrweave language additions::   Extra stuff for authors.
-* jrweave print setup recipe::   Printing the initial setup recipe.
 * jrweave chunk indexes::        Create indices for chunk definition and
                                  references.
 * jrweave def/use collecting::   Collecting definition and use information.
 * jrweave file chunks::          Processing file chunks.
 * jrweave code chunks::          Processing code chunks.
+* jrweave file defs::              Printing file definitions.
+* jrweave code defs and refs::     Printing code definitions and references.
+* jrweave print code defs::        Printing code definitions.
+* jrweave print code refs::        Printing code references.
+* jrweave print setup recipe::   Printing the initial setup recipe.
 * jrweave last bit::             Passing everything else through.
 * jrweave expanding tabs::       Expanding tabs.
 * jrweave helper functions::     Helper functions for @command{jrweave}.
@@ -2553,59 +2557,6 @@ Pass == 2 && /^@hideurls[[:space:]]*$/ {
 }
 @
 
-@node jrweave print setup recipe
-@section Printing The Initial Setup Recipe
-
-It may be that an author wants to include the initial setup
-in the printed document.  To do so, place
-@samp{@@print_initial_setup @r{[}@var{chunkname}@r{]}}
-into the @value{TWJR} document on a line by itself.
-If no @var{chunkname} is provided, then the chunk is
-named ``Initial setup.''
-
-@(jrweave@) =
-@<Handle the initial setup chunk for @code{jrweave}@>
-@
-
-@cindex @code{@@print_initial_setup} command, @command{jrweave}
-@cindex @code{@@initial_setup} command, @command{jrweave}
-@<Handle the initial setup chunk for @code{jrweave}@> =
-/^@print_initial_setup([[:space:]]+.*|[[:space:]]*)$/ {
-	Print_initial_setup = TRUE
-	if (NF > 1) {
-		$1 = ""
-		$0 = $0
-		Initial_setup_name = $0
-	}
-	else
-		Initial_setup_name = "Initial setup"
-
-	next
-}
-
-/^@initial_setup[[:space:]]*$/, /^@end initial_setup[[:space:]]*$/ {
-	if (Pass == 1 || ! Print_initial_setup)
-		next
-
-	Chunk_info[Initial_setup_name]["type"] = "code chunk"
-	Chunk_info[Initial_setup_name]["defn"] = 1
-	if (/^@initial_setup[[:space:]]*$/) {
-		printf("%s\n", format_anchor(Initial_setup_name, 0))
-		printf("@noindent\n%s @equiv{}\n",
-			format_chunk_name(Initial_setup_name, 0, "code chunk"))
-		print Example_start
-	} else if (/^@end initial_setup[[:space:]]*$/) {
-		print Example_end
-	} else {
-		x = expand_tabs($0, Tabstop)
-		gsub(/[@{}]/, "@&", x)
-		print x
-	}
-
-	next
-}
-@
-
 @node jrweave chunk indexes
 @section Creating Indices For Chunks
 
@@ -3076,7 +3027,245 @@ function end_code_gathering()
 }
 @
 
-@c TO BE CONTINUED
+@node jrweave file defs
+@section Printing File Definitions 
+
+At this point we have collected and printed all the file and code
+defintion chunks. Along the way we have gathered information about where
+each chunk is defined and where each chunk is referenced (used inside
+a chunk body), and we printed the relevant parts of that information
+after each chunk.
+
+It is also useful to print centralized lists lists of everywhere that
+file chunks and code chunks are defined.  This @value{SECTION} treats
+file chunks.
+
+@quotation NOTE
+Since all the information is collected during the first pass, the lists
+could be printed anywhere in the document. However the general intent
+is that these lists be placed in an appendix at the end of the document,
+which makes the nost sense anyway.
+@end quotation
+
+The command to print the file definitions is @code{@@print_file_defs}.
+
+@(jrweave@) =
+@<Handle @code{@@print_file_defs}@>
+@
+
+This is done in the second pass:
+
+@cindex @code{@@print_file_defs} command, @command{jrweave}
+@<Handle @code{@@print_file_defs}@> =
+Pass == 2 && /^@print_file_defs[[:space:]]*$/ {
+	@<Print file chunk definition list@>
+	next
+}
+@
+
+We first build a sorted array of file names,
+and then print out the definitions in order.
+
+@<Print file chunk definition list@> =
+delete Sorted_file_names
+j = 1
+for (i in Chunk_info) {
+	if (Chunk_info[i]["type"] == "file chunk")
+		Sorted_file_names[j++] = i
+}
+asort(Sorted_file_names)	# Sorted by value
+@
+
+Next, we have to loop through the names and print out
+the relevant info. We do it in a Texinfo @code{@@table}.
+
+@<Print file chunk definition list@> =
+print "@table @asis"
+for (i = 1; i in Sorted_file_names; i++) {
+	name = Sorted_file_names[i]
+	@<Format and print chunk definition list@>
+}
+print "@end table"
+@
+
+@<Format and print chunk definition list@> =
+x = format_chunk_name(name, Chunk_info[name]["chunk number"], Chunk_info[name]["type"])
+printf("@item %s\n", x)
+n = Chunk_info[name]["defn"]
+if (n == 1) {
+	printf("This chunk is defined in\n")
+	printf("%s.\n", format_xref(name, 0))
+} else {
+	printf("Multiple definitions occur in\n")
+	for (j = 1; j <= n; j++) {
+		printf("%s", format_xref(name, j))
+		if (j == n-1)
+			printf(",\nand\n")
+		else if (j < n-1)
+			printf(",\n")
+	}
+	print ".\n"
+}
+@
+
+@node jrweave code defs and refs
+@section Printing Code Definitions and References
+
+Unlike files, for code we want to print both
+definitions and references.
+
+@menu
+* jrweave print code defs::     Printing code definitions.
+* jrweave print code refs::     Printing code references.
+@end menu
+
+@node jrweave print code defs
+@subsection Printing Code Definitions
+
+Printing code definitions is almost identical to printing
+file definitions.
+
+@(jrweave@) =
+@<Handle @code{@@print_code_defs}@>
+@
+
+This too is done in the second pass:
+
+@cindex @code{@@print_code_defs} command, @command{jrweave}
+@<Handle @code{@@print_code_defs}@> =
+Pass == 2 && /^@print_code_defs[[:space:]]*$/ {
+	@<Print code chunk definition list@>
+	next
+}
+@
+
+We first build a sorted array of code chunk names,
+and then print out the definitions in order.
+
+@<Print code chunk definition list@> =
+@<Create @code{Sorted_code_names}@>
+@
+
+Creating the array of sorted code chunk names is also
+done when printing code chunk references, so it lives in
+its own chunk.
+
+@<Create @code{Sorted_code_names}@> =
+delete Sorted_code_names
+j = 1
+for (i in Chunk_info) {
+	if (Chunk_info[i]["type"] == "code chunk")
+		Sorted_code_names[j++] = i
+}
+asort(Sorted_code_names)	# Sorted by value
+@
+
+Next, we have to loop through the names and print out
+the relevant info. We do it in a Texinfo @code{@@table}.
+
+@<Print code chunk definition list@> =
+print "@table @asis"
+for (i = 1; i in Sorted_code_names; i++) {
+	name = Sorted_code_names[i]
+	@<Format and print chunk definition list@>
+}
+print "@end table"
+@
+
+@node jrweave print code refs
+@subsection  Printing Code References
+
+Printing code references is the flip side of printing code definitions.
+
+@(jrweave@) =
+@<Handle @code{@@print_code_refs}@>
+@
+
+First, recognize the @code{@@print_code_refs} command:
+
+@cindex @code{@@print_code_refs} command, @command{jrweave}
+@<Handle @code{@@print_code_refs}@> =
+Pass == 2 && /^@print_code_refs[[:space:]]*$/ {
+	@<Create @code{Sorted_code_names}@>
+	@<Print code chunk references list@>
+	next
+}
+@
+
+We start by pretending that we have the information we need,
+and printing it out.
+
+@<Print code chunk references list@> =
+print "@table @asis"
+for (i = 1; i in Sorted_code_names; i++) {
+	name = Sorted_code_names[i]
+
+	n = Chunk_info[name]["defn"]
+	if (n == 0)		# warning printed elsewhere
+		continue
+
+	tag = format_chunk_name(name, Chunk_info[name]["chunk number"],
+							Chunk_info[name]["type"])
+	printf("@item %s\n", tag)
+
+	Current_chunk = name	# for use by next chunk
+	@<print list of chunks that call this one@>
+}
+print "@end table"
+@
+
+@node jrweave print setup recipe
+@section Printing The Initial Setup Recipe
+
+It may be that an author wants to include the initial setup
+in the printed document.  To do so, place
+@samp{@@print_initial_setup @r{[}@var{chunkname}@r{]}}
+into the @value{TWJR} document on a line by itself.
+If no @var{chunkname} is provided, then the chunk is
+named ``Initial setup.''
+
+@(jrweave@) =
+@<Handle the initial setup chunk for @code{jrweave}@>
+@
+
+@cindex @code{@@print_initial_setup} command, @command{jrweave}
+@cindex @code{@@initial_setup} command, @command{jrweave}
+@<Handle the initial setup chunk for @code{jrweave}@> =
+/^@print_initial_setup([[:space:]]+.*|[[:space:]]*)$/ {
+	Print_initial_setup = TRUE
+	if (NF > 1) {
+		$1 = ""
+		$0 = $0
+		Initial_setup_name = $0
+	}
+	else
+		Initial_setup_name = "Initial setup"
+
+	next
+}
+
+/^@initial_setup[[:space:]]*$/, /^@end initial_setup[[:space:]]*$/ {
+	if (Pass == 1 || ! Print_initial_setup)
+		next
+
+	Chunk_info[Initial_setup_name]["type"] = "code chunk"
+	Chunk_info[Initial_setup_name]["defn"] = 1
+	if (/^@initial_setup[[:space:]]*$/) {
+		printf("%s\n", format_anchor(Initial_setup_name, 0))
+		printf("@noindent\n%s @equiv{}\n",
+			format_chunk_name(Initial_setup_name, 0, "code chunk"))
+		print Example_start
+	} else if (/^@end initial_setup[[:space:]]*$/) {
+		print Example_end
+	} else {
+		x = expand_tabs($0, Tabstop)
+		gsub(/[@{}]/, "@&", x)
+		print x
+	}
+
+	next
+}
+@
 
 @node jrweave last bit
 @section Passing Everything Else Through
@@ -3768,17 +3957,17 @@ and the code chunk references.
 @node File Definitions
 @appendixsec Source File Definitions
 
-@code{@@print_file_defs}
+@print_file_defs
 
 @node Code Chunk Definitions
 @appendixsec Code Chunk Definitions
 
-@code{@@print_code_defs}
+@print_code_defs
 
 @node Code Chunk References
 @appendixsec Code Chunk References
 
-@code{@@print_code_refs}
+@print_code_refs
 
 @node Use of @command{gawk} features
 @appendix Features Specific to @command{gawk}
