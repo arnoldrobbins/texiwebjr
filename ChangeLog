@@ -1,3 +1,8 @@
+2014-03-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Figure out how to put the chunk cross reference
+	info into a smaller font. Thanks to Karl Berry for the help.
+
 2014-03-14         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texindex: New file. Needed if using @allowindexbraces.

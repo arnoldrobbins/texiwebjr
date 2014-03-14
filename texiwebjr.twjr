@@ -2924,14 +2924,14 @@ print Example_end
 for (i in names)
 	names[i] = strip_out_name(names[i])	# remove delimiters
 
-# FIXME: Start of small font
+@<Move to a smaller font@>
 @<print list of other places where this chunk is defined@>
 if (Chunk_type == "code chunk") {
 	@<print list of chunks that call this one@>
 }
 @<remove duplicates from @code{names}@>
 @<print list of called chunks@>
-# FIXME: End of small font
+@<Move back to the regular font@>
 @
 
 
@@ -3037,6 +3037,28 @@ function sort_and_remove_duplicates(names,	i, dups)
 	for (i in dups)
 		names[i] = dups[i]
 }
+@
+
+The chunk cross reference information disrupts the flow
+of the text, so (following literate programming tradition)
+we print it in a smaller font. At the moment this only works
+for @TeX{}. It might could be made to work for HTML, but
+I'm not sure.
+As with the macros in @ref{jrweave @TeX{} control}, this
+depends on the innards of @file{texinfo.tex}. The
+@code{@@smallfonts} puts the new, smaller fonts in place
+and the @code{@@rm} (``Roman'') actually switches to them.
+
+@<Move to a smaller font@>=
+print "@iftex"
+print "@smallfonts @rm"
+print "@end iftex"
+@
+
+@<Move back to the regular font@>=
+print "@iftex"
+print "@textfonts @rm"
+print "@end iftex"
 @
 
 @node jrweave code chunks
