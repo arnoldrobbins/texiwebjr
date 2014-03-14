@@ -1,3 +1,7 @@
+2014-03-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texindex: New file. Needed if using @allowindexbraces.
+
 2014-03-13         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Considerably reworked chunk collection and
