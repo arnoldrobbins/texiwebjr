@@ -1,3 +1,8 @@
+2014-03-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Fix spelling errors. Uppercase first letter of
+	each chunk name. Set for printing.
+
 2014-03-15         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Figure out how to put the chunk cross reference

@@ -12,6 +12,7 @@
 @allowindexbraces
 @c No chunk numbers
 @numberlesschunks
+@set FORPRINT 1
 @ifclear FORPRINT
 @pdflinkcolor
 @urllinkcolor
@@ -568,7 +569,7 @@ Many literate programming tools have been developed since then.
 and
 @uref{http://searchcode.com/codesearch/view/14097352, Ben Pfaff's TexiWeb}.
 
-@cindex @command{noweb} literate programmng tool
+@cindex @command{noweb} literate programming tool
 @command{noweb} makes a conscious attempt to provide a minimal additional
 markup over and above the document formatting language. It also attempts
 to be portable to any markup language, not just @TeX{} or @LaTeX{},
@@ -577,7 +578,7 @@ several stages in a pipeline and a documented intermediate format,
 making it easily extensible.  It is the ``minimal additional markup''
 aspect of @command{noweb} that I find particular appealing.
 
-@cindex TexiWeb literate programmng tool
+@cindex TexiWeb literate programming tool
 TexiWeb was created by Ben Pfaff for writing his
 @uref{http://adtinfo.org/, AVL library}.
 It builds on the Texinfo markup language, which at first glance is
@@ -597,6 +598,16 @@ Traditionally, a web document is processed in two different ways,
 towards two different ends.
 
 @table @dfn
+@item Tangling
+This process turns a literate program into straight code that can be
+either run directly (scripting languages), or compiled (C, C++, etc.).
+Knuth's @command{WEB} provided @command{TANGLE}, which created a straight
+Pascal program.  The @command{noweb} suite has @command{notangle}.
+
+The @value{TWJR} tangling program is called @command{jrtangle}.  It reads
+a @value{TWJR} document and produces the source files defined therein for
+running or compiling.
+
 @item Weaving
 This process turns a literate program into a form that can be processed
 for printing.  Knuth's @command{WEB} provided @command{WEAVE}, which
@@ -609,15 +620,6 @@ be processed by @command{texi2dvi} or @command{texi2pdf} to produce
 a printable file. (It can also be processed with @command{makeinfo}
 to produce Info, HTML, DocBook, or Texinfo XML.)
 
-@item Tangling
-This process turns a literate program into straight code that can be
-either run directly (scripting languages), or compiled (C, C++, etc.).
-Knuth's @command{WEB} provided @command{TANGLE}, which created a straight
-Pascal program.  The @command{noweb} suite has @command{notangle}.
-
-The @value{TWJR} tangling program is called @command{jrtangle}.  It reads
-a @value{TWJR} document and produces the source files defined therein for
-running or compiling.
 @end table
 
 By convention, @value{TWJR} files have a @file{.twjr} extension.
@@ -2216,7 +2218,7 @@ sections and it is better to use @code{@@smallexample}.  The
 to use @code{@@smallexample} for all the file and code chunks.
 
 After some experimentation, it makes the most sense to make this
-be dynamic, allowing a documment author to switch things back
+be dynamic, allowing a document author to switch things back
 and forth.  To that end there is also a @code{@@use_example}
 statement.
 
@@ -2540,7 +2542,7 @@ Pass == 2 && /^@pdflinkcolor[[:space:]]*.*$/ {
 @
 
 Similar to internal links, you can set the color of URL links.
-They are independant of each other. The command here is @code{@@urllinkcolor}:
+They are independent of each other. The command here is @code{@@urllinkcolor}:
 
 @<Set URL formatting@> =
 Pass == 2 && /^@urllinkcolor[[:space:]]*.*$/ {
@@ -2729,7 +2731,7 @@ chunk, will use cross references to anchors.
 This is similar to the @code{"defn"} element; it is needed on the second
 pass to know where we are in the list of chunk definitions.
 
-@item Referers, or callers (@code{Chunk_info[Current_chunk]["callers"][@dots{}]})
+@item Referrers, or callers (@code{Chunk_info[Current_chunk]["callers"][@dots{}]})
 We need a list of other chunks that refer to this one in their bodies.
 This will be indexed by chunk name, and we will print the list
 sorted by chunk name.
@@ -2927,17 +2929,17 @@ for (i in names)
 	names[i] = strip_out_name(names[i])	# remove delimiters
 
 @<Move to a smaller font@>
-@<print list of other places where this chunk is defined@>
+@<Print list of other places where this chunk is defined@>
 if (Chunk_type == "code chunk") {
-	@<print list of chunks that call this one@>
+	@<Print list of chunks that call this one@>
 }
-@<remove duplicates from @code{names}@>
-@<print list of called chunks@>
+@<Remove duplicates from @code{names}@>
+@<Print list of called chunks@>
 @<Move back to the regular font@>
 @
 
 
-@<print list of other places where this chunk is defined@> =
+@<Print list of other places where this chunk is defined@> =
 print ""
 if ((total_defns = Chunk_info[Current_chunk]["defn"]) > 1) {
 	current_defn = Chunk_info[Current_chunk]["redefn"]
@@ -2965,7 +2967,7 @@ if ((total_defns = Chunk_info[Current_chunk]["defn"]) > 1) {
 }
 @
 
-@<print list of chunks that call this one@>=
+@<Print list of chunks that call this one@>=
 if ("callers" in Chunk_info[Current_chunk]) {
 	print ""
 	asorti(Chunk_info[Current_chunk]["callers"], my_callers)
@@ -2975,7 +2977,7 @@ if ("callers" in Chunk_info[Current_chunk]) {
 	} else {
 		n = Chunk_info[my_callers[1]]["defn"]
 
-		printf("@noindent\nThis chunk is called by %s; see its first defintion at %s.\n",
+		printf("@noindent\nThis chunk is called by %s; see its first definition at %s.\n",
 			format_chunk_name(my_callers[1],
 						Chunk_info[my_callers[1]]["chunk number"],
 						Chunk_info[my_callers[1]]["type"]),
@@ -3009,7 +3011,7 @@ function print_ref_table(chunklist,		i, x, n)
 }
 @
 
-@<print list of called chunks@> =
+@<Print list of called chunks@> =
 switch (length(names)) {
 case 0:
 	break;
@@ -3028,7 +3030,7 @@ default:
 }
 @
 
-@<remove duplicates from @code{names}@>=
+@<Remove duplicates from @code{names}@>=
 sort_and_remove_duplicates(names)
 @
 
@@ -3094,7 +3096,7 @@ function end_code_gathering()
 @section Printing File Definitions 
 
 At this point we have collected and printed all the file and code
-defintion chunks. Along the way we have gathered information about where
+definition chunks. Along the way we have gathered information about where
 each chunk is defined and where each chunk is referenced (used inside
 a chunk body), and we printed the relevant parts of that information
 after each chunk.
@@ -3272,7 +3274,7 @@ for (i = 1; i in Sorted_code_names; i++) {
 	printf("@item %s\n", tag)
 
 	Current_chunk = name	# for use by next chunk
-	@<print list of chunks that call this one@>
+	@<Print list of chunks that call this one@>
 }
 print "@end table"
 @
@@ -4122,7 +4124,7 @@ Distributed with the source code for @command{gawk}.
 @cite{Computers & Typesetting}}. This five-volume boxed set of hardback
 books contains the documentation and source for both @TeX{} and @MF{},
 as well as the Computer Modern fonts.  It is worthwhile to obtain the
-``millineum edition'' which includes fixes for all known issues up to
+``millenium edition'' which includes fixes for all known issues up to
 the last time it was printed.  My copy is dated 2011.
 
 @enumerate a
@@ -4179,4 +4181,3 @@ TODO:
 - Full indexing of variables and functions
 - Write a script to create texiwebjr.pot ?
 - Option to print out file update recipe?
-- Footnotes inside or outside of punctuation
