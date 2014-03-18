@@ -1,3 +1,9 @@
+2014-03-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Make numberless chunks the default, change the
+	command to @numberedchunks. Remove use of @numberlesschunks.
+	* template.twjr: Remove use of @numberlesschunks.
+
 2014-03-17         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Fix spelling errors. Uppercase first letter of

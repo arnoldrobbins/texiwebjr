@@ -10,8 +10,6 @@
 @dquotexrefs
 @c And let braces in index entries work.
 @allowindexbraces
-@c No chunk numbers
-@numberlesschunks
 @set FORPRINT 1
 @ifclear FORPRINT
 @pdflinkcolor
@@ -2358,22 +2356,25 @@ print "\\gdef\\oldnum#1{\\begingroup\\oldstyle #1\\endgroup}%"
 print "@end tex"
 @
 
-As a matter of taste, it may be that an author decides not
+After some experimentation and thought, I've decided to make
+the default be that chunks are unnumbered.
+However, as
+a matter of taste, it may be that an author decides
 to have numbers in the printed chunk names.  This can
-be done using the @code{@@numberlesschunks} command.
+be done using the @code{@@numberedchunks} command.
 This can be placed anywhere in the document; by checking for
 it during the first pass we guarantee it will be in effect
 when the document is output.
-The variable @code{Numberless_chunks} is checked during
+The variable @code{Numbered_chunks} is then checked during
 chunk name formatting.
 The check for the first pass is inside the body of the rule
 since the command must be removed from the output
 during the second pass.
 
 @<Texinfo authoring additions@>=
-/^@numberlesschunks[[:space:]]*$/ {
+/^@numberedchunks[[:space:]]*$/ {
 	if (Pass == 1)
-		Numberless_chunks = TRUE
+		Numbered_chunks = TRUE
 	next
 }
 @
@@ -2709,13 +2710,14 @@ is adequate, and that Mike's graph of chunks relates mainly to code chunks.
 The value is either @code{"file chunk"} or @code{"code chunk"}.
 
 @item Chunk number (@code{Chunk_info[Current_chunk]["chunk number"]})
-This is mainly for aesthetics and tradition; in @value{TWJR} the chunk numbers
-don't have any real added value.@footnote{Mike's @command{mweb} numbers chunks with
+This is mainly for tradition; in @value{TWJR} chunk numbers
+don't bring any real added value.@footnote{Mike's @command{mweb} numbers chunks with
 page number and occurrence on the page. E.g., chunk ``3b'' is the second chunk
 on page 3.  I can't do that without @emph{a lot} of grubbing around with
 raw @TeX{}, which I don't know how, nor want, to do.  And even if I were to bother,
 that would not solve the problem for other formats such as DocBook or HTML.}
-For this reason they may be disabled with the @code{@@numberlesschunks} command
+Thus, the default is not to have numbers, bu they can be enabled
+with the @code{@@numberedchunks} command
 (@pxref{jrweave additional macros}).
 
 @item Definition points (@code{Chunk_info[Current_chunk]["defn"]})
@@ -3540,7 +3542,7 @@ function format_chunk_name(name, count, type,	result, left, right, style)
 	} else
 		fatal(_"format_chunk_name: Unknown chunk type `%s'\n", type)
 
-	if (count > 0 && ! Numberless_chunks)
+	if (count > 0 && Numbered_chunks)
 		result = sprintf("@r{%s@%s{%s} @oldnum{%d}%s}",
 						left, style, name, count, right)
 	else
@@ -3940,8 +3942,8 @@ them when tangling.
 Define the actions to be done before @command{jrtangle}
 creates any files. @xref{jrtangle before everything}.
 
-@item @@numberlesschunks
-Don't use numbered chunks in the printed document.
+@item @@numberedchunks
+Do use numbered chunks in the printed document.
 @xref{jrweave additional macros}.
 
 @item @@oldnum@{@var{number}@}

@@ -12,8 +12,6 @@
 @dquotexrefs
 @c And let braces in index entries work.
 @allowindexbraces
-@c No chunk numbers
-@numberlesschunks
 @ifclear FORPRINT
 @pdflinkcolor
 @urllinkcolor
