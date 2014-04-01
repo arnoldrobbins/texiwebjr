@@ -1,3 +1,7 @@
+2014-04-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Fix printing of other definitions for chunks.
+
 2014-03-18         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Make numberless chunks the default, change the

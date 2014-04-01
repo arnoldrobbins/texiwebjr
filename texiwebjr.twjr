@@ -2942,30 +2942,36 @@ if (Chunk_type == "code chunk") {
 
 
 @<Print list of other places where this chunk is defined@> =
-print ""
-if ((total_defns = Chunk_info[Current_chunk]["defn"]) > 1) {
-	current_defn = Chunk_info[Current_chunk]["redefn"]
+print_other_defns(Current_chunk,
+		Chunk_info[Current_chunk]["defn"],
+		Chunk_info[Current_chunk]["redefn"])
+@
 
-	print "@noindent\nThis chunk is also defined in"
+@(jrweave@) =
+function print_other_defns(chunk, total_defns, current_defn,		other_defns, i, j)
+{
+		if (total_defns == 1)
+			return
 
-	# Anchors for 1 .. current_defn - 1
-	for (i = 1; i <= current_defn - 1; i++) {
-		if (i + 1 == current_defn && current_defn == total_defns)
-			print " and"
-		printf("%s", format_xref(Current_chunk, i))
-		if (i + 1 < current_defn || current_defn < total_defns)
-			print ","
-	}
+		print ""
+		print "@noindent"
+		print "This chunk is also defined in"
 
-	# Anchors for redefn + 1 .. total_defns
-	for (i = current_defn + 1; i <= total_defns; i++) {
-		printf("%s", format_xref(Current_chunk, i))
-		if (i + 1 < total_defns)
-			print ","
-		else if (i + 1 == total_defns)
-			print ",\nand"
-	}
-	print "."
+		for (i = j = 1; i <= total_defns; i++) {
+			if (i == current_defn)
+				continue
+
+			other_defns[j++] = i
+		}
+
+		for (i = 1; i < j; i++) {
+			printf("%s", format_xref(chunk, other_defns[i]))
+			if (i + 2 == j)
+				print ", and"
+			else if (i + 2 < j)
+				print ","
+		}
+		print "."
 }
 @
 
