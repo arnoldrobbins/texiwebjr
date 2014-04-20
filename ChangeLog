@@ -1,3 +1,8 @@
+2014-04-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Checkpoint checkin and push. Most of the way
+	through lots of cleanups.
+
 2014-04-01         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Fix printing of other definitions for chunks.

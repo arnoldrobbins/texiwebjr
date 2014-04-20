@@ -193,8 +193,8 @@ on top of the Texinfo document formatting markup language.
 * Bootstrapping::                  Chicken and egg issues.
 * Evaluation and Futures::         Evaluation and future work.
 * Command summary::                Alphabetic list of @value{TWJR} commands.
-* Code Chunk Summaries::           Alphabetic lists of code chunks by
-                                   definition and by reference.
+* File Chunk Summaries::           Alphabetic lists of file chunks by
+                                   definition.
 * Use of @command{gawk} features:: Features Specific to @command{gawk}.
 * Bibliography::                   Reference material.
 * Concept Index::                  The concept index.
@@ -250,11 +250,7 @@ on top of the Texinfo document formatting markup language.
 * Initial bootstrapping::          Bringing up the system from scratch.
 * The initial setup::              The initial setup.
 * The Makefile::                   Keeping the system going.
-* Downloading from git::           Downloading from the @command{git}
-                                   Repository.
-* File Definitions::               Source files by definition.
-* Code Chunk Definitions::       Code chunks by definition.
-* Code Chunk References::        Code chunks by reference.
+* Downloading from git::           Downloading from the Git repository.
 @end detailmenu
 @end menu
 
@@ -273,7 +269,7 @@ Professor Donald E.@: Knuth, of Stanford University.
 Programming well this way requires the author of a program to
 present clear explanations of both how his program functions
 and why it is written in the way it is. The discipline involved
-thus leads to better programs.
+leads to better programs.
 
 The Texinfo markup language is the official documentation markup
 language of the GNU Project. It makes writing program documentation
@@ -304,6 +300,7 @@ I do know that I was dabbling with it as early as sometime in the first
 half of 1998, since that is when I found and fixed a race condition in
 @command{noweb}'s @command{troff} backend.
 
+@cindex Brennan, Michael
 From October of 1999 through September of 2001, I did some consulting work
 for Mike Brennan, the author of
 @uref{http://www.invisible-island.net/mawk, @command{mawk}}
@@ -391,7 +388,7 @@ and describes some of the motivation for @value{TWJR}
 literate programming system from scratch and shows the initial setup
 recipe. It also presents the @file{Makefile} used for ongoing maintenance,
 and for lack of a better place, describes how to obtain the source for
-the system using @command{git}.
+the system using Git.
 
 @ref{Evaluation and Futures}, provides some brief discussion
 of various design decisions, as well as looking at possible
@@ -402,9 +399,8 @@ the @value{TWJR} commands. It also lists the variables that
 a user may set using @command{gawk}'s @option{-v} option to
 affect the behavior of the programs.
 
-@ref{Code Chunk Summaries}, provides
-alphabetic lists of source files by definition, and of
-code chunks by definition and by reference.
+@ref{File Chunk Summaries}, provides
+alphabetic lists of source files by definition.
 
 @ref{Use of @command{gawk} features}, looks at the
 @command{gawk}-specific features that are used with a brief
@@ -453,7 +449,7 @@ like this: @option{-f}.  Some things are emphasized @emph{like this},
 and if a point needs to be made strongly, it is done @strong{like this}.
 The first occurrence of a new term is usually its @dfn{definition} and
 appears in the same font as the previous occurrence of ``definition''
-in this sentence.  Finally, file names are indicated like this:
+in this sentence.  File names are indicated like this:
 @file{/path/to/our/file}.
 @end ifnotinfo
 
@@ -495,7 +491,9 @@ Karl Berry for his infinite patience with my questions about
 and suggestions for Texinfo.
 
 @item
-Reviewers here @enddots{}
+@cindex Brennan, Michael
+Thanks to Mike Brennan for his feedback on earlier versions
+of @value{TWJR}.  They helped to significantly improve it.
 @end itemize
 
 @node Introduction
@@ -543,11 +541,12 @@ doing. Preferably, the prose also describes @emph{why} the code is
 implemented in a particular fashion.
 
 The significant difference over simply using lots of comments is
-that code is presented in the order that makes the most sense for
+that the code is presented in the order that makes the most sense for
 the human reading and understanding the program, as opposed to the
 order needed for the programming language's compiler or interpreter.
 More information and pedagogy may be found on
 @uref{http://www.literateprogramming.com, the literate programming website}.
+Please see there.
 
 Knuth's original @command{WEB} system was built on top of and for use
 with Pascal.  When this was done in the early 1980s, Pascal was just about
@@ -568,13 +567,13 @@ and
 @uref{http://searchcode.com/codesearch/view/14097352, Ben Pfaff's TexiWeb}.
 
 @cindex @command{noweb} literate programming tool
-@command{noweb} makes a conscious attempt to provide a minimal additional
+@command{noweb} makes a conscious attempt to provide minimal additional
 markup over and above the document formatting language. It also attempts
 to be portable to any markup language, not just @TeX{} or @LaTeX{},
 and to any programming language.  Finally, it is programmable, with
 several stages in a pipeline and a documented intermediate format,
 making it easily extensible.  It is the ``minimal additional markup''
-aspect of @command{noweb} that I find particular appealing.
+aspect of @command{noweb} that I find particularly appealing.
 
 @cindex TexiWeb literate programming tool
 TexiWeb was created by Ben Pfaff for writing his
@@ -713,7 +712,7 @@ Start or add to the definition of a code chunk named @var{chunkname}.
 @end table
 
 @quotation NOTE
-Due to the implementation of @command{jrweave}, file chunks and code
+Due to the implementation of both programs, file chunks and code
 chunks share the same ``name space,'' meaning that you will
 cause severe confusion if you attempt to use the same name
 as a source file name and as a code chunk name.
@@ -741,6 +740,26 @@ Let's get started.  Here is the code for @command{jrtangle}.
 The file starts with the obligatory @samp{#!} header and copyright
 statements, followed by code chunks and functions common to both
 @command{jrtangle} and @command{jrweave}.
+
+This is the first file chunk we've seen. @value{TWJR}
+automatically adds cross reference information after each
+chunk. For code chunks, the information is:
+
+@itemize @bullet
+@item
+A list of other places where the chunk is defined.
+
+@item
+A statement or list of other chunks that call this chunk.
+
+@item
+A statement or list pointing to the first definition of
+any chunk that is called by this chunk.
+@end itemize
+
+File chunks, by default, do not include the list other definition
+points since this list tends to be voluminous and not of much
+value. It can be enabled if necessary (@pxref{jrweave additional macros}).
 
 @cindex @code{@@post_create} command, @command{jrtangle}
 @post_create jrtangle chmod +x jrtangle
@@ -886,10 +905,10 @@ to add more stuff to a definition. We just use @samp{=} and figure it
 out. File and code chunks end with a single @samp{@@} on a line by itself,
 with the @samp{@@} in column 1.
 
-@code{File_chunk_pattern} describes the regexp for matching the first
-line of a file chunk. It is a variable since it needs to be used for
-matching and with @code{gensub()}. This is better than repeating the
-regexp in the code.
+The variable @code{File_chunk_pattern} describes the regexp for matching
+the first line of a file chunk. It is a variable since it needs to be
+used for matching and with @code{gensub()}. This is better than repeating
+the regexp in the code.
 
 @<Definition of @code{File_chunk_pattern}@> =
 File_chunk_pattern = "^@\\(([^)]+)@\\)[[:space:]]*=[[:space:]]*$"
@@ -933,7 +952,7 @@ flags (boolean values) indexed by strings indicating what we're doing.
 @cindex debugging, @code{Debug} variable
 The check against @code{Debug} uses a nice trick. By using
 @command{gawk}'s @option{-v} option, we can set @code{Debug} to any value,
-such as @code{"filename code"} and debug as many different aspects of
+such as @samp{filename code} and debug as many different aspects of
 the program simultaneously as we might want.  Use of the @command{gawk}
 built-in debugger also helps considerably.
 
@@ -1068,7 +1087,7 @@ The next major piece of logic is the collection of code chunks.
 Code chunks are like file chunks. They start with @samp{@@<chunk-name@@>
 =} and end with a standalone @samp{@@} sign. The logic and handling are
 essentially identical to what we just did for files, especially now that
-we are sharing code chunks.
+we are sharing code.
 
 First the pattern to match.  My initial attempt at a pattern was:
 
@@ -1082,7 +1101,7 @@ However, this didn't work as soon as I used a chunk name that included Texinfo
 commands.  Ooops.  So now the pattern is more general.
 
 Since we have to bootstrap from this file, and @samp{@@<(.+)@@>}
-looks like a code chunk name, we create it using string concatenation:
+looks like a code chunk name, we create the pattern using string concatenation:
 
 @<Constants used by @command{jrtangle} and @command{jrweave}@> =
 Code_chunk_pattern = "^@" "<(.+)" "@>[[:space:]]*=[[:space:]]*$"
@@ -1110,7 +1129,7 @@ For @command{jrtangle} we store the lines for later use.
 
 @findex @code{end_code_gathering()} function, @command{jrtangle}
 @<Process code chunks for @code{jrtangle}@>=
-# end_code_gathering --- complete the collecting lines of code chunk
+# end_code_gathering --- complete collecting lines of the code chunk
 
 function end_code_gathering()
 {
@@ -1161,15 +1180,15 @@ and @command{jrweave}. This is the first of the shared helper functions,
 @findex @code{check_unfinished()} function
 @<Helper Functions@> =
 # check_unfinished --- print a fatal error when an unfinished code or
-#			file section is detected. Also ifweave / iftangle.
+#			file chunk is detected. Also ifweave / iftangle.
 
 function check_unfinished()
 {
 	if (Flags["file chunk"])
-		fatal(_"unfinished file section (started at %s)\n",
+		fatal(_"unfinished file chunk (started at %s)\n",
 			Line_numbers["file chunk"])
 	else if (Flags["code chunk"])
-		fatal(_"unfinished code section (started at %s)\n",
+		fatal(_"unfinished code chunk (started at %s)\n",
 			Line_numbers["code chunk"])
 
 	if ("ifweave" in Line_numbers)
@@ -1383,7 +1402,7 @@ for (i = 1; i <= num_names; i++) {
 		fatal(_"expand_one_line: code chunk `%s' expands itself recursively\n",
 			chunk_names[i])
 	else
-		Currently_expanding[j]++
+		Currently_expanding[j] = TRUE
 }
 @
 @use_example
@@ -1637,7 +1656,7 @@ The collection code should look familiar by now:
 
 @cindex @code{@@file_update_recipe} command, @command{jrtangle}
 @<File update recipe handling@>=
-/^@file_update_recipe[[:space:]]*$/, \
+/^@file_update_recipe[[:space:]]*$/,
 			/^@end file_update_recipe[[:space:]]*$/ {
 	if (/^@file_update_recipe[[:space:]]*$/) {
 		# start of construct, save line number, skip this line
@@ -1832,8 +1851,10 @@ Print an error message using @code{message()} and then exit.
 Print a warning message using @code{message()} but don't exit.
 
 @item join()
-Join an array into a single string. This function is copied
-from @cite{Effective Awk Programming} (the @command{gawk}
+Join an array into a single string. This function is copied from
+@uref{http://www.gnu.org/software/gawk/manual/html_node/Join-Function.html,
+@cite{GAWK: Effective AWK Programming}},
+(the @command{gawk}
 documentation).
 
 @end table
@@ -1966,6 +1987,7 @@ referenced before it is defined; in fact this is usually the case.
 This raises a difficulty; @command{jrweave} cannot print a chunk
 with its associated number if it hasn't yet seen its definition.
 
+@cindex Brennan, Michael
 It is also traditional, for each chunk, to print a list of other
 places where the chunk is defined, and where the chunk is used.
 Mike Brennan suggests that furthermore, it is worthwhile to print
@@ -1999,7 +2021,7 @@ We use the standard two-pass mechanism for an @command{awk}
 program, which is to insert a variable assignment into
 @code{ARGV} and to duplicate the list of input files in
 additional elements in @code{ARGV}.
-In order to allow very large documents split into multiple
+In order to allow very large documents which are split into multiple
 files, we copy the full list over.
 
 @<Set up two passes@> =
@@ -2036,7 +2058,7 @@ Pass == 2 && FNR == 1 && Debug ~ /pass2/ {
 @
 
 @node jrweave initial code
-@section Initial Stuff and Printing A Warning
+@section Printing A Warning
 
 We print an initial header to remind the user @emph{not} to edit the
 generated Texinfo file.
@@ -2207,6 +2229,8 @@ do is skip over them with @code{next}.
 }
 @
 
+The last two could be combined, but it's not really that big a deal.
+
 @node jrweave choosing code size
 @section Choosing The Code Size
 
@@ -2286,7 +2310,7 @@ Pass == 2 && /^@titlepage/ {
 	print "@c Start extra commands added by jrweave\n"
 	@<Macro to hide email addresses in HTML@>
 	print ""
-	@<FIXME macro@>
+	@<Macro for ``FIXME'' notes@>
 	print ""
 	@<Macro for ``old style'' numbers@>
 	print "\n@c End extra commands added by jrweave"
@@ -2330,7 +2354,7 @@ that will appear in the output so that I will remember to tend to it.
 
 @cindex @code{@@FIXME} macro, @command{jrweave}
 @cindex macro, @command{jweave}, @code{@@FIXME}
-@<FIXME macro@>=
+@<Macro for ``FIXME'' notes@>=
 print "@macro FIXME{text}"
 print "@strong{FIXME}: \\text\\"
 print "@end macro"
@@ -2375,6 +2399,22 @@ during the second pass.
 /^@numberedchunks[[:space:]]*$/ {
 	if (Pass == 1)
 		Numbered_chunks = TRUE
+	next
+}
+@
+
+@cindex @code{@@file_chunk_full_defs} command, @command{jrweave}
+Also after some experimentation, I found that printing the
+full list of definition points for file chunks after each
+occurrence wasn't very helpful.  There can be many such,
+and the list mostly just takes up space.  However, if
+an author wants this list, it can be printed with the
+@code{@@file_chunk_full_defs} command.
+
+@<Texinfo authoring additions@>=
+/^@file_chunk_full_defs[[:space:]]*$/ {
+	if (Pass == 1)
+		Print_file_full_defs = TRUE
 	next
 }
 @
@@ -2461,6 +2501,16 @@ Use them with care!
 @<Enable braces in index entries@>
 @
 
+@menu
+* Cross-reference quoting::     Changing quoting for cross-references.
+* PDF links::                   Changing the color of internal PDF links.
+* URL formatting::              Link color and text formatting for URLs.
+* Improved index entries::      Creating improved index entries.
+@end menu
+
+@node Cross-reference quoting
+@subsubsection Changing Quoting for Cross-References
+
 I happen to dislike the way chapter and section titles are quoted in
 cross-references in @TeX{} output.  You can change to use double-quoted
 titles with the @code{@@dquotexrefs} command:
@@ -2481,6 +2531,9 @@ The commented-out @code{print} statement shows an alternative that I
 experimented with, to italicize titles, but then the formatting doesn't
 look quite as good.
 
+@node PDF links
+@subsubsection Changing The Color of Internal PDF Links
+
 Texinfo is slightly schizophrenic in relation to output from @TeX{}.
 In particular, PDF provides the ability to have @dfn{links}, both
 within the document and to external URLs.  In a PDF viewer, clicking
@@ -2489,15 +2542,15 @@ starts a web browser.  Previously, when a Texinfo file was processed with
 pdf@TeX{}, both cross-references and URLs were formatted as PDF links,
 in a different color.
 
-On the other hand, regular DVI output is aimed more for printing.  Thus,
+On the other hand, regular DVI output is intended more for printing.  Thus,
 when run with regular @TeX{}, Texinfo documents showed URLs inline in
 the text, and cross references were printed in black.
 
 It is important to note that PDF files can also be used as the master
 for printing.  In such a case, you @emph{don't} want cross-references
-in a different color and you do want URLs to appear in the text.
+in a different color and you @emph{do} want URLs to appear in the text.
 
-Because of this, in November 2013, @file{texinfo.tex} was changed to use
+Because of this confusion, in November 2013, @file{texinfo.tex} was changed to use
 the DVI printing style for both cross-references and URLs. However,
 facilities were documented for enabling the previous behavior should
 you wish to do so.
@@ -2513,7 +2566,7 @@ This sets the color for internal links.  Here, @var{red}, @var{green}
 and @var{blue} are values between zero and one (inclusive) to indicate
 how much of each color to use in creating the final color.
 The default is the previous value used by @file{texinfo.tex},
-called ``dark red'': 0.50 red, 0.09 green, and 0.12 blue.
+called ``dark red:'' 0.50 red, 0.09 green, and 0.12 blue.
 
 @(jrweave@) =
 BEGIN {
@@ -2542,8 +2595,12 @@ Pass == 2 && /^@pdflinkcolor[[:space:]]*.*$/ {
 }
 @
 
+@node URL formatting
+@subsubsection Link Color And Text Formatting For URLs
+
 Similar to internal links, you can set the color of URL links.
-They are independent of each other. The command here is @code{@@urllinkcolor}:
+They are independent of each other. The command here is @code{@@urllinkcolor}
+(and the default color is the same):
 
 @<Set URL formatting@> =
 Pass == 2 && /^@urllinkcolor[[:space:]]*.*$/ {
@@ -2580,6 +2637,9 @@ Pass == 2 && /^@hideurls[[:space:]]*$/ {
 }
 @
 
+@node Improved index entries
+@subsubsection Creating Improved Index Entries
+
 Until Texinfo 5.2, if open or close braces were the first real character
 in an index entry, they were indexed under @samp{|}, which comes between
 the brace characters in ASCII order.  This was largely due to how the
@@ -2587,7 +2647,7 @@ the brace characters in ASCII order.  This was largely due to how the
 input created for it by @file{texinfo.tex}.
 
 Early in 2014 I fixed this by rewriting @command{texindex} in
-@command{awk} (using @value{TWJR} to do so!)  and current versions of
+@command{awk} (using @value{TWJR} to do so!) and current versions of
 @file{texinfo.tex} allow enabling index entries where braces may be used.
 The @value{TWJR} command @code{@@allowindexbraces} enables this feature.
 
@@ -2654,9 +2714,7 @@ Pass == 2 && /^@c %\*\*end of header/ {
 @node jrweave def/use collecting
 @section Tracking Definitions and Uses
 
-@FIXME{Consider grouping all the def / use stuff into a section and making
-the following few sections into subsections.}
-
+@cindex Brennan, Michael
 @quotation
 A literate document defines a directed acyclic graph of code chunks.
 Mostly it is a tree.
@@ -2702,12 +2760,13 @@ We need to track the following:
 @table @asis
 @item Chunk type (@code{Chunk_info[Current_chunk]["type"]})
 File chunk or code chunk.
-We assume (for now) that the list of file chunk
-definitions provide by
-@code{@@print_file_defs}
-(@pxref{jrweave file defs})
-is adequate, and that Mike's graph of chunks relates mainly to code chunks.
 The value is either @code{"file chunk"} or @code{"code chunk"}.
+By default, we assume that the list of file chunk definitions provide
+by @code{@@print_file_defs} (@pxref{jrweave file defs}) is adequate,
+and that Mike's graph of chunks relates mainly to code chunks.
+Should an author wish to have the full list of file definitions at each
+point in the document where a file chunk is defined, he may use the
+@code{@@file_chunk_full_defs} command (@pxref{jrweave additional macros}).
 
 @item Chunk number (@code{Chunk_info[Current_chunk]["chunk number"]})
 This is mainly for tradition; in @value{TWJR} chunk numbers
@@ -2724,7 +2783,7 @@ with the @code{@@numberedchunks} command
 Each point where a chunk is defined (created or added onto) is a definition point.
 These are the siblings in Mike's graph.
 It is enough to track how many definitions there are by incrementing
-this array element. The definition number is used to generate anchors
+this array element. The definition number is used to generate Texinfo anchors
 which are used in cross references.
 All references to other chunks, and to sibling definitions of the current
 chunk, will use cross references to anchors.
@@ -2753,12 +2812,25 @@ the source document file(s).
 @node jrweave file chunks
 @section Processing File Chunks for @command{jrweave}
 
-Now comes the hard part. We use the same process for file chunks
-and for code chunks, although each will be tracked separately.
+Now comes the hard part. We first collect the lines,
+process the chunks during the first pass, and print them
+in the second pass.
+
+@menu
+* jrweave chunk collection::       Collecting file and code chunks.
+* jrweave file chunks processing:: Processing the file chunks.
+* jrweave file chunks printing::   Printing the file chunks.
+@end menu
+
+@node jrweave chunk collection
+@subsection Collecting File And Code Chunks
+
+We use the same process for file chunks
+and for code chunks, although each is tracked separately.
 
 @(jrweave@) =
 @<Process file chunks for @code{jrweave}@>
-@<Process code chunk for @command{jrweave}@>
+@<Process code chunks for @command{jrweave}@>
 @
 
 The initial code is similar to that of @command{jrtangle}.
@@ -2779,13 +2851,14 @@ lines.
 @<Collect chunk lines@>
 @
 
-The @code{end_file_gathering()} function is where
-we will do all the work.  It simply delegates
-to two different functions based on whether we
-are collecting data (pass 1) or printing it (pass 2).
-In fact, the actions are the same for file chunks
-and code chunk, so the work can be delegated
-to a common function.
+@node jrweave file chunks processing
+@subsection Processing The Chunks
+
+The @code{end_file_gathering()} function is where we will do all the work.
+It simply delegates to two different functions based on whether we are
+collecting data (pass 1) or printing it (pass 2).  In fact, the actions
+are the same for file chunks and code chunk, so the work can be delegated
+to a common function which makes the decision and does the work.
 
 @(jrweave@) =
 function end_chunk_gathering()
@@ -2812,7 +2885,7 @@ information we're going to need.
 function collect_chunk_info(	i, n, x, called, junk)
 {
 	# Current_chunk, Chunk_type already set by initial code
-	# Chunk number
+	# Chunk number:
 	if (! ("chunk number" in Chunk_info[Current_chunk])) {
 		Chunk_info[Current_chunk]["chunk number"] = \
 								++Chunk_numbers[Chunk_type]
@@ -2827,10 +2900,15 @@ function collect_chunk_info(	i, n, x, called, junk)
 	# Add ourselves to the callers
 	for (i in called) {
 		x = strip_out_name(called[i])
-		Chunk_info[x]["callers"][Current_chunk]++
+		Chunk_info[x]["callers"][Current_chunk] = TRUE
 	}
 }
 @
+
+@node jrweave file chunks printing
+@subsection Printing The File Chunks
+
+On the second pass, we print the chunk.
 
 @(jrweave@)=
 function print_out_chunk(	x, y, n, i, parts, names,
@@ -2839,7 +2917,7 @@ function print_out_chunk(	x, y, n, i, parts, names,
 	# Redefinition instance
 	Chunk_info[Current_chunk]["redefn"]++
 
-	@<Print the chunk body@>
+	@<Print the chunk@>
 }
 @
 
@@ -2849,7 +2927,7 @@ formatting the names of the referenced chunks, and
 closing off the environment.
 Then we have to print all the cross reference information.
 
-@<Print the chunk body@> =
+@<Print the chunk@> =
 @<Try to keep at least the first two lines of the chunk together@>
 @<Print the anchor@>
 @<Convert the lines for @TeX{}@>
@@ -2931,7 +3009,12 @@ for (i in names)
 	names[i] = strip_out_name(names[i])	# remove delimiters
 
 @<Move to a smaller font@>
-@<Print list of other places where this chunk is defined@>
+# Print other definition sites for code chunks, or for file
+# chunk if Print_file_full_defs is true
+if (Chunk_type == "code chunk" || Print_file_full_defs) {
+	@<Print list of other places where this chunk is defined@>
+}
+# Print callers for code chunks
 if (Chunk_type == "code chunk") {
 	@<Print list of chunks that call this one@>
 }
@@ -3083,7 +3166,7 @@ print "@end iftex"
 Code chunk collection and formatting can now benefit from all
 the work done previously.
 
-@<Process code chunk for @command{jrweave}@> =
+@<Process code chunks for @command{jrweave}@> =
 $0 ~ Code_chunk_pattern {
 	@<Common code chunk initial processing@>
 	next
@@ -3123,13 +3206,13 @@ which makes the nost sense anyway.
 The command to print the file definitions is @code{@@print_file_defs}.
 
 @(jrweave@) =
-@<Handle @code{@@print_file_defs}@>
+@<Handle @code{print_file_defs}@>
 @
 
 This is done in the second pass:
 
 @cindex @code{@@print_file_defs} command, @command{jrweave}
-@<Handle @code{@@print_file_defs}@> =
+@<Handle @code{print_file_defs}@> =
 Pass == 2 && /^@print_file_defs[[:space:]]*$/ {
 	@<Print file chunk definition list@>
 	next
@@ -3199,13 +3282,13 @@ Printing code definitions is almost identical to printing
 file definitions.
 
 @(jrweave@) =
-@<Handle @code{@@print_code_defs}@>
+@<Handle @code{print_code_defs}@>
 @
 
 This too is done in the second pass:
 
 @cindex @code{@@print_code_defs} command, @command{jrweave}
-@<Handle @code{@@print_code_defs}@> =
+@<Handle @code{print_code_defs}@> =
 Pass == 2 && /^@print_code_defs[[:space:]]*$/ {
 	@<Print code chunk definition list@>
 	next
@@ -3251,13 +3334,13 @@ print "@end table"
 Printing code references is the flip side of printing code definitions.
 
 @(jrweave@) =
-@<Handle @code{@@print_code_refs}@>
+@<Handle @code{print_code_refs}@>
 @
 
 First, recognize the @code{@@print_code_refs} command:
 
 @cindex @code{@@print_code_refs} command, @command{jrweave}
-@<Handle @code{@@print_code_refs}@> =
+@<Handle @code{print_code_refs}@> =
 Pass == 2 && /^@print_code_refs[[:space:]]*$/ {
 	@<Create @code{Sorted_code_names}@>
 	@<Print code chunk references list@>
@@ -3570,13 +3653,13 @@ Who will compile the compiler?@footnote{Yes, I made up this quote.}
 This @value{CHAPTER} discusses the initial bootstrapping process,
 presents the initial setup recipe for the @value{TWJR} software,
 presents a @file{Makefile} for ongoing maintenance, and describes
-how to access the software using @command{git}.
+how to access the software using Git.
 
 @menu
 * Initial bootstrapping::       Bringing up the system from scratch.
 * The initial setup::           The initial setup.
 * The Makefile::                Keeping the system going.
-* Downloading from git::        Downloading from the @command{git} Repository.
+* Downloading from git::        Downloading from the Git repository.
 @end menu
 
 @node Initial bootstrapping
@@ -3716,10 +3799,10 @@ distclean: clean
 @
 
 @node Downloading from git
-@section Downloading From The @command{git} Repository
+@section Downloading From The Git Repository
 
 The code for @value{TWJR} is available from GitHub.
-To get it, you will need a @uref{http://git-scm.org, @command{git}}
+To get it, you will need a @uref{http://git-scm.org, Git}
 client of some kind.  The instructions here presume a command-line
 style client.
 
@@ -3772,7 +3855,7 @@ What you see is the final product; it evolved during development.
 Unfortunately, there is no good way to present, in a static document
 like this one, the dynamics of the software development, and to show
 how the program changed as it grew.@footnote{The morbidly curious can
-go grovelling through the history in the @command{git} repository.
+go grovelling through the history in the Git repository.
 However, I'm not sure that's a good use of anyone's time.} The best I
 can do is make some appropriate notes in the prose in the right places;
 e.g., that chunks are stored without the final newline.
@@ -3802,17 +3885,16 @@ the name of the input file with the same kind of ``did it change?'' checking
 being done by @command{jrweave}, instead of this having to be done in the
 @file{Makefile} (if at all).
 
-@item
-The generated list of file definitions, and of chunk definitions and references 
-aren't wonderful. It might be necessary to track the current @code{@@node}
-and maybe chapter / section / subsection to do this really well. On the other
-hand, that looks to be a fair amount of work.
-
 @end itemize
 
 I can think of several possible future enhancements:
 
 @itemize @bullet
+@item
+Sidebars are currently indexed in the regular concept index.
+It might be reasonable to place them into a seprate index which
+the author would either print or merge into the concept index.
+
 @item
 Some kind of general mechanism for adding in @code{#line}
 statements for C and C++.
@@ -3882,6 +3964,11 @@ x
 (@command{jrtangle} + @command{jrweave}).
 Of course, ultimately, this was a major improvement.
 
+Another correct design decision was to format the generated code
+preserving indentation.  This makes it enormously easier to work
+with from the @command{gawk} debugger, since the standalone code
+is also legible.
+
 @node Command summary
 @appendix Alphabetic List of @value{SHORTTITLE} Commands and Variables
 
@@ -3912,6 +3999,11 @@ Use @var{spelled} as the email address for HTML output.
 Use @var{real} as the email address for anything else.
 This is to help avoid having one's email address harvested
 by spammers.
+@xref{jrweave additional macros}.
+
+@item @@file_chunk_full_defs
+Print the full list of file chunk definition
+points after each file chunk.
 @xref{jrweave additional macros}.
 
 @item @@file_update @var{file} @var{directory} @var{suffix}
@@ -4030,33 +4122,16 @@ it is up to you to get the command syntax right.
 This controls how many spaces are used to expand real tab characters.
 @end table
 
-@node Code Chunk Summaries
-@appendix Code Chunk Summaries
+@node File Chunk Summaries
+@appendix File Chunk Summaries
 
 This @value{APPENDIX} presents alphabetical lists of
-all the file definitions, the code chunk definitions,
+all the file definitions. The code chunk definitions
+and references are printed after each chunk in the body
+of the @value{DOCUMENT}.
 and the code chunk references.
 
-@menu
-* File Definitions::            Source files by definition.
-* Code Chunk Definitions::    Code chunks by definition.
-* Code Chunk References::     Code chunks by reference.
-@end menu
-
-@node File Definitions
-@appendixsec Source File Definitions
-
 @print_file_defs
-
-@node Code Chunk Definitions
-@appendixsec Code Chunk Definitions
-
-@print_code_defs
-
-@node Code Chunk References
-@appendixsec Code Chunk References
-
-@print_code_refs
 
 @node Use of @command{gawk} features
 @appendix Features Specific to @command{gawk}
