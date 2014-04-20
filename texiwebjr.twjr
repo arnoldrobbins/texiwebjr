@@ -2936,6 +2936,17 @@ Then we have to print all the cross reference information.
 @<Print chunk cross reference information@>
 @
 
+@menu
+* Keeping lines together::           Keeping chunk lines together.
+* Formatting the anchor::            Formatting the anchor.
+* Expanding tabs::                   Expanding tabs.
+* Printing the complete chunk::      Printing the complete chunk.
+* Printing chunk cross references::  Printing chunk cross references.
+@end menu
+
+@node Keeping lines together
+@subsubsection Keeping Chunk Lines Together
+
 For aesthetic purposes, it would be good to keep at least the first
 two lines of the chunk together.  The Texinfo command to do this
 is @code{@@need}, which takes an argument in ``mils''---thousandths of
@@ -2945,16 +2956,20 @@ So, how many thousandths of an inch do two lines take? Karl Berry advised
 to try using @samp{@@showthe@@baselineskip}.  The result is 13.2 points.
 There are 72 points in an inch, so one line is 13.2 divided by 72 = 0.183
 inches.  Multiply that by two, and we get 0.367 inches.  We round that
-up to a slightly larger number in the hopes that this will actually work:
+up to a slightly larger number in the hopes that this will actually
+work:@footnote{Unfortunately, this doesn't always work. I don't know why.}
 
 @<Try to keep at least the first two lines of the chunk together@> =
 print "@need 400"
 @
 
-Formatting the anchor is handled by a separate function which
-we'll see later. The output is the anchor.
-We have to pass it the @code{"redefn"} value since we're in
-the second pass.
+@node Formatting the anchor
+@subsubsection Formatting The Anchor
+
+Formatting the anchor is handled by a separate function which we'll
+see later. The output is the anchor.  Since we are in the second pass,
+we have to pass it the @code{"redefn"} value for where we are, and the
+@code{"defn"} value which represents the total number of definitions.
 
 @<Print the anchor@> =
 anchor = format_anchor(Current_chunk,
@@ -2962,6 +2977,9 @@ anchor = format_anchor(Current_chunk,
 			Chunk_info[Current_chunk]["defn"])
 printf("%s\n", anchor)
 @
+
+@node Expanding tabs
+@subsubsection Expanding Tabs During Processing
 
 Converting the lines means expanding the tabs, and then splitting the
 total set of lines apart at each chunk name.  The regular text goes
@@ -2992,13 +3010,20 @@ if (n > 1) {	# embedded chunk names
 }
 @
 
+@node Printing the complete chunk
+@subsubsection Printing The Complete Chunk
+
+We can now print the entire formatted chunk.
+
 @<Print the complete chunk@> =
 chunk_being_defined = \
-	format_chunk_name(Current_chunk, Chunk_info[Current_chunk]["chunk number"],
+	format_chunk_name(Current_chunk,
+						Chunk_info[Current_chunk]["chunk number"],
 						Chunk_type)
 printf("@cdindex %s, definition\n", chunk_being_defined)
 printf("@noindent\n%s %s@equiv{}\n",
-	chunk_being_defined, Chunk_info[Current_chunk]["redefn"] == 1 ? "" : "+")
+	chunk_being_defined,
+	Chunk_info[Current_chunk]["redefn"] == 1 ? "" : "+")
 print Example_start
 printf("%s\n", y)
 print Example_end
@@ -3023,6 +3048,10 @@ if (Chunk_type == "code chunk") {
 @<Move back to the regular font@>
 @
 
+@node Printing chunk cross references
+@subsubsection Printing Chunk Cross References
+
+After the chunk, we print the other places where it's defined.
 
 @<Print list of other places where this chunk is defined@> =
 print_other_defns(Current_chunk,
@@ -3031,7 +3060,8 @@ print_other_defns(Current_chunk,
 @
 
 @(jrweave@) =
-function print_other_defns(chunk, total_defns, current_defn,		other_defns, i, j)
+function print_other_defns(chunk, total_defns, current_defn,
+							other_defns, i, j)	# locals
 {
 		if (total_defns == 1)
 			return
@@ -3063,12 +3093,14 @@ if ("callers" in Chunk_info[Current_chunk]) {
 	print ""
 	asorti(Chunk_info[Current_chunk]["callers"], my_callers)
 	if (length(my_callers) > 1) {
-		print "@noindent\nThis chunk is called by the following chunks:\n"
+		print "@noindent"
+		print "This chunk is called by the following chunks:\n"
 		print_ref_table(my_callers)
 	} else {
 		n = Chunk_info[my_callers[1]]["defn"]
 
-		printf("@noindent\nThis chunk is called by %s; see its first definition at %s.\n",
+		print "@noindent"
+		printf("This chunk is called by %s; see its first definition at %s.\n",
 			format_chunk_name(my_callers[1],
 						Chunk_info[my_callers[1]]["chunk number"],
 						Chunk_info[my_callers[1]]["type"]),
@@ -3102,20 +3134,25 @@ function print_ref_table(chunklist,		i, x, n)
 }
 @
 
+@FIXME{Move the tests in the last parameter for format_xref into
+the function itself.}
+
 @<Print list of called chunks@> =
 switch (length(names)) {
 case 0:
-	break;
+	break
 case 1:
-	printf("\n@noindent\nThe called chunk %s is first defined at\n%s.\n",
+	print "\n@noindent"
+	printf("The called chunk %s is first defined at\n%s.\n",
 			format_chunk_name(names[1],
-							Chunk_info[names[1]]["chunk number"],
-							Chunk_info[names[1]]["type"]),
-			format_xref(names[1],
-				(Chunk_info[names[1]]["defn"] > 1) ? 1 : 0))
+						Chunk_info[names[1]]["chunk number"],
+						Chunk_info[names[1]]["type"]),
+						format_xref(names[1],
+							(Chunk_info[names[1]]["defn"] > 1) ? 1 : 0))
 	break;
 default:
-	printf("\n@noindent\nThe following table lists called chunk definition points.\n\n")
+	print "\n@noindent"
+	printf("The following table lists called chunk definition points.\n")
 	print_ref_table(names)
 	break;
 }
@@ -3179,7 +3216,8 @@ function end_code_gathering()
 	end_chunk_gathering()
 
 	if (Debug ~ /code/)
-		printf("finished formatting code %s\n", Code_chunk) > "/dev/stderr"
+		printf("finished formatting code %s\n",
+					Code_chunk) > "/dev/stderr"
 }
 @
 
@@ -3192,7 +3230,7 @@ each chunk is defined and where each chunk is referenced (used inside
 a chunk body), and we printed the relevant parts of that information
 after each chunk.
 
-It is also useful to print centralized lists lists of everywhere that
+It is also useful to print centralized lists of everywhere that
 file chunks and code chunks are defined.  This @value{SECTION} treats
 file chunks.
 
@@ -3245,7 +3283,9 @@ print "@end table"
 @
 
 @<Format and print chunk definition list@> =
-x = format_chunk_name(name, Chunk_info[name]["chunk number"], Chunk_info[name]["type"])
+x = format_chunk_name(name,
+			Chunk_info[name]["chunk number"],
+			Chunk_info[name]["type"])
 printf("@item %s\n", x)
 n = Chunk_info[name]["defn"]
 if (n == 1) {
@@ -3255,9 +3295,9 @@ if (n == 1) {
 	printf("Multiple definitions occur in\n")
 	for (j = 1; j <= n; j++) {
 		printf("%s", format_xref(name, j))
-		if (j == n-1)
+		if (j == n - 1)
 			printf(",\nand\n")
-		else if (j < n-1)
+		else if (j < n - 1)
 			printf(",\n")
 	}
 	print ".\n"
@@ -3360,9 +3400,9 @@ for (i = 1; i in Sorted_code_names; i++) {
 	if (n == 0)		# warning printed elsewhere
 		continue
 
-	tag = format_chunk_name(name, Chunk_info[name]["chunk number"],
+	fmt_name = format_chunk_name(name, Chunk_info[name]["chunk number"],
 							Chunk_info[name]["type"])
-	printf("@item %s\n", tag)
+	printf("@item %s\n", fmt_name)
 
 	Current_chunk = name	# for use by next chunk
 	@<Print list of chunks that call this one@>
@@ -3407,6 +3447,7 @@ named ``Initial setup.''
 	Chunk_info[Initial_setup_name]["type"] = "code chunk"
 	Chunk_info[Initial_setup_name]["defn"] = 1
 	if (/^@initial_setup[[:space:]]*$/) {
+		@<Try to keep at least the first two lines of the chunk together@>
 		printf("%s\n", format_anchor(Initial_setup_name, 0))
 		printf("@noindent\n%s @equiv{}\n",
 			format_chunk_name(Initial_setup_name, 0, "code chunk"))
@@ -3564,11 +3605,11 @@ characters from chunk names:
 
 @findex @code{sanitize_name()} function, @command{jrweave}
 @<Helper functions for @command{jrweave}@> =
-function sanitize_name(file_name)
+function sanitize_name(name)
 {
-	gsub(/[^[:alnum:]]/, "-", file_name)
+	gsub(/[^[:alnum:]]/, "-", name)
 
-	return file_name
+	return name
 }
 @
 
@@ -3580,7 +3621,8 @@ delegating to it:
 @findex @code{format_anchor_or_ref()} function, @command{jrweave}
 @findex @code{format_xref()} function, @command{jrweave}
 @<Helper functions for @command{jrweave}@> =
-function format_anchor_or_ref(type, name, defn,		clean_name, result)
+function format_anchor_or_ref(type, name, defn,
+								clean_name, result)	# locals
 {
 	clean_name = sanitize_name(name)
 	if (defn > 0)
@@ -3618,7 +3660,8 @@ it is file chunk or a code chunk.
 
 @findex @code{format_chunk_name()} function, @command{jrweave}
 @<Helper functions for @command{jrweave}@> =
-function format_chunk_name(name, count, type,	result, left, right, style)
+function format_chunk_name(name, count, type,
+							result, left, right, style) # locals
 {
 	if (type == "file chunk") {
 		left = "@{"
