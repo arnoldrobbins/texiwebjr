@@ -455,7 +455,7 @@ in this sentence.  File names are indicated like this:
 
 Finally, I sometimes break with tradition, and write in the first
 person, instead of using ``the royal we.''  However, use of ``we''
-is appropriate during discussional prose; I would like you, the reader,
+is appropriate during conversational-style prose; I would like you, the reader,
 to feel as if you're engaging in a conversation with me, the author.
 To that end, ``we'' is entirely correct.
 
@@ -3689,7 +3689,7 @@ function format_chunk_name(name, count, type,
 @chapter Bootstrapping The System
 
 @quotation
-Who will compile the compiler?@footnote{Yes, I made up this quote.}
+Who will compile the compiler?@footnote{Yes, I made that up.}
 @author Lady Ada Lovelace
 @end quotation
 
@@ -3834,7 +3834,8 @@ texiwebjr.html: $(TEXISOURCE)
 	makeinfo --no-split --html $(TEXISOURCE)
 
 clean:
-	rm -f texiwebjr.html texiwebjr.info texiwebjr.xml texiwebjr.texi texiwebjr.pdf
+	rm -f texiwebjr.html texiwebjr.info texiwebjr.xml
+	rm -f texiwebjr.texi texiwebjr.pdf
 	rm -fr texiwebjr.t2p
 
 distclean: clean
@@ -3875,9 +3876,9 @@ And of course, if you don't have @command{gawk}, the canonical
 incantation is:
 
 @example
-wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.0.tar.gz
-gzip -d < gawk-4.1.0.tar.gz | tar -xpf -
-cd gawk-4.1.0
+wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.gz
+gzip -d < gawk-4.1.1.tar.gz | tar -xpf -
+cd gawk-4.1.1
 ./configure && make
 # magic here to install, often sudo make install
 @end example
@@ -3887,7 +3888,7 @@ cd gawk-4.1.0
 
 @cindex Kernighan, Brian W.@:
 At this point, we can stop and look at what we've accomplished. Together
-@command{jrtangle} and @command{jrweave} comprise around 1,200 lines of
+@command{jrtangle} and @command{jrweave} comprise around 1,340 lines of
 code.  That's a substantial amount of @command{awk}.@footnote{Especially
 as Brian Kernighan keeps insisting that two lines is the optimal size
 for an @command{awk} program!} Nonetheless, I think that the literate
@@ -3906,10 +3907,12 @@ e.g., that chunks are stored without the final newline.
 Additionally, I don't claim that there is anything earth-shaking or
 stunningly innovative here.  What I have done is show that a useful,
 usable literate programming system can be created in a few weeks of
-spare-time work, with under 1,200 lines of @command{awk}. That's pretty
+spare-time work, with under 1,350 lines of @command{awk}. That's pretty
 good.  Of course, ``the proof is in the pudding;'' I won't know how good
 a job I've really done until I use @value{TWJR} to write something else,
-of medium to large size.
+of medium to large size.@footnote{Since writing this, I have written
+one @command{awk} script of about 400 lines. I have yet to write
+something large (for some definition of ``large'') in C or C++.}
 
 There are a few design decisions that might need revisiting once
 I start using @value{TWJR} for ``real work.''
@@ -3935,7 +3938,7 @@ I can think of several possible future enhancements:
 @itemize @bullet
 @item
 Sidebars are currently indexed in the regular concept index.
-It might be reasonable to place them into a seprate index which
+It might be reasonable to place them into a separate index which
 the author would either print or merge into the concept index.
 
 @item
@@ -4012,6 +4015,12 @@ preserving indentation.  This makes it enormously easier to work
 with from the @command{gawk} debugger, since the standalone code
 is also legible.
 
+A final thought is that many things that would normally be
+put in functions end up as code chunks when writing literately.
+This might be more of a bug than a feature, since code chunks
+may end up misusing global variables that would otherwise have
+been local in functions.
+
 @node Command summary
 @appendix Alphabetic List of @value{SHORTTITLE} Commands and Variables
 
@@ -4036,6 +4045,7 @@ indexed under @samp{@{}.
 In @TeX{} output, change cross references to enclose chapter
 and section titles in double quotes instead of in square
 brackets.
+@xref{Cross-reference quoting}.
 
 @item @@EMAIL@{@var{real}, @var{spelled}@}
 Use @var{spelled} as the email address for HTML output.
@@ -4153,7 +4163,7 @@ command line with the @option{-v} option to change how
 
 @table @code
 @item Debug
-This should be one or more keywords which are searched for regexp match.
+This should be one or more keywords which are searched for a regexp match.
 If there's a match, an appropriate debugging message is printed.
 
 @item Shell_debug
