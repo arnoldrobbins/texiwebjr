@@ -23,8 +23,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH March, 2014
-@set EDITION 0.7
+@set UPDATE-MONTH April, 2014
+@set EDITION 0.8
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -892,11 +892,14 @@ of from copy-paste-edit.
 We start by placing the two patterns that search for chunks one right
 after the other; they are then followed by the code that terminates
 collection (for the standalone @samp{@@} sign) and the collection code.
+This is purposely similar to an @command{awk} range pattern.
 We will see the code chunk processing in @ref{jrtangle code chunks}.
 
 @(jrtangle@) =
 @<Initial code chunk processing pattern for @command{jrtangle}@>
-@<Process file chunks for @code{jrtangle}@>
+@<Initial file chunk processing pattern for @command{jrtangle}@>
+@<Handle terminating at-sign for file and code chunks@>
+@<Collect chunk lines@>
 @
 
 As mentioned, file chunks start with @samp{@w{@@(filename.c@@) =}} in column
@@ -917,7 +920,7 @@ File_chunk_pattern = "^@\\(([^)]+)@\\)[[:space:]]*=[[:space:]]*$"
 It turns out that file chunk processing has some common bits
 for both @command{jrtangle} and @command{jrweave}.
 
-@<Process file chunks for @code{jrtangle}@>=
+@<Initial file chunk processing pattern for @command{jrtangle}@>=
 $0 ~ File_chunk_pattern {
 	@<Common file chunk initial processing@>
 	next
@@ -998,10 +1001,6 @@ code chunks.  Since we are manually simulating a range pattern, this
 code chunks. Otherwise the collection never stops!@footnote{Guess
 how I discovered that one@enddots{} Duh.}
 
-@<Process file chunks for @code{jrtangle}@>=
-@<Handle terminating at-sign for file and code chunks@>
-@
-
 Here too, what to do upon seeing the terminating @samp{@@} is shared
 across @command{jrtangle} and @samp{jrweave}.
 
@@ -1035,10 +1034,6 @@ Collect each line and append it.
 Any embedded code chunks are expanded at the end.
 Collecting lines is also common between the two programs.
 
-@<Process file chunks for @code{jrtangle}@>=
-@<Collect chunk lines@>
-@
-
 @<Collect chunk lines@> =
 Flags["file chunk"] || Flags["code chunk"] {
 	if (Chunk_lines == "")
@@ -1056,6 +1051,10 @@ Flags["file chunk"] || Flags["code chunk"] {
 Once we have all the lines, we save them in @code{File_contents},
 which is an associative array whose indices are the file names
 and the corresponding values are each file's lines.
+
+@(jrtangle@) =
+@<Process file chunks for @code{jrtangle}@>
+@
 
 @findex @code{end_file_gathering()} function, @command{jrtangle}
 @<Process file chunks for @code{jrtangle}@>=
@@ -3992,15 +3991,19 @@ differences (that is, typos) in chunk names. Neither program is
 very robust about this right now.
 @end itemize
 
-One thing I noted during development: Copy--paste development causes
-problems.  The original operations for file chunks and code chunks were
-similar but not identical.  This made it hard to get the code right and
-eventually led to a large refactoring of the whole business (file + code)
+Some random thoughts noted during development:
+
+@itemize @bullet
+@item
+Copy--paste development causes problems.  The original operations for
+file chunks and code chunks were similar but not identical.  This made
+it hard to get the code right and eventually led to a large refactoring
+of the whole business (file + code)
 @iftex
 @math{\times}
 @end iftex
 @docbook
-&times;&sp;
+&times; @c
 @end docbook
 @ifnottex
 @ifnotdocbook
@@ -4010,16 +4013,24 @@ x
 (@command{jrtangle} + @command{jrweave}).
 Of course, ultimately, this was a major improvement.
 
-Another correct design decision was to format the generated code
-preserving indentation.  This makes it enormously easier to work
-with from the @command{gawk} debugger, since the standalone code
-is also legible.
+@item
+Formatting the generated code to preserve indentation was a good
+design decision.  This makes it enormously easier to work with from the
+@command{gawk} debugger, since the standalone code is also legible.
 
-A final thought is that many things that would normally be
-put in functions end up as code chunks when writing literately.
-This might be more of a bug than a feature, since code chunks
-may end up misusing global variables that would otherwise have
-been local in functions.
+@item
+Many things that would normally be put in functions end up as code chunks
+when writing literately.  This might be more of a bug than a feature,
+since code chunks may end up misusing global variables that would
+otherwise have been local in functions.  It also leads to duplicated
+code in the generated programs.
+
+@item
+One nice thing about literate programming is that you can polish the
+documentation without it affecting the code. It's easy to rename chunks,
+and even move around where you discuss the code chunks, as long as their
+order in the file chunks remains unchanged.
+@end itemize
 
 @node Command summary
 @appendix Alphabetic List of @value{SHORTTITLE} Commands and Variables
