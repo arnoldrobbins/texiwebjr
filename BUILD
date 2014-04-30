@@ -10,7 +10,7 @@ Wed Apr 30 09:17:16 IDT 2014
       incantation should work:
 
 	wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.gz
-	tar -xzf gawk-4.1.1
+	tar -xzf gawk-4.1.1.tar.gz
 	cd gawk-4.1.1
 	./configure && make && make check && sudo make install
 
