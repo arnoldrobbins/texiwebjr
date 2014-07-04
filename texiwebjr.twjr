@@ -23,8 +23,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH April, 2014
-@set EDITION 0.8
+@set UPDATE-MONTH July, 2014
+@set EDITION 0.85
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -492,7 +492,7 @@ and suggestions for Texinfo.
 
 @item
 @cindex Brennan, Michael
-Thanks to Mike Brennan for his feedback on earlier versions
+Mike Brennan for his feedback on earlier versions
 of @value{TWJR}.  They helped to significantly improve it.
 @end itemize
 
