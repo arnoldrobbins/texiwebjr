@@ -786,6 +786,7 @@ out at the top of the file. The actual license text is provided later.
 
 @<Common Chunks@>=
 @<GPL 3 Copyright statement@>
+@<Source Code Repository Web Info@>
 @
 
 @node jrtangle ifweave iftangle
@@ -1832,6 +1833,18 @@ and @command{jrweave}.
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 @
 @use_example
+
+Per suggestion from Karl Berry, we include a pointer to the web location
+for current TexiWeb Jr.@: sources in both programs.
+
+@<Source Code Repository Web Info@>=
+#
+# Up-to-date source code for TexiWeb Jr. can be obtained via
+# Git from github:
+#
+#	git clone http://github.com/arnoldrobbins/texiwebjr
+#
+@
 
 We need the following functions in both programs:
 
