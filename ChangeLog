@@ -1,3 +1,8 @@
+2014-12-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Add github location to generated programs.
+	Thanks to Karl Berry for the suggestion.
+
 2014-07-04         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Minor edit in acknowledgements.
