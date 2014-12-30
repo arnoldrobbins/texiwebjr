@@ -2447,9 +2447,8 @@ from that part of the code since that is the right place to insert
 this statement.
 
 @<Turn On Automatic Titles In Cross References@>=
-	print "@c Let texinfo.tex give us full section titles"
-	print "@xrefautomaticsectiontitle on"
-	print ""
+print "@c Let texinfo.tex give us full section titles"
+print "@xrefautomaticsectiontitle on"
 @
 
 @node jrweave sidebars
