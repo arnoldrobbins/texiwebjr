@@ -17,14 +17,13 @@
 @hideurls
 @end ifclear
 
-@xrefautomaticsectiontitle on
 
 @c The following information should be updated here only!
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH July, 2014
-@set EDITION 0.85
+@set UPDATE-MONTH December, 2014
+@set EDITION 0.88
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -2300,6 +2299,7 @@ work.
 
 @menu
 * jrweave additional macros::   Macros for writing documents.
+* jrweave turning on xref titles:: Turning on titles in xrefs.
 * jrweave sidebars::            Providing sidebars.
 * jrweave @TeX{} control::      Additional features for @TeX{}.
 @end menu
@@ -2318,6 +2318,7 @@ on the copyright page without problems.
 
 @<Texinfo authoring additions@>=
 Pass == 2 && /^@titlepage/ {
+	@<Turn On Automatic Titles In Cross References@>
 	print ""
 	print "@c Start extra commands added by jrweave\n"
 	@<Macro to hide email addresses in HTML@>
@@ -2333,6 +2334,9 @@ Pass == 2 && /^@titlepage/ {
 	next
 }
 @
+
+Turning on automatic use of full titles in cross references is
+discussed in @ref{jrweave turning on xref titles}.
 
 For HTML output, we want to be able to provide an email address
 as something like ``arnold AT skeeve.com'' in order to avoid
@@ -2429,6 +2433,23 @@ an author wants this list, it can be printed with the
 		Print_file_full_defs = TRUE
 	next
 }
+@
+
+@node jrweave turning on xref titles
+@subsection Turning On Titles in Cross References
+
+For cross references to anchors to appear properly in the output
+of @TeX{}, we need to let @file{texinfo.tex} supply the full titles
+instead of the node/anchor names.
+
+Although this isn't really an authoring extension, it's invoked
+from that part of the code since that is the right place to insert
+this statement.
+
+@<Turn On Automatic Titles In Cross References@>=
+	print "@c Let texinfo.tex give us full section titles"
+	print "@xrefautomaticsectiontitle on"
+	print ""
 @
 
 @node jrweave sidebars

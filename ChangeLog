@@ -1,3 +1,10 @@
+2014-12-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Let jrweave turn on automatic full titles in
+	cross references.  Thanks to Karl Berry for the suggestion.
+	Update versions, dates, etc.
+	* texmplate.twjr: Remove `@xrefautomaticsectiontitle on'.
+
 2014-12-07         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Add github location to generated programs.
