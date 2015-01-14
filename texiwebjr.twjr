@@ -1663,7 +1663,7 @@ The collection code should look familiar by now:
 			fatal(_"cannot nest one @file_update_recipe inside another\n")
 		Line_numbers["file_update_recipe"] = (FILENAME ":" FNR)
 		Update_recipe = ""
-	} if (/^@end file_update_recipe[[:space:]]*$/) {
+	} else if (/^@end file_update_recipe[[:space:]]*$/) {
 		# end of construct, delete line number, skip this line
 		delete Line_numbers["file_update_recipe"]
 	} else
