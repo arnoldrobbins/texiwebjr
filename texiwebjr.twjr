@@ -22,8 +22,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH December, 2014
-@set EDITION 0.88
+@set UPDATE-MONTH January, 2015
+@set EDITION 0.89
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -1702,12 +1702,16 @@ And @emph{now} we can deal with the user's values:
 	if (NF != 4)
 		fatal(_"usage: @file_update name dir suffix\n")
 
+	if ($4 == "\"\"")
+		$4 = ""
 	Update_value[$2]["DIR"] = $3
 	Update_value[$2]["SUFFIX"] = $4
 
 	next
 }
 @
+
+The user can supply an explict empty string for the suffix.
 
 Finally, we have to deal with creating the per-file template
 string and the name of the destination file (a temporary one)
