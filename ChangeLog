@@ -1,3 +1,10 @@
+2015-02-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Enhance the Update_recipe to handle Windows.
+	For shell debug, check that TEMP doesn't match a Windows file path.
+	Thanks to Eli Zaretskii <eliz@gnu.org>.
+	* texiwebjr.twjr: Add 2015 to copyrights.
+
 2014-12-30         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Let jrweave turn on automatic full titles in

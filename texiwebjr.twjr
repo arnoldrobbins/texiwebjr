@@ -102,19 +102,19 @@ ISRAEL
 Email: <email>arnold@@skeeve.com</email>
 URL: <ulink url="http://www.skeeve.com/">http://www.skeeve.com/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2013, 2014
+<literallayout class="normal">Copyright &copy; 2013, 2014, 2015
 Arnold David Robbins
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2013, 2014 @*
+Copyright @copyright{} 2013, 2014, 2015 @*
 Arnold David Robbins @*
 All Rights Reserved.
 @end ifnotdocbook
 @sp 1
 The @command{jrtangle} and @command{jrweave} programs are copyright
-@copyright{} 2013, 2014 by Arnold David Robbins. They are published under
+@copyright{} 2013, 2014, 2015 by Arnold David Robbins. They are published under
 the conditions of the GNU General Public License, version 3.
 @sp 1
 The explanatory text provided in this document may be reproduced verbatim
@@ -1633,20 +1633,31 @@ the various names contain whitespace characters.
 
 @<File update recipe handling@>=
 BEGIN {
-	Update_recipe = \
-		"PATH=/bin:/usr/bin\n" \
-		"export PATH\n" \
-		"destname=\"@DIR@/@FILE@\"\n" \
-		"outname=\"${destname}@SUFFIX@\"\n" \
-		"if [ ! -f \"$destname\" ]\n" \
-		"then\n" \
-		"\tmv \"$outname\" \"$destname\"\n" \
-		"elif cmp -s \"$outname\" \"$destname\" > /dev/null\n" \
-		"then\n" \
-		"\trm \"$outname\"\n" \
-		"else\n" \
-		"\tmv \"$outname\" \"$destname\"\n" \
-		"fi\n"
+	# This condition should distinguish between the native and
+	# MSYS (POSIX-ish) Gawk.  We rely on the fact that MSYS mounts
+	# /tmp and sets $TEMP to point to it, but resets the value
+	# back to the native C:/Foo/Bar value when invoking native
+	# programs.
+	if (ENVIRON["TEMP"] ~ /^[A-Z]:[\\\/]/) {
+		# MS-Windows recipe
+		Update_recipe = \
+			"fc /B \"@DIR@\\@FILE@\" \"@DIR@\\@FILE@@SUFFIX@\" >nul 2>&1 || move /Y \"@DIR@\\@FILE@\" \"@DIR@\\@FILE@@SUFFIX@\" >nul"
+	} else {
+		# POSIX recipe
+		Update_recipe = \
+			"PATH=/bin:/usr/bin\n" \
+			"export PATH\n" \
+			"destname=\"@DIR@/@FILE@\"\n" \
+			"outname=\"${destname}@SUFFIX@\"\n" \
+			"if [ ! -f \"$destname\" ]\n" \
+			"then\n" \
+			"\tmv \"$outname\" \"$destname\"\n" \
+			"elif cmp -s \"$outname\" \"$destname\" > /dev/null\n" \
+			"then\n" \
+			"\trm \"$outname\"\n" \
+			"else\n" \
+			"\tmv \"$outname\" \"$destname\"\n" \
+			"fi\n"
 }
 @
 
@@ -1761,7 +1772,7 @@ environments, for example.
 
 @(jrtangle@) =
 BEGIN {
-	if (Debug ~ /shell/)
+	if (Debug ~ /shell/ && ENVIRON["TEMP"] !~ /^[A-Z]:[\\\/]/)
 		if (length(Shell_debug) == 0)
 			Shell_debug = "set -x; "
 }
@@ -1817,7 +1828,7 @@ and @command{jrweave}.
 @use_smallexample
 @<GPL 3 Copyright statement@>=
 #
-# Copyright (C) 2013, 2014 Arnold David Robbins
+# Copyright (C) 2013, 2014, 2015 Arnold David Robbins
 # 
 # This file is part of TexiWeb Jr., a literate programming system.
 # 
