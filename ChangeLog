@@ -1,3 +1,8 @@
+2015-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Add a closing right brace to make the 2015-02-27
+	change actually work.
+
 2015-02-27         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Enhance the Update_recipe to handle Windows.

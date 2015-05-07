@@ -1658,6 +1658,7 @@ BEGIN {
 			"else\n" \
 			"\tmv \"$outname\" \"$destname\"\n" \
 			"fi\n"
+	}
 }
 @
 
