@@ -4261,7 +4261,7 @@ then you won't mind building @command{gawk} and having it available.
 @table @asis
 @item The @code{gensub()} function
 The @value{TWJR} code takes advantage of @code{gensub()}'s ability to
-pull out the pieces that much subparentheses. This would have to be
+pull out the pieces that match subparentheses. This would have to be
 done more manually in a standard @command{awk}, using @code{match()}
 and @code{substr()}.
 
