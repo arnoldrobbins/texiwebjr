@@ -1,5 +1,11 @@
 2016-02-19         Arnold D. Robbins     <arnold@skeeve.com>
 
+	* texiwebjr.twjr: Relicense under the GPL. Bump version to 0.95.
+	Add Github URL to the preface.
+	* README: Updated.
+
+2016-02-19         Arnold D. Robbins     <arnold@skeeve.com>
+
 	* texiwebjr.twjr: Fix a typo.
 
 2015-05-07         Arnold D. Robbins     <arnold@skeeve.com>

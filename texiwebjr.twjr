@@ -22,8 +22,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH January, 2015
-@set EDITION 0.89
+@set UPDATE-MONTH February, 2016
+@set EDITION 0.95
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -102,23 +102,28 @@ ISRAEL
 Email: <email>arnold@@skeeve.com</email>
 URL: <ulink url="http://www.skeeve.com/">http://www.skeeve.com/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2013, 2014, 2015
+<literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016
 Arnold David Robbins
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2013, 2014, 2015 @*
+Copyright @copyright{} 2013, 2014, 2015, 2016 @*
 Arnold David Robbins @*
 All Rights Reserved.
 @end ifnotdocbook
 @sp 1
 The @command{jrtangle} and @command{jrweave} programs are copyright
-@copyright{} 2013, 2014, 2015 by Arnold David Robbins. They are published under
-the conditions of the GNU General Public License, version 3.
+@copyright{} 2013, 2014, 2015, 2016 by Arnold David Robbins.
+They are published under the conditions of the GNU General Public License,
+version 3.
 @sp 1
-The explanatory text provided in this document may be reproduced verbatim
-but may not be otherwise copied or modified.
+The @file{texiwebjr.twjr} literate source code file for
+@command{jrtangle} and @command{jrweave} is
+@copyright{} 2013, 2014, 2015, 2016 by Arnold David Robbins.
+Starting at Edition 0.95 and forward,
+it is published under the conditions of the GNU General Public License,
+version 3.
 @sp 2
 This is Edition @value{EDITION} of @cite{@value{TITLE}}.
 @end copying
@@ -279,6 +284,9 @@ and DocBook for publishing.
 
 This @value{DOCUMENT} describes @value{TWJR}, a system that provides
 literate programming on top of the Texinfo markup language.
+
+The canonical source for @value{TWJR} is
+@url{http://github.com/arnoldrobbins/texiwebjr}.
 
 @menu
 * Lit prog and me::             Literate programming and me.

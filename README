@@ -1,11 +1,17 @@
-Wed Nov 13 09:55:00 IST 2013
+Fri Feb 19 12:07:09 IST 2016
 ============================
 
 This is TexiWeb Jr., a super simple literate programming system built
-on top of Texinfo and implemented in awk. It is a work in progress.
+on top of Texinfo and implemented in awk.
+
 The "tangle" piece was successfully bootstrapped on November 4, 2013.
 The "weave" piece started producing a reasonable-looking document
 on November 11, 2013.
+
+As of today, both the source code and literate programming document
+are licensed under the GNU GPL. See the file COPYING.
+
+Enjoy,
 
 Arnold Robbins
 arnold AT skeeve.com
