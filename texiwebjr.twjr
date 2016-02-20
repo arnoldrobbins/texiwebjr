@@ -23,7 +23,7 @@
 
 @c These apply across the board.
 @set UPDATE-MONTH February, 2016
-@set EDITION 0.95
+@set EDITION 0.96
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -1837,7 +1837,7 @@ and @command{jrweave}.
 @use_smallexample
 @<GPL 3 Copyright statement@>=
 #
-# Copyright (C) 2013, 2014, 2015 Arnold David Robbins
+# Copyright (C) 2013, 2014, 2015, 2016 Arnold David Robbins
 # 
 # This file is part of TexiWeb Jr., a literate programming system.
 # 

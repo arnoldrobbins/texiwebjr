@@ -1,4 +1,4 @@
-Wed Apr 30 09:17:16 IDT 2014
+Sat Feb 20 20:28:07 IST 2016
 ============================
 
 0. Prerequisites
@@ -9,9 +9,9 @@ Wed Apr 30 09:17:16 IDT 2014
       scripts to work as-is, it should be /usr/local/bin/gawk. The usual
       incantation should work:
 
-	wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.gz
-	tar -xzf gawk-4.1.1.tar.gz
-	cd gawk-4.1.1
+	wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.3.tar.gz
+	tar -xzf gawk-4.1.3.tar.gz
+	cd gawk-4.1.3
 	./configure && make && make check && sudo make install
 
 1. Bootstrap the scripts:
