@@ -119,9 +119,6 @@ All Rights Reserved.
 The FOO program is copyright
 @copyright{} YYYY, YYYY by Full name here. It is published under
 the conditions of the GNU General Public License, version 3.
-@sp 1
-The explanatory text provided in this document may be reproduced verbatim
-but may not be otherwise copied or modified.
 @sp 2
 This is Edition @value{EDITION} of @cite{@value{TITLE}}.
 @end copying

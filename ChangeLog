@@ -4,6 +4,7 @@
 	* texinfo.tex, texindex: Update to versions from Texinfo 6.1.
 	* texiwebjr.twjr: Update copyright in GPL chunk, bump version
 	to 0.96.
+	* template.twjr: Remove verbatim copying restriction on text.
 
 2016-02-19         Arnold D. Robbins     <arnold@skeeve.com>
 
