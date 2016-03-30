@@ -22,8 +22,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH February, 2016
-@set EDITION 0.96
+@set UPDATE-MONTH March, 2016
+@set EDITION 0.97
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -213,6 +213,7 @@ on top of the Texinfo document formatting markup language.
 * Processing a document::          Creating code and documentation.
 * Why texinfo::                    Why build on top of Texinfo.
 * Why awk::                        Why implement in @command{awk}.
+* jrtangle header::                Getting Started.
 * jrtangle ifweave iftangle::      Text inclusion/exclusion for
                                    @command{jrtangle}.
 * jrtangle file chunks::           Processing file chunks for
@@ -229,25 +230,43 @@ on top of the Texinfo document formatting markup language.
 * jrtangle before everything::     Doing something before extracting any
                                    files.
 * jrtangle avoiding update::       Leaving unmodified files alone.
+* jrtangle shell debug::           Debugging shell commands run by
+                                   @command{jrtangle}.
 * jrtangle after creation::        Doing something after creating a file.
 * Common Chunks::                  Common code chunks and functions.
 * jrweave two passes::             Two pass design.
 * jrweave initial code::           Initial Stuff and Printing A Warning.
-* jrweave choosing code size::     Choosing the code size.
 * jrweave ifweave iftangle::       Text inclusion/exclusion for
                                    @command{jrweave}.
+* jrweave delete jrtangle code::   Removing stuff for @command{jrtangle}.
+* jrweave choosing code size::     Choosing the code size.
 * jrweave language additions::     Extra stuff for authors.
 * jrweave additional macros::      Macros for writing documents.
+* jrweave turning on xref titles:: Turning on titles in xrefs.
 * jrweave sidebars::               Providing sidebars.
 * jrweave @TeX{} control::         Additional features for @TeX{}.
-* jrweave file chunks::            Collecting and formatting file chunks.
-* jrweave code chunks::            Collecting and formatting code chunks.
-* jrweave print setup recipe::     Printing the initial setup recipe.
+* Cross-reference quoting::        Changing quoting for cross-references.
+* PDF links::                      Changing the color of internal PDF links.
+* URL formatting::                 Link color and text formatting for URLs.
+* Improved index entries::         Creating improved index entries.
+* jrweave chunk indexes::          Create indices for chunk definition and
+                                   references.
+* jrweave def/use collecting::     Collecting definition and use information.
+* jrweave file chunks::            Processing file chunks.
+* jrweave chunk collection::       Collecting file and code chunks.
+* jrweave file chunks processing:: Processing the file chunks.
+* jrweave file chunks printing::   Printing the file chunks.
+* Keeping lines together::         Keeping chunk lines together.
+* Formatting the anchor::          Formatting the anchor.
+* Expanding tabs::                 Expanding tabs.
+* Printing the complete chunk::    Printing the complete chunk.
+* Printing chunk cross references:: Printing chunk cross references.
+* jrweave code chunks::            Processing code chunks.
 * jrweave file defs::              Printing file definitions.
 * jrweave code defs and refs::     Printing code definitions and references.
 * jrweave print code defs::        Printing code definitions.
 * jrweave print code refs::        Printing code references.
-* jrweave delete jrtangle code::   Removing stuff for @command{jrtangle}.
+* jrweave print setup recipe::     Printing the initial setup recipe.
 * jrweave last bit::               Passing everything else through.
 * jrweave expanding tabs::         Expanding tabs.
 * jrweave helper functions::       Helper functions for @command{jrweave}.
@@ -727,14 +746,16 @@ as a source file name and as a code chunk name.
 
 @menu
 * jrtangle header::             Getting Started.
-* jrtangle ifweave iftangle::   Text inclusion/exclusion for @command{jrtangle}.
+* jrtangle ifweave iftangle::   Text inclusion/exclusion for
+                                @command{jrtangle}.
 * jrtangle file chunks::        Processing file chunks for @command{jrtangle}.
 * jrtangle code chunks::        Processing code chunks for @command{jrtangle}.
 * jrtangle error checking::     Checking for errors in @command{jrtangle}.
 * Expanding code chunks::       Expanding code chunks into straight code.
 * jrtangle before everything::  Doing something before extracting any files.
 * jrtangle avoiding update::    Leaving unmodified files alone.
-* jrtangle shell debug::        Debugging shell commands run by @command{jrtangle}.
+* jrtangle shell debug::        Debugging shell commands run by
+                                @command{jrtangle}.
 * jrtangle after creation::     Doing something after creating a file.
 * Common Chunks::               Common code chunks and functions.
 @end menu
@@ -1998,10 +2019,8 @@ since Texinfo won't know what to do with them.
 * jrweave def/use collecting::   Collecting definition and use information.
 * jrweave file chunks::          Processing file chunks.
 * jrweave code chunks::          Processing code chunks.
-* jrweave file defs::              Printing file definitions.
-* jrweave code defs and refs::     Printing code definitions and references.
-* jrweave print code defs::        Printing code definitions.
-* jrweave print code refs::        Printing code references.
+* jrweave file defs::            Printing file definitions.
+* jrweave code defs and refs::   Printing code definitions and references.
 * jrweave print setup recipe::   Printing the initial setup recipe.
 * jrweave last bit::             Passing everything else through.
 * jrweave expanding tabs::       Expanding tabs.
@@ -2322,10 +2341,10 @@ ease both the formatting job and some of the authoring
 work.
 
 @menu
-* jrweave additional macros::   Macros for writing documents.
+* jrweave additional macros::      Macros for writing documents.
 * jrweave turning on xref titles:: Turning on titles in xrefs.
-* jrweave sidebars::            Providing sidebars.
-* jrweave @TeX{} control::      Additional features for @TeX{}.
+* jrweave sidebars::               Providing sidebars.
+* jrweave @TeX{} control::         Additional features for @TeX{}.
 @end menu
 
 @node jrweave additional macros
@@ -2993,11 +3012,11 @@ Then we have to print all the cross reference information.
 @
 
 @menu
-* Keeping lines together::           Keeping chunk lines together.
-* Formatting the anchor::            Formatting the anchor.
-* Expanding tabs::                   Expanding tabs.
-* Printing the complete chunk::      Printing the complete chunk.
-* Printing chunk cross references::  Printing chunk cross references.
+* Keeping lines together::      Keeping chunk lines together.
+* Formatting the anchor::       Formatting the anchor.
+* Expanding tabs::              Expanding tabs.
+* Printing the complete chunk:: Printing the complete chunk.
+* Printing chunk cross references:: Printing chunk cross references.
 @end menu
 
 @node Keeping lines together
