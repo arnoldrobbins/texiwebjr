@@ -23,13 +23,15 @@
 SOURCE = texiwebjr.twjr
 TEXISOURCE = texiwebjr.texi
 
-all: jrweave jrtangle texiwebjr.pdf
+all: jrweave jrtangle pdf docbook html info
 
 jrweave jrtangle: $(SOURCE)
 	./bootstrapping/jrtangle0 $(SOURCE)
 
 $(TEXISOURCE): $(SOURCE) jrweave
 	./jrweave $(SOURCE) > $(TEXISOURCE)
+
+pdf: texiwebjr.pdf
 
 texiwebjr.pdf: $(TEXISOURCE)
 	texi2dvi --pdf --batch --build-dir=texiwebjr.t2p \
@@ -47,6 +49,11 @@ html: texiwebjr.html
 
 texiwebjr.html: $(TEXISOURCE)
 	makeinfo --no-split --html $(TEXISOURCE)
+
+info: texiwebjr.info
+
+texiwebjr.info: $(TEXISOURCE)
+	makeinfo --no-split $(TEXISOURCE)
 
 clean:
 	rm -f texiwebjr.html texiwebjr.info texiwebjr.xml

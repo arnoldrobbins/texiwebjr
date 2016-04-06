@@ -22,8 +22,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH March, 2016
-@set EDITION 0.97
+@set UPDATE-MONTH April, 2016
+@set EDITION 0.98
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -367,17 +367,35 @@ You may also find this @value{DOCUMENT} interesting if you like
 programming using scripting languages, as the code is written in
 @command{awk}, the author's favorite hammer.
 
+@ifnotdocbook
 @c Scale figure to 4.5 inches which is good for both smallbook
 @c and regular.  TeX will scale height also automatically.
 @float Figure,third-way
 @caption{Third Way (@url{http://xkcd.com/1285})}
 @center @image{third_way, 5in, , Third Way}
 @end float
+@end ifnotdocbook
+
+@docbook
+<figure id="figure-third-way" float="0">
+<title>Third Way (<ulink url="http://xkcd.com/1285">http://xkcd.com/1285</ulink>)</title>
+<mediaobject>
+<imageobject role="web"><imagedata fileref="third_way.png" format="PNG"/></imageobject>
+</mediaobject>
+</figure>
+@end docbook
 
 Many people today are used to using WYSIWYG document creation programs.
 Texinfo uses the older, batch-formatting model of document creation, where
 you @dfn{mark up} the text with formatting instructions, and the input
-does not physically resemble the output. (@xref{third-way}.)  Such systems
+does not physically resemble the output.
+@ifnotdocbook
+(@xref{third-way}.)
+@end ifnotdocbook
+@ifdocbook
+@inlineraw{docbook, (<xref linkend="figure-third-way"/>.)}
+@end ifdocbook
+Such systems
 may take longer to learn, but ultimately they provide more control over
 your document, and you spend your time thinking about your content instead
 of fighting the document creation program's ideas of how to do things.
@@ -3883,13 +3901,15 @@ suffices.
 SOURCE = texiwebjr.twjr
 TEXISOURCE = texiwebjr.texi
 
-all: jrweave jrtangle texiwebjr.pdf
+all: jrweave jrtangle pdf docbook html info
 
 jrweave jrtangle: $(SOURCE)
 	./bootstrapping/jrtangle0 $(SOURCE)
 
 $(TEXISOURCE): $(SOURCE) jrweave
 	./jrweave $(SOURCE) > $(TEXISOURCE)
+
+pdf: texiwebjr.pdf
 
 texiwebjr.pdf: $(TEXISOURCE)
 	texi2dvi --pdf --batch --build-dir=texiwebjr.t2p \
@@ -3907,6 +3927,11 @@ html: texiwebjr.html
 
 texiwebjr.html: $(TEXISOURCE)
 	makeinfo --no-split --html $(TEXISOURCE)
+
+info: texiwebjr.info
+
+texiwebjr.info: $(TEXISOURCE)
+	makeinfo --no-split $(TEXISOURCE)
 
 clean:
 	rm -f texiwebjr.html texiwebjr.info texiwebjr.xml

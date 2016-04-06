@@ -1,3 +1,11 @@
+2016-04-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr (The Makefile): Regularize and add info target,
+	build all the various forms.  Bump the version to 0.98 and update
+	the modified date.
+	(Figure): Improve the docbook for the figure.
+	* BUILD: Update the text.
+
 2016-03-30         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Update menus for makeinfo.
