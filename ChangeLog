@@ -1,3 +1,8 @@
+2016-07-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr (The Makefile): Use `fop' to make PDF from
+	DocBook; dblatex doesn't work.
+
 2016-04-06         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr (The Makefile): Regularize and add info target,

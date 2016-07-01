@@ -43,7 +43,7 @@ texiwebjr.xml: $(TEXISOURCE)
 	makeinfo --docbook $(TEXISOURCE)
 
 dbpdf: docbook
-	dblatex texiwebjr.xml
+	fop -xml texiwebjr.xml -pdf texiwebjr-fop.pdf -xsl /usr/share/xml/docbook/stylesheet/docbook-xsl/fo/docbook.xsl
 
 html: texiwebjr.html
 
