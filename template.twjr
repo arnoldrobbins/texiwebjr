@@ -2,7 +2,7 @@
 % Uncomment the 1st \input line if you need the MF logo
 % \input mftmac % for Metafont logo
 \input texinfo   @c -*-texinfo-*-
-@c vim: filetype=texinfo tabstop=4
+@c vim: filetype=texinfo tabstop=4 shiftwidth=4
 @c %**start of header (This is for running Texinfo on a region.)
 @setfilename FOO.info
 @settitle Put Your Title Here

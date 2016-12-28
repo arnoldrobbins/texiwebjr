@@ -1,6 +1,6 @@
 \input mftmac % for Metafont logo
 \input texinfo   @c -*-texinfo-*-
-@c vim: filetype=texinfo tabstop=4
+@c vim: filetype=texinfo tabstop=4 shiftwidth=4
 @c %**start of header (This is for running Texinfo on a region.)
 @setfilename texiwebjr.info
 @settitle TexiWeb Jr.---A Super Simple Literate Programming System
@@ -484,7 +484,7 @@ $ @kbd{echo hi on stdout}
 @print{} hi on stdout
 $ @kbd{echo hello on stderr 1>&2}
 @error{} hello on stderr
-@end example
+@end example 
 
 @ifnotinfo
 In the text, command names appear in @code{this font}, while code segments

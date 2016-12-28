@@ -1,3 +1,8 @@
+2016-12-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Add shiftwidth setting for vim, whitespace tweak.
+	* template.twjr: Add shiftwidth setting for vim.
+
 2016-07-01         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr (The Makefile): Use `fop' to make PDF from
