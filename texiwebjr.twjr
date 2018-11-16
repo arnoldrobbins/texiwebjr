@@ -22,12 +22,14 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH April, 2016
+@set UPDATE-MONTH November, 2018
 @set EDITION 0.98
 
-@set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
+@set TITLE Literate Programming Made Easy
+@set SUBTITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
 
+@ifweave
 @iftex
 @set DOCUMENT book
 @set CHAPTER chapter
@@ -56,6 +58,7 @@
 @set SECTION section
 @set SUBSECTION subsection
 @end ifdocbook
+@end ifweave
 
 @c some special symbols
 @ifnottex
@@ -89,6 +92,7 @@
 @iftex
 @c @finalout
 @end iftex
+@c @cropmarks
 
 @copying
 @docbook
@@ -102,46 +106,52 @@ ISRAEL
 Email: <email>arnold@@skeeve.com</email>
 URL: <ulink url="http://www.skeeve.com/">http://www.skeeve.com/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016
+<literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016, 2018
 Arnold David Robbins
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2013, 2014, 2015, 2016 @*
+Copyright @copyright{} 2013, 2014, 2015, 2016, 2018 @*
 Arnold David Robbins @*
 All Rights Reserved.
 @end ifnotdocbook
 @sp 1
 The @command{jrtangle} and @command{jrweave} programs are copyright
-@copyright{} 2013, 2014, 2015, 2016 by Arnold David Robbins.
+@copyright{} 2013, 2014, 2015, 2016, 2018 by Arnold David Robbins.
 They are published under the conditions of the GNU General Public License,
 version 3.
 @sp 1
 The @file{texiwebjr.twjr} literate source code file for
 @command{jrtangle} and @command{jrweave} is
-@copyright{} 2013, 2014, 2015, 2016 by Arnold David Robbins.
+@copyright{} 2013, 2014, 2015, 2016, 2018 by Arnold David Robbins.
 Starting at Edition 0.95 and forward,
 it is published under the conditions of the GNU General Public License,
 version 3.
 @sp 2
-This is Edition @value{EDITION} of @cite{@value{TITLE}}.
+This is Edition @value{EDITION} of
+@cite{@value{TITLE}}: @cite{@value{SUBTITLE}}.
+It was last updated in @value{UPDATE-MONTH}.
 @end copying
 
 @c The name of our program. Setting it as a macro makes it
 @c easier to change later.
 @set TWJR @sc{TexiWeb Jr.@:}
 
+@c @smallbook
+
 @c Uncomment this for the release.  Leaving it off saves paper
 @c during editing and review.
-@c @setchapternewpage odd
+@setchapternewpage odd
 
 @c Uncomment this if it's ever printed as a real book(let).
-@c @shorttitlepage @value{SHORTTITLE}
+@shorttitlepage @value{TITLE}
 
 @titlepage
 @title @value{TITLE}
-@subtitle @value{UPDATE-MONTH}
+@subtitle @value{SUBTITLE}
+@subtitle Edition @value{EDITION}
+@subtitle Last updated: @value{UPDATE-MONTH}
 @author Arnold D. Robbins
 
 @ifnotdocbook
@@ -192,6 +202,7 @@ on top of the Texinfo document formatting markup language.
 @menu
 * Preface::                        Preface.
 * Introduction::                   Introduction.
+* Example C Program::             
 * jrtangle code::                  The code for @command{jrtangle}.
 * jrweave code::                   The code for @command{jrweave}.
 * Bootstrapping::                  Chicken and egg issues.
@@ -216,6 +227,7 @@ on top of the Texinfo document formatting markup language.
 * jrtangle header::                Getting Started.
 * jrtangle ifweave iftangle::      Text inclusion/exclusion for
                                    @command{jrtangle}.
+* jrtangle texinfo vars::          Using Texinfo variables in code.
 * jrtangle file chunks::           Processing file chunks for
                                    @command{jrtangle}.
 * jrtangle start chunk collection:: Starting chunk collection.
@@ -227,6 +239,7 @@ on top of the Texinfo document formatting markup language.
                                    @command{jrtangle}.
 * jrtangle error checking::        Checking for errors in @command{jrtangle}.
 * Expanding code chunks::          Expanding code chunks into straight code.
+* jrtangle expanding values::     
 * jrtangle before everything::     Doing something before extracting any
                                    files.
 * jrtangle avoiding update::       Leaving unmodified files alone.
@@ -277,7 +290,7 @@ on top of the Texinfo document formatting markup language.
 @end detailmenu
 @end menu
 
-@c @summarycontents
+@summarycontents
 @contents
 
 @c Add these to the menu if they ever get included.
@@ -739,6 +752,590 @@ style.@footnote{This may explain why so many literate programmers have
 chosen to create their own literate programming systems.  So we now get
 a little psychology thrown in as well.}
 
+@node Example C Program
+@chapter An Example C Progrm
+
+To demonstrate the use of @value{TWJR}, here is a my very first
+literate program (from 1998!), reworked to use TWJR.  I am going
+to present the commentary (updated some) and the code, and then
+follow it with the marked-up input.
+
+In this @value{CHAPTER} I will use Texinfo unnumbered headings.
+In a larger ``real'' document, I would use Texinfo nodes and
+menues to fully structure the chapter.
+
+@unnumberedsec Introduction
+
+This is @command{echo}, Yet Another Implementation of the beloved Unix command.
+It serves as a ``warm up exercise'' for me; my first literate program.
+
+This version may or may not be POSIX-compliant, who cares?  It
+echoes@footnote{Or is that ``echos?''.}
+its arguments to @code{stdout}.  There are two possible options, the
+traditional @option{-n}, to suppress the final newline, and @option{-e} to have
+@command{echo} interpret escape sequences within the text.  A la System V
+and now POSIX argument parsing conventions, use @option{--} on the command
+line to get @command{echo} to treat any following arguments that begin with
+a dash as literal text.
+
+@unnumberedsec The High Level View
+
+The program has the following outline.
+
+@(echo.c@)=
+@<includes@>
+@<constant definitions@>
+@<forward declarations@>
+@<global variables@>
+@<main program@>
+@<other functions@>
+@
+
+@unnumberedsec And On With The Show
+
+In a simple program like @command{echo}, it is often easiest to just
+write out characters one at a time. For that, we will use the facilities
+provided by the @code{<stdio.h>} header file.  Thus:
+
+@<includes@>=
+#include <stdio.h>
+@
+
+No other include files should be necessary.
+
+Since C does not have a @code{bool} (boolean) type like C++ or Pascal,
+we define some constants to improve readability.@footnote{This was written
+before the C 99 standard added booleans to the language. We'll leave it
+alone for now.}
+
+@<constant definitions@>=
+#define TRUE	1
+#define FALSE	0
+@
+
+We need keep track of only two things at the global level: whether
+we need to suppress the final newline, and whether or not we're
+processing escape sequences. Initially, both are @code{FALSE}.
+
+@<global variables@>=
+int suppress_newline = FALSE;	/* no final newline if TRUE */
+int do_escapes = FALSE;		/* process \x within strings */
+@
+
+@unnumberedsec The Main Program
+The job here is pretty straightforward. First, process any command
+line arguments, in order to set the values of the global flags
+@code{suppress_newline} and @code{do_escapes}.  Then, loop over each
+argument and print it out.
+
+@<main program@>=
+int
+main(int argc, char **argv)
+{
+	@<local variables for main@>
+
+	@<special case for no arguments@>
+	@<process command line flags@>
+	@<process remaining command line arguments@>
+	exit(0);
+}
+@
+
+If there are no arguments, @command{echo} can just print a newline
+and return.
+
+@<special case for no arguments@>=
+if (argc == 1) {
+	putchar('\n');
+	exit(0);
+}
+@
+
+To process the command line flags, we use the standard @code{getopt()}
+routine.  The variables that @code{getopt()} manipulates are in the
+@code{<unistd.h>} header file, so it seems we do need another header.
+We also need a local variable to hold the result from each call to
+@code{getopt()}.
+
+Note that in the call to @code{getopt()}, neither @option{-e}
+nor @option{-n} take an argument. Also note that no @code{default}
+case is supplied, we just let @code{getopt()} print a message for us.
+
+@<includes@>=
+#include <unistd.h>	/* for getopt(3) machinery */
+@
+
+@<local variables for main@>=
+int c;
+@
+
+@<process command line flags@>=
+while ((c = getopt(argc, argv, "en")) != -1) {
+	switch (c) {
+	case 'e':
+		do_escapes = TRUE;
+		break;
+	case 'n':
+		suppress_newline = TRUE;
+		break;
+	}
+}
+@
+
+Now it's time to get down to brass tacks, and do the work.
+We either are doing escapes or we're not, so we key things
+off of that decision first.  We'll need another local variable
+for looping over the arguments, and we need a function that
+handles the escape sequence processing.
+
+@<local variables for main@>=
+int i;	/* loop variable */
+@
+
+@<forward declarations@>=
+extern void out_escape(const char *str);
+@
+
+@<process remaining command line arguments@>=
+if (do_escapes) {
+	for (i = optind; i < argc; i++) {
+		out_escape(argv[i]);
+		@<output a space if not the last argument@>
+	}
+} else {
+	for (i = optind; i < argc; i++) {
+		fputs(argv[i], stdout);
+		@<output a space if not the last argument@>
+	}
+}
+if (! suppress_newline)
+	putchar('\n');
+@
+
+We print a single space in between arguments, but not after
+the last one.
+
+@<output a space if not the last argument@>=
+if (i < argc-1)
+	putchar(' ');
+@
+
+And that's it for the main logic.
+
+@unnumberedsec Processing Escapes
+
+The last thing to do is write the function that handles escape
+sequences. For now, we won't bother with octal and hex escapes;
+those are left as an exercise for the reader.
+
+An initial version looks like this:
+
+@<first version of @code{out_escape}@>=
+void
+out_escape(const char *str)
+{
+	register char *cp;
+
+	for (cp = (char *) str; *cp != '\0'; cp++) {
+		if (*cp != '\\') {
+			putchar(*cp);	/* normal character */
+			continue;
+		}
+
+		/* a \ seen, look at next character */
+		switch (cp[1]) {
+		case 'a':
+			putchar('\a');
+			cp++;
+			break;
+		case 'f':
+			putchar('\f');
+			cp++;
+			break;
+		case 'n':
+			putchar('\n');
+			cp++;
+			break;
+		case 'r':
+			putchar('\r');
+			cp++;
+			break;
+		case 't':
+			putchar('\t');
+			cp++;
+			break;
+		case 'v':
+			putchar('\v');
+			cp++;
+			break;
+		case '\\':
+			putchar('\\');
+			cp++;
+			break;
+		default:
+			putchar('\\');
+			break;
+		}
+	}
+}
+@
+
+But that's rather long winded. A better way uses @code{strchr()} and
+indexing to get the right character to print.
+
+@<other functions@>=
+void
+out_escape(const char *str)
+{
+	static char texts[] = "abfnrtv";
+	static char escapes[] = "\a\b\f\n\r\t\v";
+	char *cp;
+	int i;
+
+	for (; *str != '\0'; str++) {
+		if (*str != '\\' || str[1] == '\0') {
+			putchar(*str);
+			continue;
+		}
+
+		cp = strchr(texts, str[1]);
+		if (cp != NULL) {
+			i = (cp - texts);	/* get index */
+			putchar(escapes[i]);
+			str++;			/* skip the next char */
+		} else if (str[1] == 'c') {
+			/* a la troff: \c means no newline */
+			suppress_newline = TRUE;
+			str++;
+		} else	/* do next char literally */
+			putchar('\\');
+	}
+}
+@
+
+Interestingly enough, for this version I remembered @code{\b} and
+also @code{\c}.
+
+We also need to include the right header file to get @code{strchr()} declared.
+
+@<includes@>=
+#include <string.h>	/* for strchr(3) */
+@
+
+That's all folks!
+
+@unnumberedsec Critques
+
+Once the program is written and laid out, it becomes clear that
+the special case for @samp{argc == 1} isn't needed; the behavior falls
+out of the design and implementation.
+
+The code at the end for suppressing the final newline should
+probably be in a separate chunk, since it is conceptually separate
+from the loops over the arguments.
+
+Also, @code{getopt()} could be better documented, but I assume that most
+people are familiar with it or can do @samp{man getopt} to get more
+information.  Although argument parsing for @command{echo} could easily be
+done by hand, using @code{getopt()} gives us standard, well defined
+behavior, and the code is as short or shorter than doing it manually.
+
+The @code{do_escapes} variable doesn't need to be global, after all,
+although @code{suppress_newline} does.
+
+Finally, octal and hexadecimal escapes ought to be implemented, but
+for a first, example, program, I don't want to bother doing that, or
+fixing the above other problems.
+
+@unnumberedsec The Input For The Program
+
+Here is the @value{TWJR} input for the preceding program.
+
+@smallexample
+@@unnumberedsec Introduction
+
+This is @@command@{echo@}, Yet Another Implementation of the beloved Unix command.
+It serves as a ``warm up exercise'' for me; my first literate program.
+
+This version may or may not be POSIX-compliant, who cares?  It
+echoes@@footnote@{Or is that ``echos?''.@}
+its arguments to @@code@{stdout@}.  There are two possible options, the
+traditional @@option@{-n@}, to suppress the final newline, and @@option@{-e@} to have
+@@command@{echo@} interpret escape sequences within the text.  A la System V
+and now POSIX argument parsing conventions, use @@option@{--@} on the command
+line to get @@command@{echo@} to treat any following arguments that begin with
+a dash as literal text.
+
+@@unnumberedsec The High Level View
+
+The program has the following outline.
+
+@@(echo.c@@)=
+@@<includes@@>
+@@<constant definitions@@>
+@@<forward declarations@@>
+@@<global variables@@>
+@@<main program@@>
+@@<other functions@@>
+@@
+
+@@unnumberedsec And On With The Show
+
+In a simple program like @@command@{echo@}, it is often easiest to just
+write out characters one at a time. For that, we will use the facilities
+provided by the @@code@{<stdio.h>@} header file.  Thus:
+
+@@<includes@@>=
+#include <stdio.h>
+@@
+
+No other include files should be necessary.
+
+Since C does not have a @@code@{bool@} (boolean) type like C++ or Pascal,
+we define some constants to improve readability.@@footnote@{This was written
+before the C 99 standard added booleans to the language. We'll leave it
+alone for now.@}
+
+@@<constant definitions@@>=
+#define TRUE    1
+#define FALSE   0
+@@
+
+We need keep track of only two things at the global level: whether
+we need to suppress the final newline, and whether or not we're
+processing escape sequences. Initially, both are @@code@{FALSE@}.
+
+@@<global variables@@>=
+int suppress_newline = FALSE;   /* no final newline if TRUE */
+int do_escapes = FALSE;     /* process \x within strings */
+@@
+
+@@unnumberedsec The Main Program
+The job here is pretty straightforward. First, process any command
+line arguments, in order to set the values of the global flags
+@@code@{suppress_newline@} and @@code@{do_escapes@}.  Then, loop over each
+argument and print it out.
+
+@@<main program@@>=
+int
+main(int argc, char **argv)
+@{
+    @@<local variables for main@@>
+
+    @@<special case for no arguments@@>
+    @@<process command line flags@@>
+    @@<process remaining command line arguments@@>
+    exit(0);
+@}
+@@
+
+If there are no arguments, @@command@{echo@} can just print a newline
+and return.
+
+@@<special case for no arguments@@>=
+if (argc == 1) @{
+    putchar('\n');
+    exit(0);
+@}
+@@
+
+To process the command line flags, we use the standard @@code@{getopt()@}
+routine.  The variables that @@code@{getopt()@} manipulates are in the
+@@code@{<unistd.h>@} header file, so it seems we do need another header.
+We also need a local variable to hold the result from each call to
+@@code@{getopt()@}.
+
+Note that in the call to @@code@{getopt()@}, neither @@option@{-e@}
+nor @@option@{-n@} take an argument. Also note that no @@code@{default@}
+case is supplied, we just let @@code@{getopt()@} print a message for us.
+
+@@<includes@@>=
+#include <unistd.h> /* for getopt(3) machinery */
+@@
+
+@@<local variables for main@@>=
+int c;
+@@
+
+@@<process command line flags@@>=
+while ((c = getopt(argc, argv, "en")) != -1) @{
+    switch (c) @{
+    case 'e':
+        do_escapes = TRUE;
+        break;
+    case 'n':
+        suppress_newline = TRUE;
+        break;
+    @}
+@}
+@@
+
+Now it's time to get down to brass tacks, and do the work.
+We either are doing escapes or we're not, so we key things
+off of that decision first.  We'll need another local variable
+for looping over the arguments, and we need a function that
+handles the escape sequence processing.
+
+@@<local variables for main@@>=
+int i;  /* loop variable */
+@@
+
+@@<forward declarations@@>=
+extern void out_escape(const char *str);
+@@
+
+@@<process remaining command line arguments@@>=
+if (do_escapes) @{
+    for (i = optind; i < argc; i++) @{
+        out_escape(argv[i]);
+        @@<output a space if not the last argument@@>
+    @}
+@} else @{
+    for (i = optind; i < argc; i++) @{
+        fputs(argv[i], stdout);
+        @@<output a space if not the last argument@@>
+    @}
+@}
+if (! suppress_newline)
+    putchar('\n');
+@@
+
+We print a single space in between arguments, but not after
+the last one.
+
+@@<output a space if not the last argument@@>=
+if (i < argc-1)
+    putchar(' ');
+@@
+
+And that's it for the main logic.
+
+@@unnumberedsec Processing Escapes
+
+The last thing to do is write the function that handles escape
+sequences. For now, we won't bother with octal and hex escapes;
+those are left as an exercise for the reader.
+
+An initial version looks like this:
+
+@@<first version of @@code@{out_escape@}@@>=
+void
+out_escape(const char *str)
+@{
+    register char *cp;
+
+    for (cp = (char *) str; *cp != '\0'; cp++) @{
+        if (*cp != '\\') @{
+            putchar(*cp);   /* normal character */
+            continue;
+        @}
+
+        /* a \ seen, look at next character */
+        switch (cp[1]) @{
+        case 'a':
+            putchar('\a');
+            cp++;
+            break;
+        case 'f':
+            putchar('\f');
+            cp++;
+            break;
+        case 'n':
+            putchar('\n');
+            cp++;
+            break;
+        case 'r':
+            putchar('\r');
+            cp++;
+            break;
+        case 't':
+            putchar('\t');
+            cp++;
+            break;
+        case 'v':
+            putchar('\v');
+            cp++;
+            break;
+        case '\\':
+            putchar('\\');
+            cp++;
+            break;
+        default:
+            putchar('\\');
+            break;
+        @}
+    @}
+@}
+@@
+
+But that's rather long winded. A better way uses @@code@{strchr()@} and
+indexing to get the right character to print.
+
+@@<other functions@@>=
+void
+out_escape(const char *str)
+@{
+    static char texts[] = "abfnrtv";
+    static char escapes[] = "\a\b\f\n\r\t\v";
+    char *cp;
+    int i;
+
+    for (; *str != '\0'; str++) @{
+        if (*str != '\\' || str[1] == '\0') @{
+            putchar(*str);
+            continue;
+        @}
+
+        cp = strchr(texts, str[1]);
+        if (cp != NULL) @{
+            i = (cp - texts);   /* get index */
+            putchar(escapes[i]);
+            str++;          /* skip the next char */
+        @} else if (str[1] == 'c') @{
+            /* a la troff: \c means no newline */
+            suppress_newline = TRUE;
+            str++;
+        @} else /* do next char literally */
+            putchar('\\');
+    @}
+@}
+@@
+
+Interestingly enough, for this version I remembered @@code@{\b@} and
+also @@code@{\c@}.
+
+We also need to include the right header file to get @@code@{strchr()@} declared.
+
+@@<includes@@>=
+#include <string.h> /* for strchr(3) */
+@@
+
+That's all folks!
+
+@@unnumberedsec Critques
+
+Once the program is written and laid out, it becomes clear that
+the special case for @@samp@{argc == 1@} isn't needed; the behavior falls
+out of the design and implementation.
+
+The code at the end for suppressing the final newline should
+probably be in a separate chunk, since it is conceptually separate
+from the loops over the arguments.
+
+Also, @@code@{getopt()@} could be better documented, but I assume that most
+people are familiar with it or can do @@samp@{man getopt@} to get more
+information.  Although argument parsing for @@command@{echo@} could easily be
+done by hand, using @@code@{getopt()@} gives us standard, well defined
+behavior, and the code is as short or shorter than doing it manually.
+
+The @@code@{do_escapes@} variable doesn't need to be global, after all,
+although @@code@{suppress_newline@} does.
+
+Finally, octal and hexadecimal escapes ought to be implemented, but
+for a first, example, program, I don't want to bother doing that, or
+fixing the above other problems.
+@end smallexample
+
 @node jrtangle code
 @chapter Tangling: The @command{jrtangle} Program
 
@@ -766,10 +1363,12 @@ as a source file name and as a code chunk name.
 * jrtangle header::             Getting Started.
 * jrtangle ifweave iftangle::   Text inclusion/exclusion for
                                 @command{jrtangle}.
+* jrtangle texinfo vars::       Using Texinfo variables in code.
 * jrtangle file chunks::        Processing file chunks for @command{jrtangle}.
 * jrtangle code chunks::        Processing code chunks for @command{jrtangle}.
 * jrtangle error checking::     Checking for errors in @command{jrtangle}.
 * Expanding code chunks::       Expanding code chunks into straight code.
+* jrtangle expanding values::  
 * jrtangle before everything::  Doing something before extracting any files.
 * jrtangle avoiding update::    Leaving unmodified files alone.
 * jrtangle shell debug::        Debugging shell commands run by
@@ -815,12 +1414,12 @@ value. It can be enabled if necessary (@pxref{jrweave additional macros}).
 @<Helper Functions@>
 @
 
-On my system, the latest version of @command{gawk} lives
-in @file{/usr/local/bin}. This should be changed on
+On most system, a reasonable version of @command{gawk} lives
+in @file{/usr/bin}. This should be changed on
 your system if it's not correct.
 
 @<Shebang header@>=
-#! /usr/local/bin/gawk -f
+#! /usr/bin/gawk -f
 @
 
 As a general note, @command{jrtangle} and @command{jrweave} need features
@@ -906,6 +1505,40 @@ a capital letter.
 	# otherwise fall through into the rest of the code
 }
 @
+
+@node jrtangle texinfo vars
+@section Using Texinfo Variables In Code
+
+Texinfo provides a simple variable-substitution facility. You se
+@samp{@@set @var{variable} @var{value}} to set a variable and
+@samp{@@value@{@var{variable}@}} to put the variable's value
+into the text being formatted.
+
+It would be nice to have such things work for the generated
+code too. In the formatted document, this would happen automatically.
+But the code must be processed specially if this is to work.
+
+Two obvious uses that come to mind for such a facility
+are including version numbers in the code, as well as something
+like the date and time that the code was extracted from the
+@value{TWJR} source file.
+
+@(jrtangle@) =
+@<Process @code{@@set} lines@>
+@
+
+@<Process @code{@@set} lines@>=
+$1 == "@set" {
+	var_name = $2			# get the variable name
+	$1 = $2 = ""			# remove @set and variable name
+	gsub(/(^[[:space:]]*)|([[:space:]]*$)/, "", $0)
+	Values[var_name] = $0	# save the value
+	next
+}
+@
+
+The substitution of values into output code lines is handled
+later; see @xref{jrtangle expanding values}.
 
 @node jrtangle file chunks
 @section Processing File Chunks for @command{jrtangle}
@@ -1374,9 +2007,14 @@ function do_expand_code_chunks(contents,
 			results[i] = expand_one_line(lines[i])
 	}
 
+	@<Expand @code{@@value} instances in the code@>
+
 	return join(results, 1, nlines, "\n")
 }
 @
+
+Expanding instances of @code{@@value} is handled further on;
+see @xref{jrtangle expanding values}.
 
 Let's go ahead and define @code{Chunk_name_pattern}, which is
 used throughout the expansion process.
@@ -1539,6 +2177,39 @@ without the enclosing brackets, this just strips them off using
 function code_body(name)
 {
 	return Code_contents[strip_out_name(name)]
+}
+@
+
+@node jrtangle expanding values
+@section Expanding @code{@@value} In Code Lines
+
+Before returning the expanded code lines, we have to see if there
+are any instances of @samp{@@value@{@var{variable}@}} in them.
+To do that we make a separate pass over the lines:
+
+@<Expand @code{@@value} instances in the code@>=
+for (i = 1; i in results; i++)
+	results[i] = expand_value(results[i])
+@
+
+@<Expansion helper functions@> =
+function expand_value(text,		parts, seps, i, n, var, result)
+{
+	if (index(text, "@value") == 0)
+		return text
+
+	n = split(text, parts, /@value\{[^}]+\}/, seps)
+
+	for (i in seps) {
+		var = gensub(/@value\{([^}]+)\}/, "\\1", 1, seps[i])
+		seps[i] = Values[var]
+	}
+
+	result = seps[0]	# "" or real
+	for (i = 1; i in parts; i++)
+		result = result parts[i] seps[i]
+
+	return result
 }
 @
 
@@ -1906,6 +2577,7 @@ for current TexiWeb Jr.@: sources in both programs.
 #
 #	git clone http://github.com/arnoldrobbins/texiwebjr
 #
+# This is Edition @value{EDITION}, last updated @value{UPDATE-MONTH}.
 @
 
 We need the following functions in both programs:
