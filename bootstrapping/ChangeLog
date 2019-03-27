@@ -1,3 +1,7 @@
+2019-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* jrtangle0: Change #! path to gawk to /usr/bin/gawk.
+
 2013-11-12         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* jrtangle0: Allow duplicating a referenced chunk in a callling

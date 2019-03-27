@@ -1,4 +1,4 @@
-#! /usr/local/bin/gawk -f
+#! /usr/bin/gawk -f
 
 # This file is part of TexiWeb Jr., a literate programming system.
 # 

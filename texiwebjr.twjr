@@ -22,8 +22,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH April, 2016
-@set EDITION 0.98
+@set UPDATE-MONTH March, 2019
+@set EDITION 1.0
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -102,25 +102,25 @@ ISRAEL
 Email: <email>arnold@@skeeve.com</email>
 URL: <ulink url="http://www.skeeve.com/">http://www.skeeve.com/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016
+<literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016, 2019
 Arnold David Robbins
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2013, 2014, 2015, 2016 @*
+Copyright @copyright{} 2013, 2014, 2015, 2016, 2019 @*
 Arnold David Robbins @*
 All Rights Reserved.
 @end ifnotdocbook
 @sp 1
 The @command{jrtangle} and @command{jrweave} programs are copyright
-@copyright{} 2013, 2014, 2015, 2016 by Arnold David Robbins.
+@copyright{} 2013, 2014, 2015, 2016, 2019 by Arnold David Robbins.
 They are published under the conditions of the GNU General Public License,
 version 3.
 @sp 1
 The @file{texiwebjr.twjr} literate source code file for
 @command{jrtangle} and @command{jrweave} is
-@copyright{} 2013, 2014, 2015, 2016 by Arnold David Robbins.
+@copyright{} 2013, 2014, 2015, 2016, 2019 by Arnold David Robbins.
 Starting at Edition 0.95 and forward,
 it is published under the conditions of the GNU General Public License,
 version 3.
@@ -216,6 +216,7 @@ on top of the Texinfo document formatting markup language.
 * jrtangle header::                Getting Started.
 * jrtangle ifweave iftangle::      Text inclusion/exclusion for
                                    @command{jrtangle}.
+* jrtangle handle ignore::         Handling @code{@@ignore} lines.
 * jrtangle file chunks::           Processing file chunks for
                                    @command{jrtangle}.
 * jrtangle start chunk collection:: Starting chunk collection.
@@ -236,6 +237,7 @@ on top of the Texinfo document formatting markup language.
 * Common Chunks::                  Common code chunks and functions.
 * jrweave two passes::             Two pass design.
 * jrweave initial code::           Initial Stuff and Printing A Warning.
+* jrweave handle ignore::          Handling @code{@@ignore} lines.
 * jrweave ifweave iftangle::       Text inclusion/exclusion for
                                    @command{jrweave}.
 * jrweave delete jrtangle code::   Removing stuff for @command{jrtangle}.
@@ -766,6 +768,7 @@ as a source file name and as a code chunk name.
 * jrtangle header::             Getting Started.
 * jrtangle ifweave iftangle::   Text inclusion/exclusion for
                                 @command{jrtangle}.
+* jrtangle handle ignore::      Handling @code{@@ignore} lines.
 * jrtangle file chunks::        Processing file chunks for @command{jrtangle}.
 * jrtangle code chunks::        Processing code chunks for @command{jrtangle}.
 * jrtangle error checking::     Checking for errors in @command{jrtangle}.
@@ -815,12 +818,12 @@ value. It can be enabled if necessary (@pxref{jrweave additional macros}).
 @<Helper Functions@>
 @
 
-On my system, the latest version of @command{gawk} lives
-in @file{/usr/local/bin}. This should be changed on
+On modern systems, the latest version of @command{gawk} lives
+in @file{/usr/bin}. This should be changed on
 your system if it's not correct.
 
 @<Shebang header@>=
-#! /usr/local/bin/gawk -f
+#! /usr/bin/gawk -f
 @
 
 As a general note, @command{jrtangle} and @command{jrweave} need features
@@ -905,6 +908,23 @@ a capital letter.
 
 	# otherwise fall through into the rest of the code
 }
+@
+
+
+@node jrtangle handle ignore
+@section Handling @code{@@ignore} Lines
+
+In a regular Texinfo document, lines bracketed between @samp{@@ignore}
+and @samp{@@end ignore} are ignored.  During development, it would be
+good if @command{jrtangle} and @command{jrweave} also did so, in case
+it's desirable to ``comment out'' chunks that are still half-baked
+
+@(jrtangle@) =
+@<Handle lines between @code{@@ignore} and @code{@@end ignore}@>
+@
+
+@<Handle lines between @code{@@ignore} and @code{@@end ignore}@>=
+/^@ignore/, /^@end ignore/ { next }
 @
 
 @node jrtangle file chunks
@@ -1876,7 +1896,7 @@ and @command{jrweave}.
 @use_smallexample
 @<GPL 3 Copyright statement@>=
 #
-# Copyright (C) 2013, 2014, 2015, 2016 Arnold David Robbins
+# Copyright (C) 2013, 2014, 2015, 2016, 2019 Arnold David Robbins
 # 
 # This file is part of TexiWeb Jr., a literate programming system.
 # 
@@ -2027,6 +2047,7 @@ since Texinfo won't know what to do with them.
 @menu
 * jrweave two passes::           Two pass design.
 * jrweave initial code::         Initial Stuff and Printing A Warning.
+* jrweave handle ignore::        Handling @code{@@ignore} lines.
 * jrweave ifweave iftangle::     Text inclusion/exclusion for
                                  @command{jrweave}.
 * jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
@@ -2201,6 +2222,15 @@ each side of the text.
 for (i = 1; i <= l + 4; i++)
 	printf("%%")
 printf "\n"
+@
+
+@node jrweave handle ignore
+@section Handling @code{@@ignore} Lines
+
+@xref{jrtangle handle ignore} for why we need this.
+
+@(jrweave@) =
+@<Handle lines between @code{@@ignore} and @code{@@end ignore}@>
 @
 
 @node jrweave ifweave iftangle
@@ -3982,6 +4012,9 @@ cd gawk-4.1.1
 ./configure && make
 # magic here to install, often sudo make install
 @end example
+
+You should, of course, get the latest version of @command{gawk}
+that has been released.
 
 @node Evaluation and Futures
 @chapter Evaluation and Future Work
