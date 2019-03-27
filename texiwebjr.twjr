@@ -826,17 +826,35 @@ your system if it's not correct.
 #! /usr/bin/gawk -f
 @
 
-As a general note, @command{jrtangle} and @command{jrweave} need features
-introduced in @command{gawk} 4.0; @emph{earlier versions will not work}.
-
 The common chunks and functions are described later in this @value{CHAPTER}.
-However, we define one of them now, so that the license comes
+However, we define some of them now, so that the license comes
 out at the top of the file. The actual license text is provided later.
 
 @<Common Chunks@>=
 @<GPL 3 Copyright statement@>
 @<Source Code Repository Web Info@>
+@<Check @command{gawk} version@>
 @
+
+As a general note, @command{jrtangle} and @command{jrweave} need features
+introduced in @command{gawk} 4.0; @emph{earlier versions will not work}.
+Since this is particularly important for @command{jrtangle}, we
+check for it. (This chunk was provided by the Texinfo maintainers.)
+
+@<Check @command{gawk} version@>=
+BEGIN {
+	v[0] = 0
+	if ("version" in PROCINFO) {
+		match(PROCINFO["version"], /^[0-9]+\./, v);
+	}
+
+	if (v[0] < 4) {
+		print("gawk >= 4.0 required") > "/dev/stderr"
+		exit 63	# for "missing" script
+	}
+}
+@
+
 
 @node jrtangle ifweave iftangle
 @section Document Sections Exclusive to Tangling and Weaving

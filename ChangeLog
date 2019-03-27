@@ -2,6 +2,7 @@
 
 	* texiwebjr.twjr: Add handling of @ignore lines.  Change #! path
 	to gawk to /usr/bin/gawk.  Update dates and version to 1.0.
+	Add gawk version checking chunk from Texinfo copy of jrtangle.
 
 2016-12-28         Arnold D. Robbins     <arnold@skeeve.com>
 
