@@ -1,3 +1,11 @@
+2019-04-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Remove the special command for braces in indexes.
+	Add @sortas in chunk index calls. Note that this needs more
+	work. Update path where gawk should be. Also latest gawk version.
+	Update official date and version.
+	* BUILD: Update expected path for gawk.
+
 2019-03-27         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Add handling of @ignore lines.  Change #! path

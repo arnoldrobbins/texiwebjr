@@ -8,8 +8,6 @@
 
 @c Change how xref titles are quoted.
 @dquotexrefs
-@c And let braces in index entries work.
-@allowindexbraces
 @set FORPRINT 1
 @ifclear FORPRINT
 @pdflinkcolor
@@ -22,8 +20,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH March, 2019
-@set EDITION 1.0
+@set UPDATE-MONTH April, 2019
+@set EDITION 1.1
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -2802,6 +2800,10 @@ Pass == 2 && /^@allowindexbraces[[:space:]]*$/ {
 }
 @
 
+As of at least April, 2019, and I think a bit earlier, the above
+command is neither necessary, nor accepted by @file{texinfo.tex};
+use it only on versions where it's needed.
+
 @node jrweave chunk indexes
 @section Creating Indices For Chunks
 
@@ -3144,12 +3146,21 @@ if (n > 1) {	# embedded chunk names
 		chunk_being_used = \
 			format_chunk_name(name, Chunk_info[name]["chunk number"],
 				Chunk_info[name]["type"])
-		printf("@crindex %s, use\n", chunk_being_used)
+		printf("@crindex %s, use @sortas{%s, use}\n", chunk_being_used, name)
 		y = y chunk_being_used
 		y = y parts[i+1]
 	}
 }
 @
+
+By using @code{@@sortas} in the index entry, chunk names
+are placed in the index under the heading of their initial
+letter, instead of all ending up under @samp{<}.  (This might
+be worth enhancing to be under user control.)
+
+@FIXME{Having @code{@@command} or other Texinfo constructs
+in the argument to @code{@@sortas} causes warnings. We need
+to add a function to intelligently strip such things out.}
 
 @node Printing the complete chunk
 @subsubsection Printing The Complete Chunk
@@ -3161,7 +3172,8 @@ chunk_being_defined = \
 	format_chunk_name(Current_chunk,
 						Chunk_info[Current_chunk]["chunk number"],
 						Chunk_type)
-printf("@cdindex %s, definition\n", chunk_being_defined)
+printf("@cdindex %s, definition @sortas{%s, definition}\n",
+	chunk_being_defined, Current_chunk)
 printf("@noindent\n%s %s@equiv{}\n",
 	chunk_being_defined,
 	Chunk_info[Current_chunk]["redefn"] == 1 ? "" : "+")
@@ -4015,7 +4027,7 @@ of @command{texi2pdf} and @command{makeinfo}.  The latter should come from
 the Texinfo 5.2 distribution, or newer.
 
 These instructions assume that you have @command{gawk} version 4.0
-or later installed in @file{/usr/local/bin}. If not you will have to
+or later installed in @file{/usr/bin}. If not you will have to
 use something like @samp{gawk -f ./jrweave @r{@dots{}}} (assuming that
 @command{gawk} 4.0 or later is in your search path somewhere).
 
@@ -4024,9 +4036,9 @@ And of course, if you don't have @command{gawk}, the canonical
 incantation is:
 
 @example
-wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.gz
-gzip -d < gawk-4.1.1.tar.gz | tar -xpf -
-cd gawk-4.1.1
+wget http://ftp.gnu.org/gnu/gawk/gawk-5.0.0.tar.gz
+gzip -d < gawk-5.0.0.tar.gz | tar -xpf -
+cd gawk-5.0.0
 ./configure && make
 # magic here to install, often sudo make install
 @end example
