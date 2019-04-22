@@ -2224,9 +2224,9 @@ else
 	s = sprintf(_"It was created by jrweave from `%s'.", filename)
 
 l = length(s)
-pl = (l - length(t)) / 2	# padding on left side
-pr = l - (pl + length(t))	# padding on right side
-if (pl * 2 < l)				# account for odd lengths
+pl = int((l - length(t)) / 2)	# padding on left side, integer division!
+pr = l - (pl + length(t))		# padding on right side
+if ((pl + pr + length(t)) < l)	# account for odd lengths
 	pr++
 @
 

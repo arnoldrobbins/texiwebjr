@@ -3,7 +3,8 @@
 	* texiwebjr.twjr: Remove the special command for braces in indexes.
 	Add @sortas in chunk index calls. Note that this needs more
 	work. Update path where gawk should be. Also latest gawk version.
-	Update official date and version.
+	Update official date and version. Fix bug in padding calculation
+	for print_do_not_edit function.
 	* BUILD: Update expected path for gawk.
 
 2019-03-27         Arnold D. Robbins     <arnold@skeeve.com>
