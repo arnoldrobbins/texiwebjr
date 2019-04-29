@@ -1,3 +1,8 @@
+2019-04-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Remove markup in arguments to @sortas used
+	for indexing the chunk definitions and uses.
+
 2019-04-22         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Remove the special command for braces in indexes.

@@ -21,7 +21,7 @@
 
 @c These apply across the board.
 @set UPDATE-MONTH April, 2019
-@set EDITION 1.1
+@set EDITION 1.2
 
 @set TITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
 @set SHORTTITLE TexiWeb Jr.@:
@@ -3146,7 +3146,7 @@ if (n > 1) {	# embedded chunk names
 		chunk_being_used = \
 			format_chunk_name(name, Chunk_info[name]["chunk number"],
 				Chunk_info[name]["type"])
-		printf("@crindex %s, use @sortas{%s, use}\n", chunk_being_used, name)
+		printf("@crindex %s, use @sortas{%s, use}\n", chunk_being_used, remove_markup(name))
 		y = y chunk_being_used
 		y = y parts[i+1]
 	}
@@ -3157,10 +3157,8 @@ By using @code{@@sortas} in the index entry, chunk names
 are placed in the index under the heading of their initial
 letter, instead of all ending up under @samp{<}.  (This might
 be worth enhancing to be under user control.)
-
-@FIXME{Having @code{@@command} or other Texinfo constructs
-in the argument to @code{@@sortas} causes warnings. We need
-to add a function to intelligently strip such things out.}
+The @code{remove_markup()} function removes Texinfo markup,
+which isn't allowed inside the argument to @code{@@sortas}.
 
 @node Printing the complete chunk
 @subsubsection Printing The Complete Chunk
@@ -3173,7 +3171,7 @@ chunk_being_defined = \
 						Chunk_info[Current_chunk]["chunk number"],
 						Chunk_type)
 printf("@cdindex %s, definition @sortas{%s, definition}\n",
-	chunk_being_defined, Current_chunk)
+	chunk_being_defined, remove_markup(Current_chunk))
 printf("@noindent\n%s %s@equiv{}\n",
 	chunk_being_defined,
 	Chunk_info[Current_chunk]["redefn"] == 1 ? "" : "+")
@@ -3763,6 +3761,21 @@ function sanitize_name(name)
 	gsub(/[^[:alnum:]]/, "-", name)
 
 	return name
+}
+@
+
+In a related sense, this function removes Texinfo
+markup from text, in order to use it as the argument for
+@code{@@sortas}.
+
+@findex @code{remove_markup()} function, @command{jrweave}
+@<Helper functions for @command{jrweave}@> =
+function remove_markup(text,	result)
+{
+	result = gensub(/([^@])(@[[:alpha:]]+[{]([^}]+)[}])/, "\\1\\3", "g", text)
+	result = gensub(/@TeX[{][}]/, "TeX", "g", result)
+
+	return result
 }
 @
 
