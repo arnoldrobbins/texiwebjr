@@ -8,8 +8,6 @@
 
 @c Change how xref titles are quoted.
 @dquotexrefs
-@c And let braces in index entries work.
-@allowindexbraces
 @set FORPRINT 1
 @ifclear FORPRINT
 @pdflinkcolor
@@ -22,8 +20,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH November, 2018
-@set EDITION 0.98
+@set UPDATE-MONTH April, 2019
+@set EDITION 1.2
 
 @set TITLE Literate Programming Made Easy
 @set SUBTITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
@@ -106,25 +104,25 @@ ISRAEL
 Email: <email>arnold@@skeeve.com</email>
 URL: <ulink url="http://www.skeeve.com/">http://www.skeeve.com/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016, 2018
+<literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016, 2018, 2019
 Arnold David Robbins
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2013, 2014, 2015, 2016, 2018 @*
+Copyright @copyright{} 2013, 2014, 2015, 2016, 2018, 2019 @*
 Arnold David Robbins @*
 All Rights Reserved.
 @end ifnotdocbook
 @sp 1
 The @command{jrtangle} and @command{jrweave} programs are copyright
-@copyright{} 2013, 2014, 2015, 2016, 2018 by Arnold David Robbins.
+@copyright{} 2013, 2014, 2015, 2016, 2018, 2019 by Arnold David Robbins.
 They are published under the conditions of the GNU General Public License,
 version 3.
 @sp 1
 The @file{texiwebjr.twjr} literate source code file for
 @command{jrtangle} and @command{jrweave} is
-@copyright{} 2013, 2014, 2015, 2016, 2018 by Arnold David Robbins.
+@copyright{} 2013, 2014, 2015, 2016, 2018, 2019 by Arnold David Robbins.
 Starting at Edition 0.95 and forward,
 it is published under the conditions of the GNU General Public License,
 version 3.
@@ -228,6 +226,7 @@ on top of the Texinfo document formatting markup language.
 * jrtangle ifweave iftangle::      Text inclusion/exclusion for
                                    @command{jrtangle}.
 * jrtangle texinfo vars::          Using Texinfo variables in code.
+* jrtangle handle ignore::         Handling @code{@@ignore} lines.
 * jrtangle file chunks::           Processing file chunks for
                                    @command{jrtangle}.
 * jrtangle start chunk collection:: Starting chunk collection.
@@ -249,6 +248,7 @@ on top of the Texinfo document formatting markup language.
 * Common Chunks::                  Common code chunks and functions.
 * jrweave two passes::             Two pass design.
 * jrweave initial code::           Initial Stuff and Printing A Warning.
+* jrweave handle ignore::          Handling @code{@@ignore} lines.
 * jrweave ifweave iftangle::       Text inclusion/exclusion for
                                    @command{jrweave}.
 * jrweave delete jrtangle code::   Removing stuff for @command{jrtangle}.
@@ -1364,6 +1364,7 @@ as a source file name and as a code chunk name.
 * jrtangle ifweave iftangle::   Text inclusion/exclusion for
                                 @command{jrtangle}.
 * jrtangle texinfo vars::       Using Texinfo variables in code.
+* jrtangle handle ignore::      Handling @code{@@ignore} lines.
 * jrtangle file chunks::        Processing file chunks for @command{jrtangle}.
 * jrtangle code chunks::        Processing code chunks for @command{jrtangle}.
 * jrtangle error checking::     Checking for errors in @command{jrtangle}.
@@ -1414,7 +1415,7 @@ value. It can be enabled if necessary (@pxref{jrweave additional macros}).
 @<Helper Functions@>
 @
 
-On most system, a reasonable version of @command{gawk} lives
+On modern systems, the latest version of @command{gawk} lives
 in @file{/usr/bin}. This should be changed on
 your system if it's not correct.
 
@@ -1422,17 +1423,35 @@ your system if it's not correct.
 #! /usr/bin/gawk -f
 @
 
-As a general note, @command{jrtangle} and @command{jrweave} need features
-introduced in @command{gawk} 4.0; @emph{earlier versions will not work}.
-
 The common chunks and functions are described later in this @value{CHAPTER}.
-However, we define one of them now, so that the license comes
+However, we define some of them now, so that the license comes
 out at the top of the file. The actual license text is provided later.
 
 @<Common Chunks@>=
 @<GPL 3 Copyright statement@>
 @<Source Code Repository Web Info@>
+@<Check @command{gawk} version@>
 @
+
+As a general note, @command{jrtangle} and @command{jrweave} need features
+introduced in @command{gawk} 4.0; @emph{earlier versions will not work}.
+Since this is particularly important for @command{jrtangle}, we
+check for it. (This chunk was provided by the Texinfo maintainers.)
+
+@<Check @command{gawk} version@>=
+BEGIN {
+	v[0] = 0
+	if ("version" in PROCINFO) {
+		match(PROCINFO["version"], /^[0-9]+\./, v);
+	}
+
+	if (v[0] < 4) {
+		print("gawk >= 4.0 required") > "/dev/stderr"
+		exit 63	# for "missing" script
+	}
+}
+@
+
 
 @node jrtangle ifweave iftangle
 @section Document Sections Exclusive to Tangling and Weaving
@@ -1539,6 +1558,22 @@ $1 == "@set" {
 
 The substitution of values into output code lines is handled
 later; see @xref{jrtangle expanding values}.
+
+@node jrtangle handle ignore
+@section Handling @code{@@ignore} Lines
+
+In a regular Texinfo document, lines bracketed between @samp{@@ignore}
+and @samp{@@end ignore} are ignored.  During development, it would be
+good if @command{jrtangle} and @command{jrweave} also did so, in case
+it's desirable to ``comment out'' chunks that are still half-baked
+
+@(jrtangle@) =
+@<Handle lines between @code{@@ignore} and @code{@@end ignore}@>
+@
+
+@<Handle lines between @code{@@ignore} and @code{@@end ignore}@>=
+/^@ignore/, /^@end ignore/ { next }
+@
 
 @node jrtangle file chunks
 @section Processing File Chunks for @command{jrtangle}
@@ -2547,7 +2582,7 @@ and @command{jrweave}.
 @use_smallexample
 @<GPL 3 Copyright statement@>=
 #
-# Copyright (C) 2013, 2014, 2015, 2016 Arnold David Robbins
+# Copyright (C) 2013, 2014, 2015, 2016, 2019 Arnold David Robbins
 # 
 # This file is part of TexiWeb Jr., a literate programming system.
 # 
@@ -2699,6 +2734,7 @@ since Texinfo won't know what to do with them.
 @menu
 * jrweave two passes::           Two pass design.
 * jrweave initial code::         Initial Stuff and Printing A Warning.
+* jrweave handle ignore::        Handling @code{@@ignore} lines.
 * jrweave ifweave iftangle::     Text inclusion/exclusion for
                                  @command{jrweave}.
 * jrweave delete jrtangle code:: Removing stuff for @command{jrtangle}.
@@ -2859,9 +2895,9 @@ else
 	s = sprintf(_"It was created by jrweave from `%s'.", filename)
 
 l = length(s)
-pl = (l - length(t)) / 2	# padding on left side
-pr = l - (pl + length(t))	# padding on right side
-if (pl * 2 < l)				# account for odd lengths
+pl = int((l - length(t)) / 2)	# padding on left side, integer division!
+pr = l - (pl + length(t))		# padding on right side
+if ((pl + pr + length(t)) < l)	# account for odd lengths
 	pr++
 @
 
@@ -2873,6 +2909,15 @@ each side of the text.
 for (i = 1; i <= l + 4; i++)
 	printf("%%")
 printf "\n"
+@
+
+@node jrweave handle ignore
+@section Handling @code{@@ignore} Lines
+
+@xref{jrtangle handle ignore} for why we need this.
+
+@(jrweave@) =
+@<Handle lines between @code{@@ignore} and @code{@@end ignore}@>
 @
 
 @node jrweave ifweave iftangle
@@ -3426,6 +3471,10 @@ Pass == 2 && /^@allowindexbraces[[:space:]]*$/ {
 }
 @
 
+As of at least April, 2019, and I think a bit earlier, the above
+command is neither necessary, nor accepted by @file{texinfo.tex};
+use it only on versions where it's needed.
+
 @node jrweave chunk indexes
 @section Creating Indices For Chunks
 
@@ -3768,12 +3817,19 @@ if (n > 1) {	# embedded chunk names
 		chunk_being_used = \
 			format_chunk_name(name, Chunk_info[name]["chunk number"],
 				Chunk_info[name]["type"])
-		printf("@crindex %s, use\n", chunk_being_used)
+		printf("@crindex %s, use @sortas{%s, use}\n", chunk_being_used, remove_markup(name))
 		y = y chunk_being_used
 		y = y parts[i+1]
 	}
 }
 @
+
+By using @code{@@sortas} in the index entry, chunk names
+are placed in the index under the heading of their initial
+letter, instead of all ending up under @samp{<}.  (This might
+be worth enhancing to be under user control.)
+The @code{remove_markup()} function removes Texinfo markup,
+which isn't allowed inside the argument to @code{@@sortas}.
 
 @node Printing the complete chunk
 @subsubsection Printing The Complete Chunk
@@ -3785,7 +3841,8 @@ chunk_being_defined = \
 	format_chunk_name(Current_chunk,
 						Chunk_info[Current_chunk]["chunk number"],
 						Chunk_type)
-printf("@cdindex %s, definition\n", chunk_being_defined)
+printf("@cdindex %s, definition @sortas{%s, definition}\n",
+	chunk_being_defined, remove_markup(Current_chunk))
 printf("@noindent\n%s %s@equiv{}\n",
 	chunk_being_defined,
 	Chunk_info[Current_chunk]["redefn"] == 1 ? "" : "+")
@@ -4378,6 +4435,21 @@ function sanitize_name(name)
 }
 @
 
+In a related sense, this function removes Texinfo
+markup from text, in order to use it as the argument for
+@code{@@sortas}.
+
+@findex @code{remove_markup()} function, @command{jrweave}
+@<Helper functions for @command{jrweave}@> =
+function remove_markup(text,	result)
+{
+	result = gensub(/([^@])(@[[:alpha:]]+[{]([^}]+)[}])/, "\\1\\3", "g", text)
+	result = gensub(/@TeX[{][}]/, "TeX", "g", result)
+
+	return result
+}
+@
+
 Next are functions to do various kinds of formatting.
 Since formatting anchors and references are similar,
 a helper function does the work, with the main functions
@@ -4639,7 +4711,7 @@ of @command{texi2pdf} and @command{makeinfo}.  The latter should come from
 the Texinfo 5.2 distribution, or newer.
 
 These instructions assume that you have @command{gawk} version 4.0
-or later installed in @file{/usr/local/bin}. If not you will have to
+or later installed in @file{/usr/bin}. If not you will have to
 use something like @samp{gawk -f ./jrweave @r{@dots{}}} (assuming that
 @command{gawk} 4.0 or later is in your search path somewhere).
 
@@ -4648,12 +4720,15 @@ And of course, if you don't have @command{gawk}, the canonical
 incantation is:
 
 @example
-wget http://ftp.gnu.org/gnu/gawk/gawk-4.1.1.tar.gz
-gzip -d < gawk-4.1.1.tar.gz | tar -xpf -
-cd gawk-4.1.1
+wget http://ftp.gnu.org/gnu/gawk/gawk-5.0.0.tar.gz
+gzip -d < gawk-5.0.0.tar.gz | tar -xpf -
+cd gawk-5.0.0
 ./configure && make
 # magic here to install, often sudo make install
 @end example
+
+You should, of course, get the latest version of @command{gawk}
+that has been released.
 
 @node Evaluation and Futures
 @chapter Evaluation and Future Work

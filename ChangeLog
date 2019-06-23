@@ -1,3 +1,23 @@
+2019-04-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Remove markup in arguments to @sortas used
+	for indexing the chunk definitions and uses.
+
+2019-04-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Remove the special command for braces in indexes.
+	Add @sortas in chunk index calls. Note that this needs more
+	work. Update path where gawk should be. Also latest gawk version.
+	Update official date and version. Fix bug in padding calculation
+	for print_do_not_edit function.
+	* BUILD: Update expected path for gawk.
+
+2019-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texiwebjr.twjr: Add handling of @ignore lines.  Change #! path
+	to gawk to /usr/bin/gawk.  Update dates and version to 1.0.
+	Add gawk version checking chunk from Texinfo copy of jrtangle.
+
 2018-11-16         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texinfo.tex: Updated to current.
