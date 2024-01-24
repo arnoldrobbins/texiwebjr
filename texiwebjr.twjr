@@ -629,7 +629,7 @@ that the code is presented in the order that makes the most sense for
 the human reading and understanding the program, as opposed to the
 order needed for the programming language's compiler or interpreter.
 More information and pedagogy may be found on
-@uref{https://www.literateprogramming.com, the literate programming website}.
+@uref{http://www.literateprogramming.com, the literate programming website}.
 Please see there.
 
 Knuth's original @command{WEB} system was built on top of and for use
