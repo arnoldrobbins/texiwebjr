@@ -102,7 +102,7 @@ Nof Ayalon
 D.N. Shimshon 9978500
 ISRAEL
 Email: <email>arnold@@skeeve.com</email>
-URL: <ulink url="http://www.skeeve.com/">http://www.skeeve.com/</ulink></literallayout>
+URL: <ulink url="https://www.skeeve.com/">https://www.skeeve.com/</ulink></literallayout>
 
 <literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016, 2018, 2019
 Arnold David Robbins
@@ -166,7 +166,7 @@ Nof Ayalon @*
 D.N. Shimshon 9978500 @*
 ISRAEL @*
 Email: @EMAIL{arnold@@skeeve.com,arnold AT skeeve.com} @*
-URL: @url{http://www.skeeve.com/} @*
+URL: @url{https://www.skeeve.com/} @*
 
 @insertcopying
 @end ifnotdocbook
@@ -318,7 +318,7 @@ This @value{DOCUMENT} describes @value{TWJR}, a system that provides
 literate programming on top of the Texinfo markup language.
 
 The canonical source for @value{TWJR} is
-@url{http://github.com/arnoldrobbins/texiwebjr}.
+@url{https://github.com/arnoldrobbins/texiwebjr}.
 
 @menu
 * Lit prog and me::             Literate programming and me.
@@ -342,7 +342,7 @@ half of 1998, since that is when I found and fixed a race condition in
 @cindex Brennan, Michael
 From October of 1999 through September of 2001, I did some consulting work
 for Mike Brennan, the author of
-@uref{http://www.invisible-island.net/mawk, @command{mawk}}
+@uref{https://www.invisible-island.net/mawk, @command{mawk}}
 and a good friend.  We used
 Mike's @command{mweb} system@footnote{As I recall it, sometime earlier I
 had pointed him at literate programming. He created his @command{mweb} in
@@ -384,14 +384,14 @@ programming using scripting languages, as the code is written in
 @c Scale figure to 4.5 inches which is good for both smallbook
 @c and regular.  TeX will scale height also automatically.
 @float Figure,third-way
-@caption{Third Way (@url{http://xkcd.com/1285})}
+@caption{Third Way (@url{https://xkcd.com/1285})}
 @center @image{third_way, 5in, , Third Way}
 @end float
 @end ifnotdocbook
 
 @docbook
 <figure id="figure-third-way" float="0">
-<title>Third Way (<ulink url="http://xkcd.com/1285">http://xkcd.com/1285</ulink>)</title>
+<title>Third Way (<ulink url="https://xkcd.com/1285">https://xkcd.com/1285</ulink>)</title>
 <mediaobject>
 <imageobject role="web"><imagedata fileref="third_way.png" format="PNG"/></imageobject>
 </mediaobject>
@@ -476,7 +476,7 @@ At least one index follows the bibliography.
 
 @cindex Texinfo document formatting language
 This @value{DOCUMENT} is written in an enhanced version of
-@uref{http://www.gnu.org/software/texinfo/, Texinfo},
+@uref{https://www.gnu.org/software/texinfo/, Texinfo},
 the GNU documentation formatting language.
 A single Texinfo source file is used to produce both the printed and online
 versions of a program's documentation.
@@ -587,9 +587,9 @@ of appeal. This doesn't take away from its usefulness as an approach.
 
 @cindex Knuth, Donald E.@:
 @dfn{Literate programming} is a programming style invented by
-@uref{http://www-cs-faculty.stanford.edu/~knuth/, Professor Donald E.@: Knuth}
+@uref{https://www-cs-faculty.stanford.edu/~knuth/, Professor Donald E.@: Knuth}
 of Stanford University for implementing the
-@uref{http://www.tug.org, @TeX{} document formatter}
+@uref{https://www.tug.org, @TeX{} document formatter}
 and @MF{} font-creation programs.
 
 A literate program is a mixture of program fragments that do some
@@ -602,7 +602,7 @@ that the code is presented in the order that makes the most sense for
 the human reading and understanding the program, as opposed to the
 order needed for the programming language's compiler or interpreter.
 More information and pedagogy may be found on
-@uref{http://www.literateprogramming.com, the literate programming website}.
+@uref{https://www.literateprogramming.com, the literate programming website}.
 Please see there.
 
 Knuth's original @command{WEB} system was built on top of and for use
@@ -611,7 +611,7 @@ the only language that was popular, generally portable, and basically
 usable for large programs (despite a number of constraints). @command{WEB}
 provided a number of facilities to make Pascal programming easier, and
 also ``pretty printed'' the code in the finished document.  (Today Knuth
-uses @uref{http://www-cs-faculty.stanford.edu/~knuth/cweb.html,
+uses @uref{https://www-cs-faculty.stanford.edu/~knuth/cweb.html,
 @command{CWEB}}, which is similar to the original @command{WEB}
 but is intended for use with C.)
 
@@ -619,9 +619,9 @@ but is intended for use with C.)
 @cindex Pfaff, Ben
 Many literate programming tools have been developed since then.
 @value{TWJR} is inspired by two in particular:
-@uref{http://www.cs.tufts.edu/~nr/noweb/, Norman Ramsey's @command{noweb}},
+@uref{https://www.cs.tufts.edu/~nr/noweb/, Norman Ramsey's @command{noweb}},
 and
-@uref{http://searchcode.com/codesearch/view/14097352, Ben Pfaff's TexiWeb}.
+@uref{https://searchcode.com/codesearch/view/14097352, Ben Pfaff's TexiWeb}.
 
 @cindex @command{noweb} literate programming tool
 @command{noweb} makes a conscious attempt to provide minimal additional
@@ -634,7 +634,7 @@ aspect of @command{noweb} that I find particularly appealing.
 
 @cindex TexiWeb literate programming tool
 TexiWeb was created by Ben Pfaff for writing his
-@uref{http://adtinfo.org/, AVL library}.
+@uref{https://adtinfo.org/, AVL library}.
 It builds on the Texinfo markup language, which at first glance is
 exactly what I was looking for: Texinfo + Literate Programming.
 However, TexiWeb has two drawbacks: it is poorly documented,
@@ -730,7 +730,7 @@ may change as this evolves.
 Why write in @command{awk}? Good question. I glad you asked this one too.
 
 I got involved with the
-@uref{http://www.gnu.org/software/gawk/, GNU Awk project}
+@uref{https://www.gnu.org/software/gawk/, GNU Awk project}
 late in 1987.  I have been the sole maintainer and the primary author
 of its documentation since 1994.  The language is small, elegant, and
 generally quite powerful.  @command{gawk}, in particular, adds many
@@ -756,11 +756,11 @@ a little psychology thrown in as well.}
 @chapter An Example C Progrm
 
 To demonstrate the use of @value{TWJR}, here is my very first
-literate program (from 1998!), reworked to use @value{TWJR}  I am going
-to present the commentary (updated some) and the code, and then
+literate program (from 1998!), reworked to use @value{TWJR}  I
+present the commentary (updated some) and the code, and then
 follow it with the marked-up input.
 
-In this @value{CHAPTER} I will use Texinfo unnumbered headings.
+In this @value{CHAPTER} I use Texinfo unnumbered headings.
 In a larger ``real'' document, I would use Texinfo nodes and
 menues to fully structure the chapter.
 
@@ -2610,7 +2610,7 @@ for current TexiWeb Jr.@: sources in both programs.
 # Up-to-date source code for TexiWeb Jr. can be obtained via
 # Git from github:
 #
-#	git clone http://github.com/arnoldrobbins/texiwebjr
+#	git clone https://github.com/arnoldrobbins/texiwebjr
 #
 # This is Edition @value{EDITION}, last updated @value{UPDATE-MONTH}.
 @
@@ -2633,7 +2633,7 @@ Print a warning message using @code{message()} but don't exit.
 
 @item join()
 Join an array into a single string. This function is copied from
-@uref{http://www.gnu.org/software/gawk/manual/html_node/Join-Function.html,
+@uref{https://www.gnu.org/software/gawk/manual/html_node/Join-Function.html,
 @cite{GAWK: Effective AWK Programming}},
 (the @command{gawk}
 documentation).
@@ -4337,7 +4337,7 @@ BEGIN {
 
 I recommend using whatever appropriate magic in the @value{TWJR}
 input document that will set the tab stop to whatever you prefer
-in your favorite editor.  For @uref{http://www.vim.org, Vim},
+in your favorite editor.  For @uref{https://www.vim.org, Vim},
 I use this line, which also switches on syntax highlighting
 appropriate to Texinfo. It must be placed within the first four
 or so lines of the file.
@@ -4509,7 +4509,7 @@ function format_chunk_name(name, count, type,
 		right = ">"
 		style = "i"
 	} else
-		fatal(_"format_chunk_name: Unknown chunk type `%s'\n", type)
+		fatal(_"format_chunk_name: chunk <%s>, used but not defined (unknown chunk type `%s'\n", name, type)
 
 	if (count > 0 && Numbered_chunks)
 		result = sprintf("@r{%s@%s{%s} @oldnum{%d}%s}",
@@ -4520,7 +4520,6 @@ function format_chunk_name(name, count, type,
 	return result
 }
 @
-@c +++++++++++++++++++ end of new +++++++++++++++++++++++++
 
 @node Bootstrapping
 @chapter Bootstrapping The System
@@ -4592,7 +4591,7 @@ in a literate fashion, since @command{jrtangle} creates it for us.
 The initial version of @command{jrweave} was pretty simple. It handled
 @samp{@@ifweave @r{@dots{}} @@end ifweave} and
 @samp{@@iftangle @r{@dots{}} @@end iftangle}, and the earliest supported
-additional commands (@code{@@post_create}). It then simply formatted the
+additional command (@code{@@post_create}). It then simply formatted the
 file and code chunks using @code{@@example}, escaping the characters
 @samp{@@}, @samp{@{}, and @samp{@}}, and expanding tabs.  This was enough
 to produce a straight Texinfo document that could be formatted and viewed
@@ -4690,7 +4689,7 @@ distclean: clean
 @section Downloading From The Git Repository
 
 The code for @value{TWJR} is available from GitHub.
-To get it, you will need a @uref{http://git-scm.org, Git}
+To get it, you will need a @uref{https://git-scm.org, Git}
 client of some kind.  The instructions here presume a command-line
 style client.
 
@@ -4720,9 +4719,9 @@ And of course, if you don't have @command{gawk}, the canonical
 incantation is:
 
 @example
-wget http://ftp.gnu.org/gnu/gawk/gawk-5.0.0.tar.gz
-gzip -d < gawk-5.0.0.tar.gz | tar -xpf -
-cd gawk-5.0.0
+wget https://ftp.gnu.org/gnu/gawk/gawk-5.3.0.tar.gz
+gzip -d < gawk-5.3.0.tar.gz | tar -xpf -
+cd gawk-5.3.0
 ./configure && make
 # magic here to install, often sudo make install
 @end example
@@ -5099,7 +5098,7 @@ way into POSIX, though.
 @enumerate
 
 @item
-@uref{http://www-cs-faculty.stanford.edu/~knuth/lp.html,
+@uref{https://www-cs-faculty.stanford.edu/~knuth/lp.html,
 @cite{Literate Programming}},
 Donald E.@: Knuth,
 Center for the Study of Language and Information, 1992.
@@ -5108,14 +5107,14 @@ ISBN-13: 978-0937073803.
 
 @item
 @cindex @command{gawk} documentation
-@uref{http://www.gnu.org/software/gawk/manual/,
+@uref{https://www.gnu.org/software/gawk/manual/,
 @cite{GAWK: Effective AWK Programming}},
 Arnold D. Robbins,
 Free Software Foundation, Cambridge, Massachusetts, 2013.
 Distributed with the source code for @command{gawk}.
 
 @item
-@uref{http://www-cs-faculty.stanford.edu/~knuth/abcde.html,
+@uref{https://www-cs-faculty.stanford.edu/~knuth/abcde.html,
 @cite{Computers & Typesetting}}. This five-volume boxed set of hardback
 books contains the documentation and source for both @TeX{} and @MF{},
 as well as the Computer Modern fonts.  It is worthwhile to obtain the
@@ -5160,7 +5159,7 @@ ISBN-13: 978-0201134469.
 @end enumerate
 
 @item
-@uref{http://www.ctan.org,
+@uref{https://www.ctan.org,
 The Comprehensive @TeX{} Archive Network}.
 
 @end enumerate

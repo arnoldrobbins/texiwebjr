@@ -1,3 +1,9 @@
+2024-01-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* template.twjr: Update for current texinfo.tex.
+	* texiwebjr.twjr: Move to https URLs. Other small
+	fixes.
+
 2019-04-29         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* texiwebjr.twjr: Remove markup in arguments to @sortas used

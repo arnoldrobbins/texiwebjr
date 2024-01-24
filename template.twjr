@@ -10,8 +10,6 @@
 
 @c Change how xref titles are quoted.
 @dquotexrefs
-@c And let braces in index entries work.
-@allowindexbraces
 @ifclear FORPRINT
 @pdflinkcolor
 @urllinkcolor
@@ -103,7 +101,7 @@ Address Line 1
 Address Line 2
 etc.
 Email: <email>user@@example.com</email>
-URL: <ulink url="http://www.example.com/">http://www.example.com/</ulink></literallayout>
+URL: <ulink url="https://www.example.com/">https://www.example.com/</ulink></literallayout>
 
 <literallayout class="normal">Copyright &copy; YYYY, YYYY
 Full name here
@@ -148,7 +146,7 @@ Address Line 1 @*
 Address Line 2 @*
 etc. @*
 Email: @EMAIL{user@@example.com,user AT example.com} @*
-URL: @url{http://www.example.com/} @*
+URL: @url{https://www.example.com/} @*
 
 @insertcopying
 @end ifnotdocbook
@@ -220,7 +218,7 @@ Text and chapter by chapter description here.
 
 @cindex Texinfo document formatting language
 This @value{DOCUMENT} is written in an enhanced version of
-@uref{http://www.gnu.org/software/texinfo/, Texinfo},
+@uref{https://www.gnu.org/software/texinfo/, Texinfo},
 the GNU documentation formatting language.
 A single Texinfo source file is used to produce both the printed and online
 versions of a program's documentation.
