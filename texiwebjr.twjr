@@ -200,7 +200,7 @@ on top of the Texinfo document formatting markup language.
 @menu
 * Preface::                        Preface.
 * Introduction::                   Introduction.
-* Example C Program::             
+* Example C Program::              An example C program using @value{TWJR}
 * jrtangle code::                  The code for @command{jrtangle}.
 * jrweave code::                   The code for @command{jrweave}.
 * Bootstrapping::                  Chicken and egg issues.
@@ -238,7 +238,7 @@ on top of the Texinfo document formatting markup language.
                                    @command{jrtangle}.
 * jrtangle error checking::        Checking for errors in @command{jrtangle}.
 * Expanding code chunks::          Expanding code chunks into straight code.
-* jrtangle expanding values::     
+* jrtangle expanding values::      Expanding values from @@set.
 * jrtangle before everything::     Doing something before extracting any
                                    files.
 * jrtangle avoiding update::       Leaving unmodified files alone.
@@ -350,8 +350,8 @@ had pointed him at literate programming. He created his @command{mweb} in
 For weaving, it used
 @command{markup} from @command{noweb} with a backend written
 (of course) in @command{mawk}, and a custom set of @TeX{} macros.
-This was certainly the largest body of literate code I have written
-to date.  (At this point, I don't recall the details of @command{mweb},
+This was certainly the largest body of literate code I had written
+before starting to work on @value{TWJR}  (At this point, I don't recall the details of @command{mweb},
 but undoubtedly it was an influence for @value{TWJR}) @c no period!
 
 In April of 2003, I used @command{noweb} to rewrite the input record
@@ -359,9 +359,23 @@ handling of @command{gawk}, considerably simplifying it in the process. To
 this day, there have been very few bugs in it, and it certainly qualifies
 as ``golden code.''
 
-Alas, though. I've done very little literate programming since, until now.
-I hope that this will be the start of a new phase for me, where I can write
+Alas, though. I'd done very little literate programming since then, until I
+finally decided to create @value{TWJR}
+My hope was that it would be the start of a new phase for me, where I can write
 code that will be appealing to read and enjoyable to write.
+
+As I write this, a little over 10 years have passed since @value{TWJR}
+became functional.  I have used it mostly for writing (or rewriting)
+@command{awk} programs, all of which are available from
+@uref{https://github.com/arnoldrobbins}.  @strong{FIXME:} List here.
+
+I'm proud of all of them; but of particular note is the rewrite I did of
+@code{texindex}, which ships with the Texinfo distribution.
+
+Recently, I have also used @value{TWJR} to write some C code, see
+@uref{https://github.com/arnoldrobbins/setsearch}.  I was pleased to find
+that literate programming was just as effective for C code as it's
+been for @command{awk} scripts.
 
 @node Audience
 @unnumberedsec Intended Audience
@@ -434,6 +448,10 @@ The @value{CHAPTER}s and what they cover are as follows.
 @c No period when TWJR ends a sentence, since it has a period in it.
 @ref{Introduction}, briefly introduces literate programming
 and describes some of the motivation for @value{TWJR}
+
+@ref{Example C Program} presents a small C progrm written
+in literate style, followed by the @value{TWJR} input
+for the prose and the program.
 
 @ref{jrtangle code}, presents the code for @command{jrtangle}, the
 ``tangling'' component of @value{TWJR}
@@ -534,17 +552,26 @@ for inventing the @command{awk} language.
 Richard M.@: Stallman for inventing the Texinfo markup language.
 
 @item
+@cindex Knuth, Donald E.@:
 Donald E.@: Knuth for inventing literate programming.
 
 @item
+@cindex Ramsey, Norman
 Norman Ramsey for inventing @command{noweb}.
 
 @item
+@cindex Pfaff, Ben
 Ben Pfaff for inventing the original TexiWeb.
 
 @item
 @cindex Berry, Karl
 Karl Berry for his infinite patience with my questions about
+and suggestions for Texinfo.
+
+@item
+@cindex Smith, Gavin
+Gavin Smith, the current Texinfo maintainer, for @emph{his}
+patience with my questions about
 and suggestions for Texinfo.
 
 @item
@@ -764,6 +791,7 @@ In this @value{CHAPTER} I use Texinfo unnumbered headings.
 In a larger ``real'' document, I would use Texinfo nodes and
 menues to fully structure the chapter.
 
+@c fakenode for prepinfo
 @unnumberedsec Introduction
 
 This is @command{echo}, Yet Another Implementation of the beloved Unix command.
@@ -778,6 +806,7 @@ and now POSIX argument parsing conventions, use @option{--} on the command
 line to get @command{echo} to treat any following arguments that begin with
 a dash as literal text.
 
+@c fakenode for prepinfo
 @unnumberedsec The High Level View
 
 The program has the following outline.
@@ -791,6 +820,7 @@ The program has the following outline.
 @<other functions@>
 @
 
+@c fakenode for prepinfo
 @unnumberedsec And On With The Show
 
 In a simple program like @command{echo}, it is often easiest to just
@@ -822,6 +852,7 @@ int suppress_newline = FALSE;	/* no final newline if TRUE */
 int do_escapes = FALSE;		/* process \x within strings */
 @
 
+@c fakenode for prepinfo
 @unnumberedsec The Main Program
 The job here is pretty straightforward. First, process any command
 line arguments, in order to set the values of the global flags
@@ -922,6 +953,7 @@ if (i < argc-1)
 
 And that's it for the main logic.
 
+@c fakenode for prepinfo
 @unnumberedsec Processing Escapes
 
 The last thing to do is write the function that handles escape
@@ -1024,6 +1056,7 @@ We also need to include the right header file to get @code{strchr()} declared.
 
 That's all folks!
 
+@c fakenode for prepinfo
 @unnumberedsec Critques
 
 Once the program is written and laid out, it becomes clear that
@@ -1047,6 +1080,7 @@ Finally, octal and hexadecimal escapes ought to be implemented, but
 for a first, example, program, I don't want to bother doing that, or
 fixing the above other problems.
 
+@c fakenode for prepinfo
 @unnumberedsec The Input For The Program
 
 Here is the @value{TWJR} input for the preceding program.
@@ -1336,6 +1370,16 @@ for a first, example, program, I don't want to bother doing that, or
 fixing the above other problems.
 @end smallexample
 
+@c fakenode for prepinfo
+@unnumberedsec Commentary
+
+@command{echo} is a small program and it doesn't fully demonstrate
+the power of literate programming.  Nonetheless, as a small introduction
+it serves well.  I think that the recording of the developer's thoughts
+as part of the programming process is important. It allows reviewers
+to participate more fully in the development process and therefore
+to give richer feedback.
+
 @node jrtangle code
 @chapter Tangling: The @command{jrtangle} Program
 
@@ -1369,7 +1413,7 @@ as a source file name and as a code chunk name.
 * jrtangle code chunks::        Processing code chunks for @command{jrtangle}.
 * jrtangle error checking::     Checking for errors in @command{jrtangle}.
 * Expanding code chunks::       Expanding code chunks into straight code.
-* jrtangle expanding values::  
+* jrtangle expanding values::   Expanding values from @@set.
 * jrtangle before everything::  Doing something before extracting any files.
 * jrtangle avoiding update::    Leaving unmodified files alone.
 * jrtangle shell debug::        Debugging shell commands run by
@@ -2452,7 +2496,7 @@ BEGIN {
 }
 @
 
-Note that it is is a bad idea to the shell's @code{$$} variable
+Note that it is is a bad idea to use the shell's @code{$$} variable
 for any of these values since the string returned to @command{gawk}
 for the destination file will not have it expanded!@footnote{Here too,
 guess how I found this out.}  If you really want something like
@@ -3229,6 +3273,8 @@ print "@c Let texinfo.tex give us full section titles"
 print "@xrefautomaticsectiontitle on"
 @
 
+@c -------------------------------------------------
+
 @node jrweave sidebars
 @subsection Providing Sidebars
 
@@ -3471,7 +3517,7 @@ Pass == 2 && /^@allowindexbraces[[:space:]]*$/ {
 }
 @
 
-As of at least April, 2019, and I think a bit earlier, the above
+As of at least April, 2019, the above
 command is neither necessary, nor accepted by @file{texinfo.tex};
 use it only on versions where it's needed.
 
@@ -3817,7 +3863,7 @@ if (n > 1) {	# embedded chunk names
 		chunk_being_used = \
 			format_chunk_name(name, Chunk_info[name]["chunk number"],
 				Chunk_info[name]["type"])
-		printf("@crindex %s, use @sortas{%s, use}\n", chunk_being_used, remove_markup(name))
+		printf("@crindex %s @subentry use @sortas{%s, use}\n", chunk_being_used, remove_markup(name))
 		y = y chunk_being_used
 		y = y parts[i+1]
 	}
@@ -3841,7 +3887,7 @@ chunk_being_defined = \
 	format_chunk_name(Current_chunk,
 						Chunk_info[Current_chunk]["chunk number"],
 						Chunk_type)
-printf("@cdindex %s, definition @sortas{%s, definition}\n",
+printf("@cdindex %s @subentry definition @sortas{%s, definition}\n",
 	chunk_being_defined, remove_markup(Current_chunk))
 printf("@noindent\n%s %s@equiv{}\n",
 	chunk_being_defined,
@@ -4859,6 +4905,12 @@ x
 @end ifnottex
 (@command{jrtangle} + @command{jrweave}).
 Of course, ultimately, this was a major improvement.
+
+@item
+On the other hand, where reusing a chunk makes sense,
+it mitigates the usual problems with copy/paste, since if
+a change is needed, it's automatically made everywhere that
+the code is use.
 
 @item
 Formatting the generated code to preserve indentation was a good
