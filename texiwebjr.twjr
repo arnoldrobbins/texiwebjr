@@ -1380,6 +1380,9 @@ as part of the programming process is important. It allows reviewers
 to participate more fully in the development process and therefore
 to give richer feedback.
 
+Also, I hope that this @value{CHAPTER} lets you see that Texinfo
+markup is not overly verbose or complicated.
+
 @node jrtangle code
 @chapter Tangling: The @command{jrtangle} Program
 
@@ -3273,18 +3276,23 @@ print "@c Let texinfo.tex give us full section titles"
 print "@xrefautomaticsectiontitle on"
 @
 
-@c -------------------------------------------------
-
 @node jrweave sidebars
 @subsection Providing Sidebars
 
 Sidebars are blocks of text with a title that are set off to the side in
 a printed book (or magazine). They address topics of tangential interest
 that are worth discussing but not necessarily part of the main flow of
-a section.  Since Texinfo doesn't support them, and I want to be able
-to have them, this code provides them. It collects the title and text,
-and outputs them twice, once for DocBook, and once for everything
-else using Texinfo's @code{@@cartouche} environment.
+a section.
+
+Originally, Texinfo did not support them.  Since I like sidebars,
+I had code that collected them and generated the proper Texinfo
+commands, for DocBook and for the other supported formats.
+
+As of Texinfo 7.1, sidebars were added via the simple expedient
+of allowing an optional title on the @code{@@cartouche} command line.
+The code here continues to support @code{@@sidebar} markup,
+mainly because by doing so we can automatically add indexing
+for all the sidebars.
 The title is provided on the opening @code{@@sidebar} line.
 
 @cindex @code{@@sidebar} command, @command{jrweave}
@@ -3299,26 +3307,12 @@ Pass == 2 && /^@sidebar[[:space:]]+/ {
 
 Pass == 2 && /^@end[[:space:]]+sidebar[[:space:]]*$/ {
 	Collecting_sidebar = FALSE
-	printf "@cindex sidebar, %s\n", Sidebar_title
-	printf "@ifdocbook\n"
-		printf "@docbook\n"
-		printf "<sidebar><title>%s</title>\n", Sidebar_title
-		printf "@end docbook\n"
-			print Sidebar_body
-		print ""
-		printf "@docbook\n"
-		printf "</sidebar>\n"
-		printf "@end docbook\n"
-	printf "@end ifdocbook\n\n"
-
-	printf "@ifnotdocbook\n"
-		printf "@cartouche\n"
-		printf "@center @b{%s}\n\n", Sidebar_title
-			print "@noindent"
-			sub(/^\n*/, "", Sidebar_body)	# remove initial newlines
-			print Sidebar_body
-		printf "@end cartouche\n"
-	printf "@end ifnotdocbook\n"
+	printf "@cindex sidebar @subentry %s\n", Sidebar_title
+	printf "@cartouche %s\n", Sidebar_title
+	print "@noindent"
+	sub(/^\n*/, "", Sidebar_body)	# remove initial newlines
+	print Sidebar_body
+	printf "@end cartouche\n"
 	Sidebar_body = ""
 	next
 }
@@ -3333,7 +3327,7 @@ Pass == 2 && Collecting_sidebar {
 This is a test sidebar, just to show what one looks like,
 and to make sure that the @command{jrweave} code works.
 
-And here is a second paragraph, to show that (in Texinfo) the first
+And here is a second paragraph, to show that the first
 paragraph of a sidebar is not indented, whereas subsequent ones are.
 @end sidebar
 
@@ -3524,19 +3518,9 @@ use it only on versions where it's needed.
 @node jrweave chunk indexes
 @section Creating Indices For Chunks
 
-@ignore
-Besides printing out the list of file definitions and code chunk
-definitions and references (@pxref{jrweave file defs}, and
-@pxref{jrweave code defs and refs}),
-@end ignore
-@command{jrweave} creates index entries for
-each chunk's definition(s) and use(s).  This provides
-@ignore
-another
-@end ignore
-an easy way
-way to
-find information, based on alphabetic lookup of a chunk name.
+@command{jrweave} creates index entries for each chunk's definition(s)
+and use(s).  This provides an easy way way to find information, based
+on alphabetic lookup of a chunk name.
 
 The index names are @samp{cd} for ``chunk definition'' and
 @samp{cr} for ``chunk reference.''
