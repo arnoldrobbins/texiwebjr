@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013, 2014, 2015, 2016, 2019 Arnold David Robbins
+# Copyright (C) 2013, 2014, 2015, 2016, 2019, 2024 Arnold David Robbins
 # 
 # This file is part of TexiWeb Jr., a literate programming system.
 # 
