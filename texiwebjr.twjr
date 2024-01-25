@@ -20,8 +20,8 @@
 @c This sets the edition of the document.
 
 @c These apply across the board.
-@set UPDATE-MONTH April, 2019
-@set EDITION 1.2
+@set UPDATE-MONTH January, 2024
+@set EDITION 1.3
 
 @set TITLE Literate Programming Made Easy
 @set SUBTITLE TexiWeb Jr.@:---A Super Simple Literate Programming System
@@ -63,9 +63,7 @@
 @macro ii{text}
 @i{\text\}
 @end macro
-@end ifnottex
 
-@ifnottex
 @macro MF{}
 @sc{METAFONT}
 @end macro
@@ -90,7 +88,6 @@
 @iftex
 @c @finalout
 @end iftex
-@c @cropmarks
 
 @copying
 @docbook
@@ -104,25 +101,25 @@ ISRAEL
 Email: <email>arnold@@skeeve.com</email>
 URL: <ulink url="https://www.skeeve.com/">https://www.skeeve.com/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016, 2018, 2019
+<literallayout class="normal">Copyright &copy; 2013, 2014, 2015, 2016, 2018, 2019, 2024
 Arnold David Robbins
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2013, 2014, 2015, 2016, 2018, 2019 @*
+Copyright @copyright{} 2013, 2014, 2015, 2016, 2018, 2019, 2024 @*
 Arnold David Robbins @*
 All Rights Reserved.
 @end ifnotdocbook
 @sp 1
 The @command{jrtangle} and @command{jrweave} programs are copyright
-@copyright{} 2013, 2014, 2015, 2016, 2018, 2019 by Arnold David Robbins.
+@copyright{} 2013, 2014, 2015, 2016, 2018, 2019, 2024 by Arnold David Robbins.
 They are published under the conditions of the GNU General Public License,
 version 3.
 @sp 1
 The @file{texiwebjr.twjr} literate source code file for
 @command{jrtangle} and @command{jrweave} is
-@copyright{} 2013, 2014, 2015, 2016, 2018, 2019 by Arnold David Robbins.
+@copyright{} 2013, 2014, 2015, 2016, 2018, 2019, 2024 by Arnold David Robbins.
 Starting at Edition 0.95 and forward,
 it is published under the conditions of the GNU General Public License,
 version 3.
@@ -2629,7 +2626,7 @@ and @command{jrweave}.
 @use_smallexample
 @<GPL 3 Copyright statement@>=
 #
-# Copyright (C) 2013, 2014, 2015, 2016, 2019 Arnold David Robbins
+# Copyright (C) 2013, 2014, 2015, 2016, 2019, 2024 Arnold David Robbins
 # 
 # This file is part of TexiWeb Jr., a literate programming system.
 # 
